@@ -1,0 +1,2 @@
+#Rule for symlinking LoRa radio module
+SUBSYSTEMS=="usb", ATTRS{product}=="Feather 32u4", SYMLINK+="LORA"

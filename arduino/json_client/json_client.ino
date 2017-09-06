@@ -1,10 +1,27 @@
+
+
 // Sample Arduino Json Web Client
 // Downloads and parse http://jsonplaceholder.typicode.com/users/1
 
 
-
+#include <Keyboard.h>
 #include <ArduinoJson.h>
 #include <SPI.h>
+
+const byte rows = 4; //four rows
+const byte cols = 4; //three columns
+char keys[rows][cols] = {
+  {'1','2','3', 'A'},
+  {'4','5','6', 'B'},
+  {'7','8','9', 'C'},
+  {'#','0','*', 'D'}
+};
+byte rowPins[rows] = {5, 4, 3, 2}; //connect to the row pinouts of the keypad
+byte colPins[cols] = {8, 7, 6}; //connect to the column pinouts of the keypad
+String key_str = "";
+unsigned long code_timer;
+unsigned long CODE_TIMER_THRESH = 20000; //20sec
+Keypad keypad = Keypad( makeKeymap(keys), rowPins, colPins, rows, cols );
 
 const char* server = "houseslave";  // server's address
 const char* resource = "/users/1";                    // http resource
@@ -24,8 +41,46 @@ void setup() {
   Serial.println("Serial ready");
 }
 
+void actuate(){
+  //
+}
+
+bool test_input(){
+  
+}
+
 // ARDUINO entry point #2: runs over and over again forever
 void loop() {
+  //************************ KEYPAD ENTRY  ******************************
+  //timeout for key presses
+  if (millis() - code_timer > CODE_TIMER_THERESH){
+    key_str = "";
+  }
+  char key = keypad.getKey();
+  if(key == '#'){
+    //test for valid key_str via json request
+    if (test_input()){
+      //open door or blink red light if wrong
+      //actuate();
+    }
+
+    //perform json put to advise server that code has been used/attempt has been made
+    //reset key_str
+    key_str = "";
+  }
+  if(key){
+    code_timer = millis();
+    key_str =+ key;
+    #ifdef debug
+      Serial.print("Key string is: ");
+      Serial.println(key_str);
+    #endif
+  }
+
+  //******************** MQTT ENTRY  ****************************
+
+
+  //*******************  RFID ENTRY  *****************************
   if (connect(server)) {
     if (sendRequest(server, resource) && skipResponseHeaders()) {
       UserData userData;

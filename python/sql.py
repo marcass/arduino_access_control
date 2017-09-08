@@ -1,6 +1,5 @@
 import matplotlib
 matplotlib.use('Agg')
-import users
 import pytz
 import sys
 import time
@@ -63,6 +62,38 @@ def build_user_dict_query():
     burner = [i[7] for i in ret]
     enabled = [i[8] for i in ret]
     ret_dict = {'createtime':createtime, 'name':name, 'username':username, 'keycode':keycode, 'keycode_en':keycode_en, 'mqtt_id':mqtt_id, 'mqtt_id_en':mqtt_id_en, 'burner':burner, 'enabled':enabled}
+    print ret_dict
+    return ret_dict
+
+def build_allowed_keys():
+    conn, c = get_db()
+    c.execute("SELECT * FROM doorUsers")
+    ret = c.fetchall()
+    name = [i[1] for i in ret]
+    username = [i[2] for i in ret]
+    keycode = [i[3] for i in ret]
+    keycode_en = [i[4] for i in ret]
+    mqtt_id = [i[5] for i in ret]
+    mqtt_id_en = [i[6] for i in ret]
+    burner = [i[7] for i in ret]
+    enabled = []
+    for i in ret:
+        #user enabled?
+        if i[8] == 1:
+            #keycode enabled?
+            if i[4] == 1:
+                enabled.append(i[3])
+    burner_key_list = []
+    burner_username = []
+    for a in ret:
+        #burner?
+        if a[7] == 1:
+            burner_key_list.append(a[3])
+            burner_username.append(a[2])
+    burner = {'keys':burner_key_list, 'username':burner_username}
+    print 'burner '+str(burner)
+    print 'enabled '+str(enabled)
+    ret_dict = {'enabled':enabled, 'burner':burner}
     print ret_dict
     return ret_dict
     

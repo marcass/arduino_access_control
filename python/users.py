@@ -56,4 +56,4 @@ class User:
 #mqtt_id_list = [i.mqtt_id for i in USER_LIST]
 #username_by_keycode = {i.keycode : i.username for in USER_LIST}
 
-m = User('Marcus Wells', 'marcass', str('1234A'), 1, str('mqttdash-mi4c'), 1, 0, 1)
+p = User('Pellets', 'pell', str('111111'), 1, str('phone'), 1, 1, 1)

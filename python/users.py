@@ -1,38 +1,59 @@
-import pickle
-
-#need to pickle data for future retrieval in case of restart
+import sql
 
 class User:
-    global ALWAYS_ALLOWED_KEYS_LIST, BURN_KEYS_LIST, USER_LIST, username_list, mqtt_id_list, username_by_keycode
-    def __init__(self, name, username, keycode, mqtt_id, burner):
-        self.name = name
-        self.username = username
-        if self.username in username_list:
-            raise exception(self.username)
-        self.keycode = keycode
-        if (self.keycode in ALWAYS_ALLOWED_KEYS_LIST) or(self.keycode in BURN_KEYS_LIST) :
-            raise exception(self.keycode)        
-        self.mqtt_id = mqtt_id
-        if self.mqtt_id in mqtt_id_list:
-            raise exception(self.mqtt_id)
-        self.burner = burner
+    sql.setup_db()
+    def __init__(self, name, username, keycode, keycode_en, mqtt_id, mqtt_id_en, burner, enabled):
+        self.name = self.add_item('name', name)
+        self.username = self.add_item('username', username)
+        self.keycode = self.add_item('keycode', keycode)
+        self.keycode_en = self.add_item('keycode_en', keycode_en)
+        self.mqtt_id = self.add_item('mqtt_id', mqtt_id)
+        self.mqtt_id_en = self.add_item('mqtt_id_en', mqtt_id_en)
+        self.burner = self.add_item('burner', burner)
+        self.enabled = self.add_item('enabled', enabled)
+        sql.add_user(self.name, self.username, self.keycode, self.keycode_en, self.mqtt_id, self.mqtt_id_en, self.burner, self.enabled)
         
-    USER_LIST.append(self)
-        
-    if burner = True:
-        BURN_KEYS_LIST.append(self.keycode)
-        
-    if burner = False:
-        ALWAYS_ALLOWED_KEYS_LIST.append(self.keycode)
-        
-    def exception(item):
-        print item+' is not unique. Please try again'
+    def add_item(self, var_name, item):
+        d = sql.build_user_dict_query()
+        error = 0
+        if (var_name == 'keycode') or (var_name == 'mqtt_id') or (var_name == 'name') or (var_name == 'username'):
+            #print type(item)
+            if type(item) is not str:
+                print 'invalid data type (not str) '+var_name
+                error = 1
+            try:
+                print d[var_name]
+                if item in d[var_name]:
+                    print 'entry already exists'
+                    error = 1
+                else:
+                    print 'not found in dict, returning item'
+                    return item
+            except:
+                print 'exception, returning item'
+                return item
+        if (var_name == 'burner') or (var_name == 'mqtt_id_en') or (var_name == 'keycode_en') or (var_name == 'enabled'):
+            print 'booleans'
+            if type(item) is not int:
+                print 'invalid data type (not int)'
+                error = 1
+            else:
+                print 'returning '+var_name+' = '+str(item)
+                return item
+        if error == 1:
+            raise Exception
 
-ALWAYS_ALLOWED_KEYS_LIST = ['1234','5123']
-BURN_KEYS_LIST = ['0000',]
-USER_LIST = []
-username_list = [i.name for i in USER_LIST]
-mqtt_id_list = [i.mqtt_id for i in USER_LIST]
-username_by_keycode = {i.keycode : i.username for in USER_LIST}
+    #USER_LIST.append(self)
+        
+    #def exception(self, item, value):
+        #print item+' is not a unique '+value+'. Please try again'
+        
 
-m = User('Marcus Wells', 'marcass', '1234A', 'mqttdash-mi4c', False)
+#ALWAYS_ALLOWED_KEYS_LIST = ['1234','5123']
+#BURN_KEYS_LIST = ['0000',]
+#USER_LIST = []
+#username_list = [i.name for i in USER_LIST]
+#mqtt_id_list = [i.mqtt_id for i in USER_LIST]
+#username_by_keycode = {i.keycode : i.username for in USER_LIST}
+
+m = User('Marcus Wells', 'marcass', str('1234A'), 1, str('mqttdash-mi4c'), 1, 0, 1)

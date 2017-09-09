@@ -33,6 +33,8 @@
 #curl -X PUT -H "Content-Type: application/json" -d '{"status":"open"}' http://127.0.0.1:5000/doorstatus
 # Response:  {  "doorstatus": "open"}
 
+#curl -X GET -H "Content-Type: application/json" -d '{"days":"10"}' http://127.0.0.1:5000/getlog
+# Response:  {  log stuff in here }
 
 import re
 import sql
@@ -51,10 +53,12 @@ def use_key(key):
             c.execute("UPDATE doorUsers SET enabled=? WHERE username=?", (0, 'burner'))
             conn.commit()
         print 'username = '+d['key_name'][key]
-        sql.insert_actionLog('Pinpad', key, d['key_name'][key])
+        x = sql.insert_actionLog('Pinpad', key, d['key_name'][key])
+        print x
         return True
     else:
-        sql.insert_actionLog('Pinpad', key)
+        x = sql.insert_actionLog('Pinpad', key)
+        print x
         return False
 
 def add_user_to_db(username, keycode, enabled, timeStart, timeEnd):
@@ -66,13 +70,10 @@ def add_user_to_db(username, keycode, enabled, timeStart, timeEnd):
         sql.add_user(username, keycode, enabled, timeStart, timeEnd)
         return True
 
-
-def add_to_keys(key, typeburnkey=True):
-    global ALWAYS_ALLOWED_KEYS_LIST, BURN_KEYS_LIST
-    if typeburnkey:
-        BURN_KEYS_LIST.append(key)
-    else:
-        ALWAYS_ALLOWED_KEYS_LIST.append(key)
+def get_access_log(days):
+    d = sql.get_doorlog(days)
+    return d
+    
         
 
 sql.setup_db()
@@ -126,5 +127,12 @@ def update_status():
     status = content["status"]
     sql.update_doorstatus(status)
     resp = {"doorstatus":status}
+    return jsonify(resp), 200
+
+@app.route("/getlog", methods=['GET',])
+def getAccessLog():
+    content = request.get_json(silent=False)
+    days = content['days']
+    resp = get_access_log(days)
     return jsonify(resp), 200
     

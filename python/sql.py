@@ -25,7 +25,7 @@ def setup_db():
     conn, c = get_db()
     #type is of 'mqtt', 'keycode' or 'rfid'
     c.execute('''CREATE TABLE IF NOT EXISTS actionLog
-                    (actiontime TIMESTAMP, message TEXT, type TEXT)''')
+                    (timestamp TIMESTAMP, message TEXT, type TEXT)''')
     c.execute('''CREATE TABLE IF NOT EXISTS doorUsers
                     (username TEXT, keycode TEXT, enabled INTEGER, timeStart TIMESTAMP, timeEnd TIMESTAMP )''')
     c.execute('''CREATE TABLE IF NOT EXISTS doorStates
@@ -37,6 +37,33 @@ def update_doorstatus(status):
     utcnow = datetime.datetime.utcnow()
     c.execute("INSERT INTO doorStates VALUES (?,?)", (utcnow,status) )
     conn.commit()
+    
+def get_doorlog(days):
+    conn, c = get_db()
+    conn1, c1 = get_db()
+    days = int(days)
+    print days
+    #c.execute("SELECT * FROM doorStates actionLog WHERE timestamp BETWEEN datetime('now', '-%i days') AND datetime('now','localtime')" % (days))
+    c.execute("SELECT * FROM actionLog WHERE timestamp BETWEEN datetime('now', '-%i days') AND datetime('now','localtime')" % (days))
+    ret = c.fetchall()
+    timestamp_action = [localtime_from_response(i[0]) for i in ret]
+    message = [i[1] for i in ret]
+    actionType = [i[2] for i in ret]
+    dump = []
+    for a in ret:
+        dump = dump+[a[0],a[1],a[2]]
+    c1.execute("SELECT * FROM doorStates WHERE timestamp BETWEEN datetime('now', '-%i days') AND datetime('now','localtime')" % (days))
+    got = c1.fetchall()
+    timestamp_open = [localtime_from_response(i[0]) for i in got]
+    state = [i[1] for i in got]
+    dump1 = []
+    for x in got:
+        dump1 = dump1 + [x[0], x[1]]
+    ret_dict = {"actions":dump, "states":dump1}
+    #ret_dict = {"time door changed":timestamp_open, "detail":[state,timestamp_action,message, actionType]}
+    return ret_dict
+    
+    
     
 def add_user(username, keycode, enabled, timeStart, timeEnd):
     # Insert a row of data
@@ -62,6 +89,7 @@ def insert_actionLog(access_type, pin=None, username='Someone'):
     c.execute("INSERT INTO actionLog VALUES (?,?,?)",\
         (datetime.datetime.utcnow(), message, access_type) )
     conn.commit()
+    return message
 
 def localtime_from_response(resp):
     ts = datetime.datetime.strptime(resp, "%Y-%m-%d %H:%M:%S.%f")

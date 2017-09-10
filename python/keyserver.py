@@ -2,7 +2,7 @@
 #- front end https://auth0.com/blog/vuejs2-authentication-tutorial/
 
 # USAGE:
-# INSTALL: sudo pip install flask
+# INSTALL: sudo pip install flask flask-cors
 # START API with:
 #    FLASK_APP=keyserver.py flask run
 
@@ -22,7 +22,7 @@
 # curl -X POST -H "Content-Type: application/json" -d '{"door":"topgarage", "pincode":"1111"}' http://127.0.0.1:5000/usekey
 # Response:  {"pin_correct": False} # NOW FALSE because it was a burn code!
 
-# curl -X POST -H "Content-Type: application/json" -d '{"username": "max", "keycode": "AAB23", "doorlist":["topgarage",  "frontdoor", "bottomgarage"], "enabled":"1"}' http://127.0.0.1:5000/addkey
+# curl -X POST -H "Content-Type: application/json" -d '{"username": "max", "keycode": "AAB23", "doorlist":["topgarage",  "frontdoor", "bottomgarage"], "enabled":"1"}' http://127.0.0.1:5000/user
 # Response:  {  "Status": "Added key" }
 
 # curl -X POST -H "Content-Type: application/json" -d '{"username": "burner", "keycode": "1111", "doorlist":["topgarage",  "frontdoor", "bottomgarage"], "enabled":"1"}' http://127.0.0.1:5000/addkey
@@ -41,14 +41,8 @@
 import re
 import sql
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 
-def get_allowed_users():
-    d = sql.build_allowed_users()
-    return d
-
-def get_all_keys():
-    d = sql.build_all_keys()
-    return d
 
 def use_key(key, door):
     d = sql.validate_key(key, door)
@@ -85,11 +79,10 @@ def add_user_to_db(username, keycode, enabled, doorlist, timeStart, timeEnd):
 def get_access_log(days):
     d = sql.get_doorlog(days)
     return d
-    
-        
 
 sql.setup_db()
 app = Flask(__name__)
+CORS(app)
 
 @app.route("/")
 def hello():
@@ -105,13 +98,10 @@ def getStatus():
 
 @app.route("/listallowed", methods=['GET',])
 def list_allowed_keys():
-    resp = get_allowed_users()
+    #resp = sql.build_allowed_users()
+    resp = {}
     return jsonify(resp), 200
 
-@app.route("/listall", methods=['GET',])
-def list_all_keys():
-    resp = get_all_keys()
-    return jsonify(resp), 200
 
 @app.route("/usekey", methods=['POST',])
 def usekey():
@@ -124,10 +114,13 @@ def usekey():
         resp = {'pin_correct':False}
     return jsonify(resp), 200
 
-@app.route("/addkey", methods=['POST',])
-def addkey():
+@app.route("/user", methods=['POST',])
+def add_user():
+    '''
+    Add a new user to everything.
+    '''
     content = request.get_json(silent=False)
-    #{"username":pell", "keycode":"00003", "doorlist":{"topgarage":"1",  "frontdoor":"1", "bottomgarage":"1"}, "enabled":"1"}
+    #{"username":pell", "keycode":"00003", "doorlist":["topgarage","frontdoor","bottomgarage"], "enabled":"1"}
     timeStart = None
     timeEnd = None
     if content.has_key('timeStart'):
@@ -145,6 +138,117 @@ def addkey():
     else:
         resp = {'Status':'Did not at key for {}. Pin must use numbers 1-9 and letters A-D and be at between 4 and 10 alphanumeric characters long'.format(content['username'])}
     return jsonify(resp), 200
+
+
+@app.route("/user", methods=['DELETE',])
+def remove_user():
+    '''
+    Remove Username in user doorUsers table, and update all tables...
+    '''
+    content = request.get_json(silent=False)
+    content['username']
+    resp = {}
+    return jsonify(resp), 200
+
+
+@app.route("/user", methods=['PUT',])
+def update_user():
+    '''
+    Select Username and update in user doorUsers table
+    '''
+    content = request.get_json(silent=False)
+    content['username']
+    content['keycode']
+    content['enabled']
+    content['timeStart']
+    content['timeEnd']
+    resp = {}
+    return jsonify(resp), 200
+
+@app.route("/user/keycode", methods=['PUT',])
+def update_user_keycode():
+    '''
+    Select Username and update in user doorUsers table
+    '''
+    content = request.get_json(silent=False)
+    content['username']
+    content['keycode']
+    resp = {}
+    return jsonify(resp), 200
+
+@app.route("/user/enabled", methods=['PUT',])
+def update_user_enabled():
+    '''
+    Select Username and update in user doorUsers table
+    '''
+    content = request.get_json(silent=False)
+    content['username']
+    content['enabled']
+    resp = {}
+    return jsonify(resp), 200
+
+@app.route("/user/timestart", methods=['PUT',])
+def update_user_timestart():
+    '''
+    Select Username and update in user doorUsers table
+    '''
+    content = request.get_json(silent=False)
+    content['username']
+    content['timeStart']
+    resp = {}
+    return jsonify(resp), 200
+
+@app.route("/user/timeend", methods=['PUT',])
+def update_user_timeend():
+    '''
+    Select Username and update in user doorUsers table
+    '''
+    content = request.get_json(silent=False)
+    content['username']
+    content['timeEnd']
+    resp = {}
+    return jsonify(resp), 200
+
+@app.route("/user/doors", methods=['PUT',])
+def update_user_doors():
+    '''
+    Select Username and update canOpen table
+    '''
+    content = request.get_json(silent=False)
+    content['username']
+    content['doors']
+    resp = {}
+    return jsonify(resp), 200
+
+
+@app.route("/user", methods=['GET',])
+def get_user():
+    '''
+    Returns {'username':, 'keycode':, enabled:'', timeStart:, timeEnd, doors: [...]}
+    '''
+    content = request.get_json(silent=False)
+    content['username']
+    resp = {}
+    return jsonify(resp), 200
+
+@app.route("/users", methods=['GET',])
+def get_users():
+    '''
+    Returns [{'username':, 'keycode':, enabled:'', timeStart:, timeEnd, doors: [...]}, {...}, ...]
+    '''
+    resp = sql.get_all_users()
+    return jsonify(resp), 200
+
+@app.route("/doors", methods=['GET',])
+def get_doors():
+    '''
+    Returns all possible door names in db as a list['door1','door2',...]
+    '''
+    resp = 
+    return jsonify(sql.get_all_doors()), 200
+
+
+
 
 @app.route("/doorstatus", methods=['PUT',])
 def update_status():

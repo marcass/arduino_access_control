@@ -37,11 +37,40 @@ def setup_db():
                     (door TEXT, userallowed TEXT, FOREIGN KEY(door) REFERENCES doorID(door_id), FOREIGN KEY(userallowed) REFERENCES doorUsers(username) )''')
     conn.commit() # Save (commit) the changes
 
-def build_allowed_users():
-    utcnow = datetime.datetime.utcnow()
+def get_usernames():
     conn, c = get_db()
-    c.execute("SELECT * FROM canOpen WHERE userallowed IN (SELECT username FROM doorUsers WHERE enabled=1 AND ? BETWEEN timeStart AND timeEnd)", (utcnow,))
-    ret = c.fetchall()
+    c.execute("SELECT username FROM doorUsers")
+    ret = [i[0] for i in c.fetchall()]
+    print ret
+    return ret
+
+def get_all_doors():
+    conn, c = get_db()
+    c.execute("SELECT * FROM doorID ")
+    ret =  [i[0] for i in c.fetchall()]
+    return ret
+
+#def build_allowed_users():
+    #utcnow = datetime.datetime.utcnow()
+    #conn, c = get_db()
+    #ret = []
+    ##c.execute("SELECT * FROM canOpen WHERE userallowed IN (SELECT username FROM doorUsers WHERE enabled=1 AND ? BETWEEN timeStart AND timeEnd)", (utcnow,))
+        #ret = c.fetchall()
+        
+    #temp = [{'username':i[1],'door':i[0]} for i in ret]
+    #{'username':u} for u in temp
+    #return ret
+
+def get_all_users():
+    conn, c = get_db()
+    ret = []
+    for username in get_usernames():
+        print username
+        c.execute("SELECT * FROM doorUsers WHERE username=?", (username,))
+        res = c.fetchall()[0]    
+        c.execute("SELECT door FROM canOpen WHERE userallowed=?", (username,))
+        doors =  [i[0] for i in c.fetchall()]
+        ret.append({'username': res[0], 'keycode': res[1], 'enabled': res[2], 'times' : {'start':res[3][:-3].replace(' ','T')+'Z','end':res[4][:-3].replace(' ','T')+'Z'}, 'doors':doors})
     return ret
 
 def update_doorstatus(status, door):
@@ -146,8 +175,9 @@ def build_all_keys():
     conn, c = get_db()
     c.execute("SELECT * FROM doorUsers")
     ret = c.fetchall()
-    print ret
-    return ret
+    res = [{'username': i[0], 'keycode': i[1], 'enabled': i[2], 'times' : {'start':i[3],'end':i[4]}} for i in ret]
+    print res
+    return res
     
 def query_via_user(user, days_str, q_range):
     time_range = int(days_str)
@@ -184,9 +214,14 @@ def query_via_type(in_type, days_str, q_range):
 
 def setup_doors():
     conn, c = get_db()
-    for i in door_setup.doors:
-        c.execute("INSERT INTO doorID VALUES (?)", (i,) )
-    conn.commit()
+    c.execute("SELECT * FROM doorID")
+    if len(c.fetchall()) > 0:
+        return
+    else:
+        for i in door_setup.doors:
+            c.execute("INSERT INTO doorID VALUES (?)", (i,) )
+        conn.commit()
+        
 
 setup_db()
 setup_doors()

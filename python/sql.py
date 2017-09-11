@@ -47,17 +47,13 @@ def get_allowed():
     door_list = get_all_doors()
     ret_dict = {'doors':doors, 'users':users}
     res_dict = {}
-    user_list = []
     for i in door_list:
-        try:
-
-            user_list.append(ret_dict['users'][ret_dict['doors'].index(i)])
-
-            # res_dict.update({i:ret_dict['users'][ret_dict['doors'].index(i)]})
-            # index = a_list.index(search_term)
-        except:
-            pass
-    return ret_dict
+        user_list = []
+        for c, value in enumerate(ret_dict['doors']):
+            if value == i:
+                user_list.append(ret_dict['users'][c])
+        res_dict.update({i:user_list})
+    return res_dict
 
 def update_doorUsers(user, column, value):
     conn, c = get_db()
@@ -123,9 +119,9 @@ def delete_user(user):
 
 def fetch_user_data(user):
     conn, c = get_db()
-    c.execute("SELECT * FROM doorUsers WHERE username=?", (username,))
+    c.execute("SELECT * FROM doorUsers WHERE username=?", (user,))
     res = c.fetchall()[0]
-    c.execute("SELECT door FROM canOpen WHERE userallowed=?", (username,))
+    c.execute("SELECT door FROM canOpen WHERE userallowed=?", (user,))
     doors =  [i[0] for i in c.fetchall()]
     ret = ({'username': res[0], 'keycode': res[1], 'enabled': res[2], 'times' : {'start':res[3][:-3].replace(' ','T')+'Z','end':res[4][:-3].replace(' ','T')+'Z'}, 'doors':doors})
     return ret

@@ -11,7 +11,7 @@
 
 # curl -X GET http://127.0.0.1:5000/listallowed
 
-# curl -X GET http://127.0.0.1:5000/getstatus
+# curl -X GET http://127.0.0.1:5000/door/status
 
 # curl -X POST -H "Content-Type: application/json" -d '{"door":"topgarage", "pincode":"000"}' http://127.0.0.1:5000/usekey
 # Response: {"pin_correct": False}
@@ -27,6 +27,8 @@
 
 # curl -X POST -H "Content-Type: application/json" -d '{"username": "mw", "keycode": "1111", "doorlist":["topgarage",  "frontdoor"], "enabled":"1"}' http://127.0.0.1:5000/user
 
+# curl -X POST -H "Content-Type: application/json" -d '{"username": "burner", "keycode": "1111", "doorlist":["topgarage"], "enabled":"1"}' http://127.0.0.1:5000/user
+
 # curl -X POST -H "Content-Type: application/json" -d '{"username": "burner", "keycode": "1111", "doorlist":["topgarage",  "frontdoor", "bottomgarage"], "enabled":"1"}' http://127.0.0.1:5000/addkey
 # Response:  {  "Status": "Added key" }
 
@@ -39,6 +41,8 @@
 
 #curl -X GET -H "Content-Type: application/json" -d '{"days":"10"}' http://127.0.0.1:5000/getlog
 # Response:  {  log stuff in here }
+
+# curl -X DELETE -H "Content-Type: application/json" -d '{"username":"mw"}' http://127.0.0.1:5000/user
 
 import re
 import sql
@@ -84,19 +88,22 @@ def get_access_log(days):
 
 def username_validation(user):
     users = sql.get_doorUser_col('username')
+    print user
+    print users
     if user in users:
-        return 'Invalid. Already in use'
+        print 'found it'
+        return False
     else:
-        return user
+        return True
 
 def keycode_validation(keycode):
     keycodes = sql.get_doorUser_col('keycode')
     if keycode in keycodes:
         return 'Invalid. Already in use'
     if (len(keycode) > 3) and (len(keycode) < 11) and (re.match("^[A-D1-9]+$", keycode)):
-        return keycode
+        return True
     else:
-        return 'Invalid. Pin must use numbers 1-9 and letters A-D and be at between 4 and 10 alphanumeric characters long'
+        return False
 
 sql.setup_db()
 app = Flask(__name__)
@@ -145,8 +152,10 @@ def add_user():
         timeEnd = content['timeEnd'] # parse this to datetime
     else:
         content.update({'timeEnd':0})
-    u = username_validation(content['username'])
-    v = keycode_validation(content['keycode'])
+    if not username_validation(content['username']):
+        return jsonify({'Status':'username failure'}), 200
+    if not keycode_validation(content['keycode']):
+        return jsonify({'Status':'keycode failure'}), 200
     #resp = {'username':u, 'keycode':v, 'timeStart':timeStart, 'timeEnd':timeEnd, 'doorlist':doorlist, 'enabled':content['enabled']}
     sql.write_userdata(content)
     return jsonify(content), 200
@@ -155,6 +164,7 @@ def add_user():
 def remove_user():
     '''
     Remove Username in user doorUsers table, and update all tables...
+    {'username':'mw'}
     '''
     content = request.get_json(silent=False)
     user = content['username']

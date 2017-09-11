@@ -34,12 +34,44 @@ def setup_db():
     c.execute('''CREATE TABLE IF NOT EXISTS doorStates
                     (timestamp TIMESTAMP, door TEXT, state TEXT )''')
     c.execute('''CREATE TABLE IF NOT EXISTS canOpen
-                    (door TEXT, userallowed TEXT, FOREIGN KEY(door) REFERENCES doorID(door_id), FOREIGN KEY(userallowed) REFERENCES doorUsers(username) )''')
+                    (door TEXT, userallowed TEXT, FOREIGN KEY(door) REFERENCES doorID(door_id), FOREIGN KEY(userallowed) REFERENCES doorUsers(username) ON DELETE CASCADE)''')
     conn.commit() # Save (commit) the changes
+
+def update_doorUsers(user, column, value):
+    conn, c = get_db()
+    c.execute("UPDATE doorUsers SET %s=? WHERE username=?", %(column), (value, user))
+    conn.commit()
+
+def write_userdata(resp):
+    conn, c = get_db()
+    #delete old data in table then update all userdata in doorUsers
+    try:
+        c.execute("DELETE FROM doorUsers WHERE username=?", (resp['old_user'])
+    except:
+        pass
+    c.execute("INSERT INTO doorUsers VALUES (?,?,?,?,?)",(resp['username'], resp['keycode'], resp['enabled'], resp['timeStart'], resp['timeEnd']))
+    update_canOpen(resp['username'], resp['doorlist'])
+    conn.commit()
+
+def update_canOpen(user, doors):
+    conn, c = get_db()
+    #flush detail from canOpen then rewrite it
+    c.execute("DELETE FROM canOpen WHERE userallowed=?", (user,))
+    if len(doors) > 0:
+        for i in doors:
+            c.execute("INSERT INTO canOpen VALUES (?,?)", (i, resp['username']))
+    conn.commit()
 
 def get_usernames():
     conn, c = get_db()
     c.execute("SELECT username FROM doorUsers")
+    ret = [i[0] for i in c.fetchall()]
+    print ret
+    return ret
+
+def get_keycodes():
+    conn, c = get_db()
+    c.execute("SELECT keycode FROM doorUsers")
     ret = [i[0] for i in c.fetchall()]
     print ret
     return ret
@@ -50,16 +82,15 @@ def get_all_doors():
     ret =  [i[0] for i in c.fetchall()]
     return ret
 
-#def build_allowed_users():
-    #utcnow = datetime.datetime.utcnow()
-    #conn, c = get_db()
-    #ret = []
-    ##c.execute("SELECT * FROM canOpen WHERE userallowed IN (SELECT username FROM doorUsers WHERE enabled=1 AND ? BETWEEN timeStart AND timeEnd)", (utcnow,))
+#special sql query. Look at that trickiness!
+#c.execute("SELECT * FROM canOpen WHERE userallowed IN (SELECT username FROM doorUsers WHERE enabled=1 AND ? BETWEEN timeStart AND timeEnd)", (utcnow,))
         #ret = c.fetchall()
-        
-    #temp = [{'username':i[1],'door':i[0]} for i in ret]
-    #{'username':u} for u in temp
-    #return ret
+
+def delete_user(user):
+    conn, c = get_db()
+    #cascade delete in canOpen table (set in table initialisation)
+    c.execute("DELETE FROM doorUsers WHERE username=?", (user,))
+    conn.commit()
 
 def get_all_users():
     conn, c = get_db()
@@ -67,7 +98,7 @@ def get_all_users():
     for username in get_usernames():
         print username
         c.execute("SELECT * FROM doorUsers WHERE username=?", (username,))
-        res = c.fetchall()[0]    
+        res = c.fetchall()[0]
         c.execute("SELECT door FROM canOpen WHERE userallowed=?", (username,))
         doors =  [i[0] for i in c.fetchall()]
         ret.append({'username': res[0], 'keycode': res[1], 'enabled': res[2], 'times' : {'start':res[3][:-3].replace(' ','T')+'Z','end':res[4][:-3].replace(' ','T')+'Z'}, 'doors':doors})
@@ -78,7 +109,7 @@ def update_doorstatus(status, door):
     utcnow = datetime.datetime.utcnow()
     c.execute("INSERT INTO doorStates VALUES (?,?,?)", (utcnow,door,status) )
     conn.commit()
-    
+
 def get_doorlog(days):
     conn, c = get_db()
     conn1, c1 = get_db()
@@ -103,9 +134,9 @@ def get_doorlog(days):
     ret_dict = {"actions":dump, "states":dump1}
     #ret_dict = {"time door changed":timestamp_open, "detail":[state,timestamp_action,message, actionType]}
     return ret_dict
-    
-    
-    
+
+
+
 def add_user(username, keycode, doors, enabled, timeStart, timeEnd):
     # Insert a row of data
     conn, c = get_db()
@@ -119,7 +150,7 @@ def add_user(username, keycode, doors, enabled, timeStart, timeEnd):
     for i in doors:
         c.execute("INSERT INTO canOpen VALUES (?,?)", (i, username) )
     conn.commit() # Save (commit) the changes
-    
+
 def insert_actionLog(access_type, door, pin=None, username='Someone'):
     if username is not 'Someone':
         pin = '****'
@@ -170,7 +201,7 @@ def validate_key(key, door):
             return user
         except:
             return None
-     
+
 def build_all_keys():
     conn, c = get_db()
     c.execute("SELECT * FROM doorUsers")
@@ -178,7 +209,7 @@ def build_all_keys():
     res = [{'username': i[0], 'keycode': i[1], 'enabled': i[2], 'times' : {'start':i[3],'end':i[4]}} for i in ret]
     print res
     return res
-    
+
 def query_via_user(user, days_str, q_range):
     time_range = int(days_str)
     plot_range = days_str+' '+q_range
@@ -193,7 +224,7 @@ def query_via_user(user, days_str, q_range):
     name = [i[1] for i in ret]
     access_type = [i[3] for i in ret]
     ret_dict = {'timestamp':accesstime, 'username':username, 'name':name, 'access_type':access_type, 'burner':burner}
-    print ret_dict 
+    print ret_dict
     return ret_dict
 
 def query_via_type(in_type, days_str, q_range):
@@ -209,7 +240,7 @@ def query_via_type(in_type, days_str, q_range):
     access_type = [i[3] for i in ret]
     burner = [i[4] for i in ret]
     ret_dict = {'timestamp':accesstime, 'username':username, 'name':name, 'access_type':access_type, 'burner':burner}
-    print ret_dict 
+    print ret_dict
     return ret_dict
 
 def setup_doors():
@@ -221,7 +252,7 @@ def setup_doors():
         for i in door_setup.doors:
             c.execute("INSERT INTO doorID VALUES (?)", (i,) )
         conn.commit()
-        
+
 
 setup_db()
 setup_doors()

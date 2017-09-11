@@ -50,7 +50,7 @@ def use_key(key, door):
         x = sql.insert_actionLog('Pinpad', door, key)
         print x
         return False
-    else:       
+    else:
         if d == 'burner':
             print 'user tested true for burner'
             conn, c = sql.get_db()
@@ -61,24 +61,40 @@ def use_key(key, door):
         print 'username = '+str(d)+' for '+door
         y = sql.insert_actionLog('Pinpad', door, key, d)
         print y
-        return True        
-
-def add_user_to_db(username, keycode, enabled, doorlist, timeStart, timeEnd):
-    sql.setup_db()
-    d = sql.build_user_dict_query()
-    print d
-    if (keycode in d['keycode']) or username in d['username']:
-        print 'failed to add user as exists'
-        return False
-    else:
-        print 'moving on down'
-        print doorlist
-        sql.add_user(username, keycode, doorlist, enabled, timeStart, timeEnd)
         return True
+
+# def add_user_to_db(username, keycode, enabled, doorlist, timeStart, timeEnd):
+#     sql.setup_db()
+#     d = sql.build_user_dict_query()
+#     print d
+#     if (keycode in d['keycode']) or username in d['username']:
+#         print 'failed to add user as exists'
+#         return False
+#     else:
+#         print 'moving on down'
+#         print doorlist
+#         sql.add_user(username, keycode, doorlist, enabled, timeStart, timeEnd)
+#         return True
 
 def get_access_log(days):
     d = sql.get_doorlog(days)
     return d
+
+def username_validation(user):
+    users = sql.get_usernames()
+    if user in users:
+        return 'Invalid. Already in use'
+    else:
+        return user
+
+def keycode_validation(keycode):
+    keycodes = sql.get_keycodes()
+    if keycode in keycodes:
+        return 'Invalid. Already in use'
+    if (len(content['keycode']) > 3) and (len(content['keycode']) < 11) and (re.match("^[A-D1-9]+$", content['keycode'])):
+        return keycode
+    else:
+        return 'Invalid. Pin must use numbers 1-9 and letters A-D and be at between 4 and 10 alphanumeric characters long'
 
 sql.setup_db()
 app = Flask(__name__)
@@ -120,23 +136,19 @@ def add_user():
     Add a new user to everything.
     '''
     content = request.get_json(silent=False)
+    #{"username":invalid", "keycode":"invalid", "doorlist":["topgarage","frontdoor","bottomgarage"], "enabled":"1"}
     #{"username":pell", "keycode":"00003", "doorlist":["topgarage","frontdoor","bottomgarage"], "enabled":"1"}
     timeStart = None
     timeEnd = None
+    doorlist = None
     if content.has_key('timeStart'):
         timeStart = content['timeStart'] # parse this to datetime
     if content.has_key('timeEnd'):
         timeEnd = content['timeEnd'] # parse this to datetime
-    if (len(content['keycode']) > 3) and (len(content['keycode']) < 11) and (re.match("^[A-D1-9]+$", content['keycode'])):
-        #print content["doorlist"]
-        ret = add_user_to_db(content['username'], content['keycode'], int(content['enabled']), content["doorlist"], timeStart, timeEnd)
-        if ret:
-            resp = {'Status':'Added key for {}'.format(content['username'])}
-        else:
-            resp = {'Status':'Did not at key for {}. Either username or pin already in use'.format(content['username'])}
-            
-    else:
-        resp = {'Status':'Did not at key for {}. Pin must use numbers 1-9 and letters A-D and be at between 4 and 10 alphanumeric characters long'.format(content['username'])}
+    u = username_validation(content['username'])
+    v = validate_keycode(content['keycode'])
+    resp = {'username':u, 'keycode':v, 'timeStart':timeStart, 'timeEnd':timeEnd, 'doorlist':d, 'enabled':content['enabled']}
+    sql.write_userdata(resp)
     return jsonify(resp), 200
 
 
@@ -146,7 +158,8 @@ def remove_user():
     Remove Username in user doorUsers table, and update all tables...
     '''
     content = request.get_json(silent=False)
-    content['username']
+    user = content['username']
+    sql.delete_user(user)
     resp = {}
     return jsonify(resp), 200
 
@@ -154,25 +167,36 @@ def remove_user():
 @app.route("/user", methods=['PUT',])
 def update_user():
     '''
-    Select Username and update in user doorUsers table
+    Select Username and update in user doorUsers table. Json must contain old username
+    #{"old_username":"pell", "old_keycode":"1234", "username":pell", "keycode":"00003", "startTime":"blah", "endTime":"blah", "doorlist":["topgarage","frontdoor","bottomgarage"], "enabled":"1"}
     '''
     content = request.get_json(silent=False)
-    content['username']
-    content['keycode']
+    #check for partial updates of userdata
+    prev_user = content['old_username']
+    prev_key = content['old_keycode']
+    if prev_user == content['username']:
+        u = prev_user
+    else:
+        u = username_validation(content['username'])
+    if prev_key == content['keycode']:
+        v = prev_key
+    else:
+        v = validate_keycode(content['keycode'])
     content['enabled']
     content['timeStart']
     content['timeEnd']
-    resp = {}
+    resp = {'old_user':prev_user, 'username':u, 'keycode':v, 'timeStart':timeStart, 'timeEnd':timeEnd, 'doorlist':d}
+    sql.write_userdata(resp)
     return jsonify(resp), 200
 
 @app.route("/user/keycode", methods=['PUT',])
 def update_user_keycode():
     '''
     Select Username and update in user doorUsers table
+    {"username":pell", "keycode":"00003"}
     '''
     content = request.get_json(silent=False)
-    content['username']
-    content['keycode']
+    sql.update_doorUsers(content['username'], 'keycode', content['keycode'])
     resp = {}
     return jsonify(resp), 200
 
@@ -180,10 +204,10 @@ def update_user_keycode():
 def update_user_enabled():
     '''
     Select Username and update in user doorUsers table
+    {"username":pell", "enabled":"1"}
     '''
     content = request.get_json(silent=False)
-    content['username']
-    content['enabled']
+    sql.update_doorUsers(content['username'], 'enabled', int(content['enabled']))
     resp = {}
     return jsonify(resp), 200
 
@@ -193,8 +217,7 @@ def update_user_timestart():
     Select Username and update in user doorUsers table
     '''
     content = request.get_json(silent=False)
-    content['username']
-    content['timeStart']
+    sql.update_doorUsers(content['username'], 'timeStart', content['timeStart'])
     resp = {}
     return jsonify(resp), 200
 
@@ -204,8 +227,7 @@ def update_user_timeend():
     Select Username and update in user doorUsers table
     '''
     content = request.get_json(silent=False)
-    content['username']
-    content['timeEnd']
+    sql.update_doorUsers(content['username'], 'timeEnd', content['timeEnd'])
     resp = {}
     return jsonify(resp), 200
 
@@ -215,12 +237,11 @@ def update_user_doors():
     Select Username and update canOpen table
     '''
     content = request.get_json(silent=False)
-    content['username']
-    content['doors']
+    sql.update_canOpen(content['username'], content['doors'])
     resp = {}
     return jsonify(resp), 200
 
-
+#up top here
 @app.route("/user", methods=['GET',])
 def get_user():
     '''
@@ -228,6 +249,7 @@ def get_user():
     '''
     content = request.get_json(silent=False)
     content['username']
+    sql.
     resp = {}
     return jsonify(resp), 200
 
@@ -244,7 +266,7 @@ def get_doors():
     '''
     Returns all possible door names in db as a list['door1','door2',...]
     '''
-    resp = 
+    resp =
     return jsonify(sql.get_all_doors()), 200
 
 
@@ -265,4 +287,3 @@ def getAccessLog():
     days = content['days']
     resp = get_access_log(days)
     return jsonify(resp), 200
-    

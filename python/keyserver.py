@@ -7,7 +7,7 @@
 #    FLASK_APP=keyserver.py flask run
 
 # In another terminal:
-# curl -X GET http://127.0.0.1:5000/listall
+# curl -X GET http://127.0.0.1:5000/users
 
 # curl -X GET http://127.0.0.1:5000/listallowed
 
@@ -24,6 +24,8 @@
 
 # curl -X POST -H "Content-Type: application/json" -d '{"username": "max", "keycode": "AAB23", "doorlist":["topgarage",  "frontdoor", "bottomgarage"], "enabled":"1"}' http://127.0.0.1:5000/user
 # Response:  {  "Status": "Added key" }
+
+# curl -X POST -H "Content-Type: application/json" -d '{"username": "mw", "keycode": "1111", "doorlist":["topgarage",  "frontdoor"], "enabled":"1"}' http://127.0.0.1:5000/user
 
 # curl -X POST -H "Content-Type: application/json" -d '{"username": "burner", "keycode": "1111", "doorlist":["topgarage",  "frontdoor", "bottomgarage"], "enabled":"1"}' http://127.0.0.1:5000/addkey
 # Response:  {  "Status": "Added key" }
@@ -81,17 +83,17 @@ def get_access_log(days):
     return d
 
 def username_validation(user):
-    users = sql.get_usernames()
+    users = sql.get_doorUser_col('username')
     if user in users:
         return 'Invalid. Already in use'
     else:
         return user
 
 def keycode_validation(keycode):
-    keycodes = sql.get_keycodes()
+    keycodes = sql.get_doorUser_col('keycode')
     if keycode in keycodes:
         return 'Invalid. Already in use'
-    if (len(content['keycode']) > 3) and (len(content['keycode']) < 11) and (re.match("^[A-D1-9]+$", content['keycode'])):
+    if (len(keycode) > 3) and (len(keycode) < 11) and (re.match("^[A-D1-9]+$", keycode)):
         return keycode
     else:
         return 'Invalid. Pin must use numbers 1-9 and letters A-D and be at between 4 and 10 alphanumeric characters long'
@@ -104,19 +106,13 @@ CORS(app)
 def hello():
     return "Hello World!"
 
-@app.route("/getstatus", methods=['GET',])
-def getStatus():
-    conn, c = sql.get_db()
-    c.execute("SELECT * FROM doorStates GROUP BY door")
-    #c.execute("SELECT * FROM doorStates")
-    resp = c.fetchall()
-    return jsonify(resp), 200
-
 @app.route("/listallowed", methods=['GET',])
 def list_allowed_keys():
-    #resp = sql.build_allowed_users()
-    resp = {}
-    return jsonify(resp), 200
+    '''
+    List doors with allowed users
+    ["topgarage":["max", "mw", "etc"], "bottomgarage":[...]]
+    '''
+    return jsonify(sql.get_allowed()), 200
 
 
 @app.route("/usekey", methods=['POST',])
@@ -143,14 +139,17 @@ def add_user():
     doorlist = None
     if content.has_key('timeStart'):
         timeStart = content['timeStart'] # parse this to datetime
+    else:
+        content.update({'timeStart':0})
     if content.has_key('timeEnd'):
         timeEnd = content['timeEnd'] # parse this to datetime
+    else:
+        content.update({'timeEnd':0})
     u = username_validation(content['username'])
-    v = validate_keycode(content['keycode'])
-    resp = {'username':u, 'keycode':v, 'timeStart':timeStart, 'timeEnd':timeEnd, 'doorlist':d, 'enabled':content['enabled']}
-    sql.write_userdata(resp)
-    return jsonify(resp), 200
-
+    v = keycode_validation(content['keycode'])
+    #resp = {'username':u, 'keycode':v, 'timeStart':timeStart, 'timeEnd':timeEnd, 'doorlist':doorlist, 'enabled':content['enabled']}
+    sql.write_userdata(content)
+    return jsonify(content), 200
 
 @app.route("/user", methods=['DELETE',])
 def remove_user():
@@ -163,6 +162,13 @@ def remove_user():
     resp = {}
     return jsonify(resp), 200
 
+@app.route("/user", methods=['GET',])
+def get_user():
+    '''
+    Returns {'username':, 'keycode':, enabled:'', timeStart:, timeEnd, doors: [...]}
+    '''
+    content = request.get_json(silent=False)
+    return jsonify(sql.fetch_user_data(content['username'])), 200
 
 @app.route("/user", methods=['PUT',])
 def update_user():
@@ -181,7 +187,7 @@ def update_user():
     if prev_key == content['keycode']:
         v = prev_key
     else:
-        v = validate_keycode(content['keycode'])
+        v = keycode_validation(content['keycode'])
     content['enabled']
     content['timeStart']
     content['timeEnd']
@@ -241,45 +247,34 @@ def update_user_doors():
     resp = {}
     return jsonify(resp), 200
 
-#up top here
-@app.route("/user", methods=['GET',])
-def get_user():
-    '''
-    Returns {'username':, 'keycode':, enabled:'', timeStart:, timeEnd, doors: [...]}
-    '''
-    content = request.get_json(silent=False)
-    content['username']
-    sql.
-    resp = {}
-    return jsonify(resp), 200
-
 @app.route("/users", methods=['GET',])
 def get_users():
     '''
     Returns [{'username':, 'keycode':, enabled:'', timeStart:, timeEnd, doors: [...]}, {...}, ...]
     '''
-    resp = sql.get_all_users()
-    return jsonify(resp), 200
+    return jsonify(sql.get_all_users()), 200
 
 @app.route("/doors", methods=['GET',])
 def get_doors():
     '''
     Returns all possible door names in db as a list['door1','door2',...]
     '''
-    resp =
+    content = request.get_json(silent=False)
     return jsonify(sql.get_all_doors()), 200
 
+@app.route("/door/status", methods=['GET',])
+def getStatus():
+    conn, c = sql.get_db()
+    c.execute("SELECT * FROM doorStates GROUP BY door")
+    #c.execute("SELECT * FROM doorStates")
+    resp = c.fetchall()
+    return jsonify(resp), 200
 
-
-
-@app.route("/doorstatus", methods=['PUT',])
+@app.route("/door/status", methods=['PUT',])
 def update_status():
     content = request.get_json(silent=False)
-    door = content['door']
-    status = content["status"]
-    sql.update_doorstatus(status, door)
-    resp = {"door":door,"status":status}
-    return jsonify(resp), 200
+    sql.update_doorstatus(content["status"], content['door'])
+    return jsonify(content), 200
 
 @app.route("/getlog", methods=['GET',])
 def getAccessLog():

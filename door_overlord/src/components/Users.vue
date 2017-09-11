@@ -7,14 +7,21 @@
            <div class="col-lg-4">
             <date-picker v-model="item.startDateObject"></date-picker> <date-picker v-model="item.endDateObject"></date-picker>
          </div>
-         {{ doors }}
+         {{ doors }} {{ obj.usrs }}
          {{ item.doors }}
+
     </div>
+     {{ doorstatus }}
+     <!-- {{ getallowedusers }} -->
   </div>
+
+  <!-- <div class="col-md-5" v-for="obj in doors">
+    {{ obj.doors }}
+  </div> -->
 </template>
 
 <script>
-import { getUsers, getDoors } from '../../utils/door-api'
+import { getUsers, getDoors, doorStatus, getAllowedUsers } from '../../utils/door-api'
 import 'bootstrap/dist/css/bootstrap.css'
 // Import this component
 import datePicker from 'vue-bootstrap-datetimepicker'
@@ -26,13 +33,21 @@ export default {
   data () {
     return {
       userlist: [],
-      doors: []
+      doors: [],
+      doorstatus: [],
+      getallowedusers: [],
+      getmoredoors: []
     }
   },
   components: {
     datePicker
   },
   methods: {
+    getDoors () {
+      getDoors().then((ret) => {
+        this.doors = ret
+      })
+    },
     getUsers () {
       getUsers().then((ret) => {
         this.userlist = ret.map(function (el) {
@@ -43,7 +58,17 @@ export default {
         })
       })
     },
-    getDoors () {
+    getAllowedUsers () {
+      getAllowedUsers().then((ret) => {
+        this.getallowedusers = ret
+      })
+    },
+    doorStatus () {
+      doorStatus().then((ret) => {
+        this.doorstatus = ret
+      })
+    },
+    getmoreDoors () {
       getDoors().then((ret) => {
         this.doors = ret
       })
@@ -52,6 +77,8 @@ export default {
   mounted () {
     this.getUsers()
     this.getDoors()
+    this.doorStatus()
+    this.getmoreDoors()
   }
 }
 </script>

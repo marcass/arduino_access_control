@@ -30,12 +30,20 @@ def setup_db():
     c.execute('''CREATE TABLE IF NOT EXISTS actionLog
                     (timestamp TIMESTAMP, message TEXT, type TEXT)''')
     c.execute('''CREATE TABLE IF NOT EXISTS doorUsers
-                    (username TEXT, keycode TEXT, enabled INTEGER, timeStart TIMESTAMP, timeEnd TIMESTAMP )''' )
+                    (username TEXT UNIQUE, keycode TEXT UNIQUE, enabled INTEGER, timeStart TIMESTAMP, timeEnd TIMESTAMP )''' )
     c.execute('''CREATE TABLE IF NOT EXISTS doorStates
                     (timestamp TIMESTAMP, door TEXT, state TEXT )''')
     c.execute('''CREATE TABLE IF NOT EXISTS canOpen
                     (door TEXT, userallowed TEXT, FOREIGN KEY(door) REFERENCES doorID(door_id), FOREIGN KEY(userallowed) REFERENCES doorUsers(username) ON DELETE CASCADE)''')
     conn.commit() # Save (commit) the changes
+
+def remove_disable_key(username):
+    conn, c = get_db()
+    #remove burnkey row
+    c.execute("DELETE FROM canOpen WHERE userallowed=?", ('burner',))
+    #disable in dorrUsers
+    c.execute("UPDATE doorUsers SET enabled=0 WHERE username=?", (username,))
+    conn.commit()
 
 def get_allowed():
     conn, c = get_db()
@@ -46,14 +54,16 @@ def get_allowed():
     users = [i[1] for i in ret]
     door_list = get_all_doors()
     ret_dict = {'doors':doors, 'users':users}
-    res_dict = {}
+    ret_list = []
     for i in door_list:
         user_list = []
         for c, value in enumerate(ret_dict['doors']):
+            res_dict = {}
             if value == i:
                 user_list.append(ret_dict['users'][c])
-        res_dict.update({i:user_list})
-    return res_dict
+        res_dict = ({'door':i, 'users':user_list})
+        ret_list.append(res_dict)
+    return ret_list
 
 def update_doorUsers(user, column, value):
     conn, c = get_db()
@@ -63,14 +73,11 @@ def update_doorUsers(user, column, value):
 def write_userdata(resp):
     utcnow = datetime.datetime.utcnow()
     conn, c = get_db()
-    #delete old data in table then update all userdata in doorUsers
-    try:
-        c.execute("DELETE FROM doorUsers WHERE username=?", (resp['old_user']))
-    except:
-        pass
-    #default time formatter
+    #ret = {}
+    print resp['timeStart']
     if resp['timeStart'] == 0:
         timeStart = utcnow
+        print timeStart
     else:
         timeStart = resp['timeStart']
     if resp['timeEnd'] == 0:
@@ -78,14 +85,24 @@ def write_userdata(resp):
         timeEnd = utcnow + relativedelta(years=+20)
     else:
         timeEnd = resp['timeEnd']
-    c.execute("INSERT INTO doorUsers VALUES (?,?,?,?,?)",(resp['username'], resp['keycode'], resp['enabled'], timeStart, timeEnd))
+    print resp['username']
+    users_in = get_doorUser_col('username')
+    print users_in
+    if resp['username'] not in users_in:
+        try:
+            c.execute("INSERT INTO doorUsers VALUES (?,?,?,?,?)",(resp['username'], resp['keycode'], resp['enabled'], timeStart, timeEnd))
+        except:
+            return {'status':'Failed as non_unique new user'}
+    else:
+        c.execute("UPDATE doorUsers SET keycode=?, enabled=?, timeStart=?, timeEnd=? WHERE username=?", (resp['keycode'], resp['enabled'], timeStart, timeEnd, resp['username']))
     conn.commit()
     update_canOpen(resp['username'], resp['doorlist'])
+    return {'status':'Success'}
 
 
 def update_canOpen(user, doors):
     conn, c = get_db()
-    c.execute("DELETE FROM canOpen WHERE (SELECT userallowed FROM canOpen WHERE userallowed=?)", (user,))
+    c.execute("DELETE FROM canOpen WHERE userallowed=?", (user,))
     # if len(c.fetchall()) > 0:
     #     #flush detail from canOpen then rewrite it
     #     c.execute("DELETE FROM canOpen WHERE userallowed=?", (user,))
@@ -138,6 +155,23 @@ def update_doorstatus(status, door):
     utcnow = datetime.datetime.utcnow()
     c.execute("INSERT INTO doorStates VALUES (?,?,?)", (utcnow,door,status) )
     conn.commit()
+
+def get_doorstatus():
+    conn, c = get_db()
+    c.execute("SELECT * FROM doorStates GROUP BY door")
+    ret = c.fetchall()
+    doors = [i[1] for i in ret]
+    time_altered = [i[0] for i in ret]
+    status = [i[2] for i in ret]
+    door_list = get_all_doors()
+    ret_dict = {'doors':doors, 'time':time_altered, 'status':status}
+    status_list = []
+    for i in door_list:
+        for c, value in enumerate(ret_dict['doors']):
+            if value == i:
+                status_dict = {'door':i, 'status':ret_dict['status'][c], 'time':ret_dict['time'][c]}
+                status_list.append(status_dict)
+    return status_list
 
 def get_doorlog(days):
     conn, c = get_db()

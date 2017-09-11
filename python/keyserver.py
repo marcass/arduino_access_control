@@ -22,27 +22,29 @@
 # curl -X POST -H "Content-Type: application/json" -d '{"door":"topgarage", "pincode":"1111"}' http://127.0.0.1:5000/usekey
 # Response:  {"pin_correct": False} # NOW FALSE because it was a burn code!
 
-# curl -X POST -H "Content-Type: application/json" -d '{"username": "max", "keycode": "AAB23", "doorlist":["topgarage",  "frontdoor", "bottomgarage"], "enabled":"1"}' http://127.0.0.1:5000/user
+# curl -X POST -H "Content-Type: application/json" -d '{"username": "max", "keycode": "AAB23", "doorlist":["topgarage", "frontdoor", "bottomgarage"], "enabled":"1"}' http://127.0.0.1:5000/user
 # Response:  {  "Status": "Added key" }
 
-# curl -X POST -H "Content-Type: application/json" -d '{"username": "mw", "keycode": "1111", "doorlist":["topgarage",  "frontdoor"], "enabled":"1"}' http://127.0.0.1:5000/user
+# curl -X POST -H "Content-Type: application/json" -d '{"username": "mw", "keycode": "1111", "doorlist":["topgarage", "frontdoor"], "enabled":"1"}' http://127.0.0.1:5000/user
 
 # curl -X POST -H "Content-Type: application/json" -d '{"username": "burner", "keycode": "1111", "doorlist":["topgarage"], "enabled":"1"}' http://127.0.0.1:5000/user
 
-# curl -X POST -H "Content-Type: application/json" -d '{"username": "burner", "keycode": "1111", "doorlist":["topgarage",  "frontdoor", "bottomgarage"], "enabled":"1"}' http://127.0.0.1:5000/addkey
+# curl -X POST -H "Content-Type: application/json" -d '{"username": "burner", "keycode": "1111", "doorlist":["topgarage",  "frontdoor", "bottomgarage"], "enabled":"1"}' http://127.0.0.1:5000/user
 # Response:  {  "Status": "Added key" }
 
 #allowed values are: topgarage, frontdoor, bottomgarage
 #curl -X POST -H "Content-Type: application/json" -d '{"door":"topgarage", "pincode":"00003"}' http://127.0.0.1:5000/usekey
 # Response:  {  "pin_correct": true}
 
-#curl -X PUT -H "Content-Type: application/json" -d '{"door":"topgarage","status":"open"}' http://127.0.0.1:5000/doorstatus
+#curl -X PUT -H "Content-Type: application/json" -d '{"door":"topgarage","status":"open"}' http://127.0.0.1:5000/door/status
 # Response:  { "door":"top garage", "status": "open"}
 
 #curl -X GET -H "Content-Type: application/json" -d '{"days":"10"}' http://127.0.0.1:5000/getlog
 # Response:  {  log stuff in here }
 
 # curl -X DELETE -H "Content-Type: application/json" -d '{"username":"mw"}' http://127.0.0.1:5000/user
+
+# curl -X GET -H "Content-Type: application/json" -d '{"username":"max"}' http://127.0.0.1:5000/user
 
 import re
 import sql
@@ -59,47 +61,20 @@ def use_key(key, door):
     else:
         if d == 'burner':
             print 'user tested true for burner'
-            conn, c = sql.get_db()
-            #remove burnkey row
-            c.execute("DELETE FROM canOpen WHERE userallowed=?", ('burner',))
-            #c.execute("DELETE FROM canOpen WHERE userallowed=burner")
-            conn.commit()
+            sql.remove_disable_key(d)
         print 'username = '+str(d)+' for '+door
         y = sql.insert_actionLog('Pinpad', door, key, d)
         print y
         return True
 
-# def add_user_to_db(username, keycode, enabled, doorlist, timeStart, timeEnd):
-#     sql.setup_db()
-#     d = sql.build_user_dict_query()
-#     print d
-#     if (keycode in d['keycode']) or username in d['username']:
-#         print 'failed to add user as exists'
-#         return False
-#     else:
-#         print 'moving on down'
-#         print doorlist
-#         sql.add_user(username, keycode, doorlist, enabled, timeStart, timeEnd)
-#         return True
-
 def get_access_log(days):
     d = sql.get_doorlog(days)
     return d
 
-def username_validation(user):
-    users = sql.get_doorUser_col('username')
-    print user
-    print users
-    if user in users:
-        print 'found it'
-        return False
-    else:
-        return True
-
 def keycode_validation(keycode):
-    keycodes = sql.get_doorUser_col('keycode')
-    if keycode in keycodes:
-        return 'Invalid. Already in use'
+    # keycodes = sql.get_doorUser_col('keycode')
+    # if keycode in keycodes:
+    #     return False
     if (len(keycode) > 3) and (len(keycode) < 11) and (re.match("^[A-D1-9]+$", keycode)):
         return True
     else:
@@ -145,20 +120,19 @@ def add_user():
     timeEnd = None
     doorlist = None
     if content.has_key('timeStart'):
+        print 'has time start'
         timeStart = content['timeStart'] # parse this to datetime
     else:
         content.update({'timeStart':0})
+        print 'making timeStart content = '+str(content)
     if content.has_key('timeEnd'):
         timeEnd = content['timeEnd'] # parse this to datetime
     else:
         content.update({'timeEnd':0})
-    if not username_validation(content['username']):
-        return jsonify({'Status':'username failure'}), 200
     if not keycode_validation(content['keycode']):
         return jsonify({'Status':'keycode failure'}), 200
-    #resp = {'username':u, 'keycode':v, 'timeStart':timeStart, 'timeEnd':timeEnd, 'doorlist':doorlist, 'enabled':content['enabled']}
     sql.write_userdata(content)
-    return jsonify(content), 200
+    return jsonify(sql.write_userdata(content)), 200
 
 @app.route("/user", methods=['DELETE',])
 def remove_user():
@@ -175,6 +149,7 @@ def remove_user():
 @app.route("/user", methods=['GET',])
 def get_user():
     '''
+    Receives: {'username':'max'}
     Returns {'username':, 'keycode':, enabled:'', timeStart:, timeEnd, doors: [...]}
     '''
     content = request.get_json(silent=False)
@@ -184,26 +159,26 @@ def get_user():
 def update_user():
     '''
     Select Username and update in user doorUsers table. Json must contain old username
-    #{"old_username":"pell", "old_keycode":"1234", "username":pell", "keycode":"00003", "startTime":"blah", "endTime":"blah", "doorlist":["topgarage","frontdoor","bottomgarage"], "enabled":"1"}
+    #{"old_username":"pell", "old_keycode":"1234", "username":pell", "keycode":"00003", "timeStart":"blah", "endTime":"blah", "doorlist":["topgarage","frontdoor","bottomgarage"], "enabled":"1"}
+
+    curl -X PUT -H "Content-Type: application/json" -d '{"username":"max","keycode":"234A","enabled":"0","doorlist":["frontdoor", "bottomgarage"], "timeStart":"2017-09-11T03:03:27.860Z", "timeEnd":"2037-09-11T03:03:27.860Z"}' http://127.0.0.1:5000/user
     '''
     content = request.get_json(silent=False)
-    #check for partial updates of userdata
-    prev_user = content['old_username']
-    prev_key = content['old_keycode']
-    if prev_user == content['username']:
-        u = prev_user
+    timeStart = None
+    timeEnd = None
+    doorlist = None
+    if content.has_key('timeStart'):
+        print 'has time start'
+        timeStart = content['timeStart'] # parse this to datetime
     else:
-        u = username_validation(content['username'])
-    if prev_key == content['keycode']:
-        v = prev_key
+        content.update({'timeStart':0})
+    if content.has_key('timeEnd'):
+        timeEnd = content['timeEnd'] # parse this to datetime
     else:
-        v = keycode_validation(content['keycode'])
-    content['enabled']
-    content['timeStart']
-    content['timeEnd']
-    resp = {'old_user':prev_user, 'username':u, 'keycode':v, 'timeStart':timeStart, 'timeEnd':timeEnd, 'doorlist':d}
-    sql.write_userdata(resp)
-    return jsonify(resp), 200
+        content.update({'timeEnd':0})
+    if not keycode_validation(content['keycode']):
+        return jsonify({'Status':'keycode failure'}), 200
+    return jsonify(sql.write_userdata(content)), 200
 
 @app.route("/user/keycode", methods=['PUT',])
 def update_user_keycode():
@@ -212,9 +187,12 @@ def update_user_keycode():
     {"username":pell", "keycode":"00003"}
     '''
     content = request.get_json(silent=False)
-    sql.update_doorUsers(content['username'], 'keycode', content['keycode'])
-    resp = {}
-    return jsonify(resp), 200
+    if not keycode_validation(content['keycode']):
+        return jsonify({'Status':'keycode failure'}), 200
+    else:
+        sql.update_doorUsers(content['username'], 'keycode', content['keycode'])
+        resp = {}
+        return jsonify(resp), 200
 
 @app.route("/user/enabled", methods=['PUT',])
 def update_user_enabled():
@@ -253,7 +231,7 @@ def update_user_doors():
     Select Username and update canOpen table
     '''
     content = request.get_json(silent=False)
-    sql.update_canOpen(content['username'], content['doors'])
+    sql.update_canOpen(content['username'], content['doorlist'])
     resp = {}
     return jsonify(resp), 200
 
@@ -274,11 +252,8 @@ def get_doors():
 
 @app.route("/door/status", methods=['GET',])
 def getStatus():
-    conn, c = sql.get_db()
-    c.execute("SELECT * FROM doorStates GROUP BY door")
-    #c.execute("SELECT * FROM doorStates")
-    resp = c.fetchall()
-    return jsonify(resp), 200
+    content = request.get_json(silent=False)
+    return jsonify(sql.get_doorstatus()), 200
 
 @app.route("/door/status", methods=['PUT',])
 def update_status():
@@ -288,7 +263,9 @@ def update_status():
 
 @app.route("/getlog", methods=['GET',])
 def getAccessLog():
+    '''
+    curl -X GET -H "Content-Type: application/json" -d '{"days":"5"}' http://127.0.0.1:5000/getlog
+    '''
     content = request.get_json(silent=False)
-    days = content['days']
-    resp = get_access_log(days)
+    resp = get_access_log(content['days'])
     return jsonify(resp), 200

@@ -1,12 +1,29 @@
 <template>
   <div class="doors">
-    <h1>Door Users for updateing</h1>
-   <div class="col-md-5" v-for="item in userlist">
+    <h1>Door Users for updating</h1>
+   <div class="col-md-5" v-for="(item, key, index) in userlist" :key="item.name">
      <li>Username: {{ item.username }}</li>
-     <li>Keycode: {{ item.keycode }}</li>
-     <li>Enabled: {{ item.enabled }}</li>
-     <li>Valid from: {{ item.times.start }}</li>
-     <li>Expires: {{ item.times.end }}</li>
+     <li>Keycode:
+       <input v-model="message" :placeholder="item.keycode">
+       <p>New keycode is: {{ index }}.{{ message }}</p>
+     </li>
+     <li>Enabled:
+       <!-- <input type="checkbox" id="checkbox" v-model="checked">
+       <label for="checkbox">{{ checked }}</label> -->
+       <!-- http://www.davidebarranca.com/2016/08/vue-js-binding-a-component-in-a-v-for-loop-to-the-parent-model/ -->
+       <input type="checkbox" id="checkbox" :checked="enabled(item.enabled)" @click="changeStatus(item.enabled)">
+       <label for="checkbox">{{ key.message }}</label>
+     </li>
+     <li>Valid from:
+       <date-picker v-model="item.startDateObject"></date-picker>
+       <!-- <input v-model="starttime" :placeholder="item.times.start"> -->
+       <p>New start time is: {{ starttime }}</p>
+     </li>
+     <li>Expires:
+       <date-picker v-model="item.endDateObject"></date-picker>
+       <!-- <input v-model="endtime" :placeholder="item.times.end"> -->
+       <p>New expiry time is: {{ endtime }}</p>
+      </li>
    </div>
   </div>
 </template>
@@ -21,13 +38,29 @@ export default {
   data () {
     return {
       doors: [],
-      userlist: []
+      userlist: [],
+      message: '',
+      starttime: '',
+      endtime: '',
+      checked: '',
+      key: ''
     }
   },
   components: {
     datePicker
   },
   methods: {
+    changeStatus (x) {
+      this.x = !this.x
+      return this.x
+    },
+    enabled (x) {
+      if (x === 1) {
+        return true
+      } else {
+        return false
+      }
+    },
     getDoors () {
       getDoors().then((ret) => {
         this.doors = ret
@@ -37,8 +70,6 @@ export default {
       getUsers().then((ret) => {
         this.userlist = ret.map(function (el) {
           var o = Object.assign({}, el)
-          o.keycode = new Keycode(o.keycode)
-          o.enabled = new Enabled(o.enabled)
           o.startDateObject = new Date(o.times.start)
           o.endDateObject = new Date(o.times.end)
           return o

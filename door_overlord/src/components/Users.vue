@@ -7,17 +7,14 @@
            <div class="col-lg-4">
             <date-picker v-model="item.startDateObject"></date-picker> <date-picker v-model="item.endDateObject"></date-picker>
          </div>
-         {{ doors }} {{ obj.usrs }}
-         {{ item.doors }}
-
-    </div>
-     {{ doorstatus }}
-     <!-- {{ getallowedusers }} -->
+         <!-- {{ doors }} -->
+         Permitted doors: {{ item.doors }}
   </div>
+   <!-- <div v-for="item in doorstatus">
+     <li>{{ item.door }} was {{ item.status }} at {{ item.time }}</li>
 
-  <!-- <div class="col-md-5" v-for="obj in doors">
-    {{ obj.doors }}
   </div> -->
+  </div>
 </template>
 
 <script>

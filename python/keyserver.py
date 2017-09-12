@@ -36,8 +36,8 @@
 #curl -X POST -H "Content-Type: application/json" -d '{"door":"topgarage", "pincode":"00003"}' http://127.0.0.1:5000/usekey
 # Response:  {  "pin_correct": true}
 
-#curl -X PUT -H "Content-Type: application/json" -d '{"door":"topgarage","status":"open"}' http://127.0.0.1:5000/door/status
-# Response:  { "door":"top garage", "status": "open"}
+#curl -X PUT -H "Content-Type: application/json" -d '{"door":"topgarage","status":"opened"}' http://127.0.0.1:5000/door/status
+# Response:  { "door":"top garage", "status": "opened"}
 
 #curl -X GET -H "Content-Type: application/json" -d '{"days":"10"}' http://127.0.0.1:5000/getlog
 # Response:  {  log stuff in here }

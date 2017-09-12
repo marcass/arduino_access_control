@@ -1,6 +1,6 @@
 # door_overlord
 
-> A Vue.js project for managing doors
+> AVeu.js project for all the doors
 
 ## Build Setup
 

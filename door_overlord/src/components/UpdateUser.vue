@@ -3,33 +3,33 @@
     <h1>Door Users for updating</h1>
    <div class="col-md-5" v-for="(item, key, index) in userlist" :key="item.name">
      <li>Username: {{ item.username }}</li>
-     <li>Keycode:
-       <input v-model="message" :placeholder="item.keycode">
-       <p>New keycode is: {{ index }}.{{ message }}</p>
+     <li>Existing keycode is:
+       <input v-model="item.keycode" :placeholder="item.keycode" v-on:keyup.enter="changeattr(item.username, 'keycode', item.keycode)">
      </li>
      <li>Enabled:
        <!-- <input type="checkbox" id="checkbox" v-model="checked">
        <label for="checkbox">{{ checked }}</label> -->
+       <!-- :checked="enabled(item.enabled)" -->
        <!-- http://www.davidebarranca.com/2016/08/vue-js-binding-a-component-in-a-v-for-loop-to-the-parent-model/ -->
-       <input type="checkbox" id="checkbox" :checked="enabled(item.enabled)" @click="changeStatus(item.enabled)">
-       <label for="checkbox">{{ key.message }}</label>
+       <input type="checkbox" id="checkbox" v-model="item.enabled"  @click="changeattr(item.username, 'enabled', !item.enabled)">
+       <!-- <label for="checkbox">{{ item.enabled }}</label> -->
      </li>
      <li>Valid from:
-       <date-picker v-model="item.startDateObject"></date-picker>
+       <date-picker v-model="item.times.start" :placeholder="String(item.times.start)" v-on:click="changeattr(item.username, 'timeStart', item.times.start)"></date-picker>
        <!-- <input v-model="starttime" :placeholder="item.times.start"> -->
-       <p>New start time is: {{ starttime }}</p>
+       <p>New start time is: {{ item.times.start }}</p>
      </li>
      <li>Expires:
-       <date-picker v-model="item.endDateObject"></date-picker>
+       <date-picker v-model="item.times.end"></date-picker>
        <!-- <input v-model="endtime" :placeholder="item.times.end"> -->
-       <p>New expiry time is: {{ endtime }}</p>
+       <p>New expiry time is: {{ item.times.end }}</p>
       </li>
    </div>
   </div>
 </template>
 
 <script>
-import { getUsers, getDoors } from '../../utils/door-api'
+import { getUsers, getDoors, putUserData } from '../../utils/door-api'
 import 'bootstrap/dist/css/bootstrap.css'
 import datePicker from 'vue-bootstrap-datetimepicker'
 import 'eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.css'
@@ -40,9 +40,6 @@ export default {
       doors: [],
       userlist: [],
       message: '',
-      starttime: '',
-      endtime: '',
-      checked: '',
       key: ''
     }
   },
@@ -50,7 +47,16 @@ export default {
     datePicker
   },
   methods: {
-    changeStatus (x) {
+    changeattr (userin, attr, val) {
+      // var key = attr
+      // axios.put(url,{'username': this.username, 'keycode': message})
+      const payload = JSON.stringify({'username': userin, [attr]: val})
+      // const pl = {username: item.username, keycode: message}
+      putUserData(payload, attr)
+      console.log(payload)
+      return 1
+    },
+    changestatus (x) {
       this.x = !this.x
       return this.x
     },
@@ -68,15 +74,15 @@ export default {
     },
     getUsers () {
       getUsers().then((ret) => {
-        this.userlist = ret.map(function (el) {
-          var o = Object.assign({}, el)
-          o.startDateObject = new Date(o.times.start)
-          o.endDateObject = new Date(o.times.end)
-          return o
-          // instead of `Object.assign(this.someObject, { a: 1, b: 2 })`
-          // this.someObject = Object.assign({}, this.someObject, { a: 1, b: 2 })
-        })
-        // this.userlist = ret
+        // this.userlist = ret.map(function (el) {
+        // var o = Object.assign({}, el)
+        //   o.startDateObject = new Date(o.times.start)
+        //   o.endDateObject = new Date(o.times.end)
+        //   return o
+        //   // instead of `Object.assign(this.someObject, { a: 1, b: 2 })`
+        //   // this.someObject = Object.assign({}, this.someObject, { a: 1, b: 2 })
+        // })
+        this.userlist = ret
       })
     }
   },

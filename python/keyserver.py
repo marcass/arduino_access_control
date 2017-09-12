@@ -187,6 +187,7 @@ def update_user_keycode():
     {"username":pell", "keycode":"00003"}
     '''
     content = request.get_json(silent=False)
+    print content
     if not keycode_validation(content['keycode']):
         return jsonify({'Status':'keycode failure'}), 200
     else:

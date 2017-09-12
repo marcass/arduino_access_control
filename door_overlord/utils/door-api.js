@@ -1,8 +1,11 @@
 import axios from 'axios';
 
 const BASE_URL = 'http://localhost:5000';
+axios.defaults.headers.post['Content-Type'] = 'application/json';
+axios.defaults.headers.put['Content-Type'] = 'application/json';
+axios.defaults.headers.delete['Content-Type'] = 'application/json';
 
-export {getUsers, getDoors, doorStatus, getAllowedUsers};
+export {getUsers, getDoors, getDoorStatus, getAllowedUsers, putUserData};
 
 function getUsers() {
   const url = `${BASE_URL}/users`;
@@ -14,7 +17,7 @@ function getDoors() {
   return axios.get(url).then(response => response.data);
 }
 
-function doorStatus() {
+function getDoorStatus() {
   const url = `${BASE_URL}/door/status`;
   return axios.get(url).then(response => response.data);
 }
@@ -22,4 +25,9 @@ function doorStatus() {
 function getAllowedUsers() {
   const url = `${BASE_URL}/listallowed`;
   return axios.get(url).then(response => response.data);
+}
+
+function putUserData(payload, route) {
+  const url = `${BASE_URL}/user/`;
+  return axios.put(url+route, payload);
 }

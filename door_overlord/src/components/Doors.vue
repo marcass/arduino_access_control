@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import { getDoors, doorStatus } from '../../utils/door-api'
+import { getDoors, getDoorStatus } from '../../utils/door-api'
 // import 'bootstrap/dist/css/bootstrap.css'
 export default {
   name: 'doors',
@@ -28,8 +28,8 @@ export default {
         this.doors = ret
       })
     },
-    doorStatus () {
-      doorStatus().then((ret) => {
+    getDoorStatus () {
+      getDoorStatus().then((ret) => {
         this.doorstatus = ret
       })
     }

@@ -165,6 +165,7 @@ def update_user():
     curl -X PUT -H "Content-Type: application/json" -d '{"username":"max","keycode":"234A","enabled":"0","doorlist":["frontdoor", "bottomgarage"], "timeStart":"2017-09-11T03:03:27.860Z", "timeEnd":"2037-09-11T03:03:27.860Z"}' http://127.0.0.1:5000/user
     '''
     content = request.get_json(silent=False)
+    print content
     timeStart = None
     timeEnd = None
     doorlist = None

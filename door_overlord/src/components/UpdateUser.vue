@@ -15,12 +15,13 @@
        <!-- <label for="checkbox">{{ item.enabled }}</label> -->
      </li>
      <li>Valid from:
-       <date-picker v-model="item.times.start" :placeholder="String(item.times.start)" v-on:click="changeattr(item.username, 'timeStart', item.times.start)"></date-picker>
+       <date-picker v-model="item.times.start" :placeholder="Date(item.times.start)"></date-picker>
+       <button v-on:click="changeattr(item.username, 'timeStart', item.times.start)">Change time</button>
        <!-- <input v-model="starttime" :placeholder="item.times.start"> -->
        <p>New start time is: {{ item.times.start }}</p>
      </li>
      <li>Expires:
-       <date-picker v-model="item.times.end"></date-picker>
+       <date-picker v-model="item.times.start" :placeholder="Date(item.times.end)" v-on:click="changeattr(item.username, 'timeStart', item.times.end)"></date-picker>
        <!-- <input v-model="endtime" :placeholder="item.times.end"> -->
        <p>New expiry time is: {{ item.times.end }}</p>
       </li>

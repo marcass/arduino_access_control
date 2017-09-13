@@ -4,6 +4,7 @@ import time
 import datetime
 import sqlite3
 import door_setup
+from dateutil import parser
 
 users_db = '/home/mw/git/arduino_access_control/python/door_database.db'
 tz = 'Pacific/Auckland'
@@ -12,6 +13,15 @@ def localtime_from_response(resp):
     ts = datetime.datetime.strptime(resp, "%Y-%m-%d %H:%M:%S.%f")
     ts = ts.replace(tzinfo=pytz.UTC)
     return ts.astimezone(pytz.timezone(tz))
+
+def utc_from_string(payload):
+    local = pytz.timezone(tz)
+    print payload
+    naive = datetime.datetime.strptime (payload, "%Y-%m-%dT%H:%M:%S.%fZ")
+    local_dt = local.localize(naive, is_dst=None)
+    utc_dt = local_dt.astimezone(pytz.utc)
+    return utc_dt
+
 
 def get_db():
     conn = sqlite3.connect(users_db)
@@ -138,6 +148,11 @@ def get_doorlog(days):
 ############  Write data ########################
 def update_doorUsers(user, column, value):
     conn, c = get_db()
+    if 'time' in column:
+        print value
+        #parse timestting
+        value = utc_from_string(value)
+    print value
     c.execute("UPDATE doorUsers SET %s=? WHERE username=?" %(column), (value, user))
     conn.commit()
 

@@ -50,7 +50,6 @@ import re
 import sql
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from dateutil import parser
 
 
 def use_key(key, door):
@@ -213,10 +212,7 @@ def update_user_timestart():
     Select Username and update in user doorUsers table
     '''
     content = request.get_json(silent=False)
-    print content
-    dt = parser.parse(content['timeStart'])
-    print dt
-    sql.update_doorUsers(content['username'], 'timeStart', dt)
+    sql.update_doorUsers(content['username'], 'timeStart', content['timeStart'])
     resp = {}
     return jsonify(resp), 200
 
@@ -226,7 +222,6 @@ def update_user_timeend():
     Select Username and update in user doorUsers table
     '''
     content = request.get_json(silent=False)
-    print content
     sql.update_doorUsers(content['username'], 'timeEnd', content['timeEnd'])
     resp = {}
     return jsonify(resp), 200

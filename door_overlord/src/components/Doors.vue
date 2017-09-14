@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import { getDoors, getDoorStatus } from '../../utils/door-api'
+import { getDoorStatus } from '../../utils/door-api'
 // import 'bootstrap/dist/css/bootstrap.css'
 export default {
   name: 'doors',
@@ -23,11 +23,6 @@ export default {
     // datePicker
   },
   methods: {
-    getDoors () {
-      getDoors().then((ret) => {
-        this.doors = ret
-      })
-    },
     getDoorStatus () {
       getDoorStatus().then((ret) => {
         this.doorstatus = ret
@@ -35,8 +30,7 @@ export default {
     }
   },
   mounted () {
-    this.getDoors()
-    this.doorStatus()
+    this.getDoorStatus()
   }
 }
 </script>

@@ -5,11 +5,15 @@
         <div class="col-md-5">
             <div  v-if="enabled(item.enabled)">
                 <h3>{{ item.username }}  |  {{ item.keycode }} is ENABLED</h3>
+                  <p>Valid from: {{ item.startDateObject }}</p>
                     <div class="col-lg-4">
                       <date-picker v-model="item.startDateObject"></date-picker> <date-picker v-model="item.endDateObject"></date-picker>
                     </div>
                     <!-- {{ doors }} -->
-                    Permitted doors: {{ item.doors }}
+                    Permitted doors: <p v-for="x in item.doors">
+                                        {{ x }}
+                                      </p>
+
             </div>
             <div v-else>
                 <h3>{{ item.username }}  |  {{ item.keycode }} is disabled</h3>
@@ -38,8 +42,7 @@ export default {
       userlist: [],
       doors: [],
       doorstatus: [],
-      getallowedusers: [],
-      getmoredoors: []
+      getallowedusers: []
     }
   },
   components: {
@@ -77,18 +80,12 @@ export default {
       getDoorStatus().then((ret) => {
         this.doorstatus = ret
       })
-    },
-    getmoreDoors () {
-      getDoors().then((ret) => {
-        this.doors = ret
-      })
     }
   },
   mounted () {
     this.getUsers()
     this.getDoors()
-    this.doorStatus()
-    this.getmoreDoors()
+    this.getDoorStatus()
   }
 }
 </script>

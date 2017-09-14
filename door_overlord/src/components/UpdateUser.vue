@@ -7,26 +7,13 @@
        <input v-model="item.keycode" :placeholder="item.keycode" v-on:keyup.enter="changeattr(item.username, 'keycode', item.keycode)">
      </li>
      <li>Enabled:
-       <!-- <input type="checkbox" id="checkbox" v-model="checked">
-       <label for="checkbox">{{ checked }}</label> -->
-       <!-- :checked="enabled(item.enabled)" -->
-       <!-- http://www.davidebarranca.com/2016/08/vue-js-binding-a-component-in-a-v-for-loop-to-the-parent-model/ -->
-       <input type="checkbox" id="checkbox" v-model="item.enabled">
-       <!-- <input type="checkbox" id="checkbox" v-model="item.enabled"  @click="changeattr(item.username, 'enabled', !item.enabled)"> -->
-       <!-- <label for="checkbox">{{ item.enabled }}</label> -->
+      <input type="checkbox" id="checkbox" v-model="item.enabled">
      </li>
      <li>Valid from:
        <date-picker v-model="item.startDateObject" :config="config" :placeholder="String(item.startDateObject)"></date-picker>
-       <!-- <button v-on:click="changeattr(item.username, 'timeStart', item.times.start)">Change start time</button> -->
-       <!-- <input v-model="starttime" :placeholder="item.times.start"> -->
-       <!-- <p>New start time is: {{ item.times.start }}</p> -->
      </li>
      <li>Expires:
-       <!-- <date-picker v-model="item.times.end" :config="config" :placeholder="String(item.endDateObject)"></date-picker> -->
        <date-picker v-model="item.endDateObject" :config="config" :placeholder="String(item.endDateObject)"></date-picker>
-       <!-- <button v-on:click="changeattr(item.username, 'timeEnd', item.times.end)">Change end time</button> -->
-       <!-- <input v-model="endtime" :placeholder="item.times.end"> -->
-       <!-- <p>New expiry time is: {{ item.times.end }}</p> -->
       </li>
       <li>
         <div id='enabled-doors' v-for="x in doorlist">

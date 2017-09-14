@@ -5,7 +5,7 @@ axios.defaults.headers.post['Content-Type'] = 'application/json';
 axios.defaults.headers.put['Content-Type'] = 'application/json';
 axios.defaults.headers.delete['Content-Type'] = 'application/json';
 
-export {getUsers, getDoors, getDoorStatus, getAllowedUsers, putUserData, putAllUserData};
+export {getUsers, getDoors, getDoorStatus, getAllowedUsers, putUserData, putAllUserData, postUserData, postKeycode};
 
 function getUsers() {
   const url = `${BASE_URL}/users`;
@@ -35,4 +35,14 @@ function putUserData(payload, route) {
 function putAllUserData(payload) {
   const url = `${BASE_URL}/user`;
   return axios.put(url, payload);
+}
+
+function postUserData(payload) {
+  const url = `${BASE_URL}/user`;
+  return axios.post(url, payload);
+}
+
+function postKeycode(payload) {
+  const url = `${BASE_URL}/usekey`;
+  return axios.post(url, payload);
 }

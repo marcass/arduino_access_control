@@ -2,9 +2,9 @@
   <div class="keypad">
     <h2>Input your keycode, then press #</h2>
     <p>
-      <div id='enabled-doors' v-for="x in doorlist">
+      <div id='doors' v-for="x in doorstatus">
         <input type="radio" :id="x" :value="x" v-model="doorselected">
-        <label for="x">{{ x }}</label>
+      <label for="x">{{ x }}</label><p> is {{ x.status }}</p>
      </div>
     </p>
     <keyboard layouts="123A|456B|789C|*0{#:enter}D" v-model="keycode" @enter="postkey"></keyboard>
@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import { postKeycode, getDoors } from '../../utils/door-api'
+import { postKeycode, getDoors, getDoorStatus } from '../../utils/door-api'
 import keyboard from 'vue-keyboard'
 export default {
   name: 'updateuser',
@@ -21,7 +21,9 @@ export default {
     return {
       doorlist: [],
       keycode: '',
-      doorselected: ''
+      doorselected: '',
+      doorstatus: [],
+      stat: {}
     }
   },
   components: {
@@ -36,10 +38,16 @@ export default {
       getDoors().then((ret) => {
         this.doorlist = ret
       })
+    },
+    getDoorStatus () {
+      getDoorStatus().then((ret) => {
+        this.doorstatus = ret
+      })
     }
   },
   mounted () {
     this.getDoors()
+    this.getDoorStatus()
   }
 }
 </script>

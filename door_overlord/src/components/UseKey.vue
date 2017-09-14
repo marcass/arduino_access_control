@@ -3,12 +3,18 @@
     <h2>Input your keycode, then press #</h2>
     <p>
       <div id='doors' v-for="x in doorstatus">
-        <input type="radio" :id="x" :value="x" v-model="doorselected">
-      <label for="x">{{ x }}</label><p> is {{ x.status }}</p>
+        <input type="radio" :id="x.door" :value="x.door" v-model="doorselected">
+      <label for="x.door">{{ x.door }} currently {{ x.status }}</label>
      </div>
     </p>
     <keyboard layouts="123A|456B|789C|*0{#:enter}D" v-model="keycode" @enter="postkey"></keyboard>
     <p> Keycode = {{ keycode }}</p>
+    <div class="statusgood" v-if="resp.pin_correct === true">
+     <p>Status</p>
+    </div>
+    <div class="statusbad" v-else>
+     <p>Status</p>
+    </div>
   </div>
 </template>
 
@@ -23,7 +29,7 @@ export default {
       keycode: '',
       doorselected: '',
       doorstatus: [],
-      stat: {}
+      resp: []
     }
   },
   components: {
@@ -31,7 +37,9 @@ export default {
   },
   methods: {
     postkey () {
-      postKeycode(JSON.stringify({'door': this.doorselected, 'pincode': this.keycode}))
+      postKeycode(JSON.stringify({'door': this.doorselected, 'pincode': this.keycode})).then((ret) => {
+        this.resp = ret
+      })
       this.keycode = ''
     },
     getDoors () {
@@ -54,6 +62,16 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+div.statusgood {
+    background-color: green;
+    width: 50px;
+    margin:0 auto;
+}
+div.statusbad {
+    background-color: red;
+    margin:0 auto;
+    width: 50px;
+}
 h1, h2 {
   font-weight: normal;
 }

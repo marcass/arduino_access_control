@@ -44,5 +44,5 @@ function postUserData(payload) {
 
 function postKeycode(payload) {
   const url = `${BASE_URL}/usekey`;
-  return axios.post(url, payload);
+  return axios.post(url, payload).then(response => response.data);
 }

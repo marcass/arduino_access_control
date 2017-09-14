@@ -118,7 +118,7 @@ def get_doorstatus():
     for i in door_list:
         for c, value in enumerate(ret_dict['doors']):
             if value == i:
-                status_dict = {i:{'status':ret_dict['status'][c], 'time':ret_dict['time'][c]}}
+                status_dict = {'door':i, 'status':ret_dict['status'][c], 'time':ret_dict['time'][c]}
                 # status_dict = {'status':ret_dict['status'][c], 'time':ret_dict['time'][c]}
                 status_list.append(status_dict)
     return status_list

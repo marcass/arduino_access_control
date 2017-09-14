@@ -170,16 +170,16 @@ def write_userdata(resp):
     conn, c = get_db()
     #ret = {}
     print resp['timeStart']
-    if (resp['timeStart'] == 0) or (resp['timeStart'] == None):
+    try:
+        timeStart = utc_from_string(resp['timeStart'])
+    except:
         timeStart = utcnow
         print timeStart
-    else:
-        timeStart = resp['timeStart']
-    if (resp['timeEnd'] == 0) or (resp['timeStart'] == None) :
+    try:
+        timeEnd = utc_from_string(resp['timeEnd'])
+    except:
         from dateutil.relativedelta import relativedelta
         timeEnd = utcnow + relativedelta(years=+20)
-    else:
-        timeEnd = resp['timeEnd']
     print resp['username']
     users_in = get_doorUser_col('username')
     print users_in

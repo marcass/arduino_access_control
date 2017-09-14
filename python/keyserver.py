@@ -120,7 +120,7 @@ def add_user():
     timeEnd = None
     doorlist = None
     if content.has_key('timeStart'):
-        print 'has time start'
+        # print 'has time start'
         timeStart = content['timeStart'] # parse this to datetime in sql script
     else:
         content.update({'timeStart':0})
@@ -134,15 +134,13 @@ def add_user():
     sql.write_userdata(content)
     return jsonify(sql.write_userdata(content)), 200
 
-@app.route("/user", methods=['DELETE',])
-def remove_user():
+@app.route("/user/<username>", methods=['DELETE',])
+def remove_user(username):
     '''
     Remove Username in user doorUsers table, and update all tables...
     {'username':'mw'}
     '''
-    content = request.get_json(silent=False)
-    user = content['username']
-    sql.delete_user(user)
+    sql.delete_user(username)
     resp = {}
     return jsonify(resp), 200
 
@@ -169,7 +167,7 @@ def update_user():
     timeEnd = None
     doorlist = None
     if content.has_key('timeStart'):
-        print 'has time start'
+        # print 'has time start'
         timeStart = content['timeStart'] # parse this to datetime
     else:
         content.update({'timeStart':0})

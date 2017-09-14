@@ -21,7 +21,9 @@
         </div>
         <div class="col-sm-3">
           <h4>Enabled: <input type="checkbox" id="checkbox" v-model="item.enabled"></h4>
-          <button v-on:click="blah(JSON.stringify({'username': item.username, 'keycode': item.keycode, 'enabled': item.enabled, 'timeStart': item.startDateObject, 'timeEnd': item.endDateObject, 'doorlist': item.doors}))">Submit user data</button>
+          <button v-on:click="sendData(JSON.stringify({'username': item.username, 'keycode': item.keycode, 'enabled': item.enabled, 'timeStart': item.startDateObject, 'timeEnd': item.endDateObject, 'doorlist': item.doors}))">Submit user data</button>
+          <button v-on:click="sendDelete(item.username)">Delete all user data</button>
+          <!-- <button v-on:click="deleteUser(JSON.stringify({'username': item.username}))">Delete all user data</button> -->
         </div>
       </div>
    </div>
@@ -29,7 +31,7 @@
 </template>
 
 <script>
-import { getUsers, getDoors, putUserData, putAllUserData } from '../../utils/door-api'
+import { getUsers, getDoors, putUserData, putAllUserData, deleteUser } from '../../utils/door-api'
 import 'bootstrap/dist/css/bootstrap.css'
 import datePicker from 'vue-bootstrap-datetimepicker'
 import 'eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.css'
@@ -51,15 +53,13 @@ export default {
     datePicker
   },
   methods: {
-    blah (payload) {
+    sendData (payload) {
       putAllUserData(payload)
     },
-    // putUserDataAll () {
-    //   console.log()
-    //   const stuff = JSON.stringify({'username': this.username, 'keycode': this.keycode, 'enabled': this.enabled, 'timeStart': this.startDateObject, 'timeEnd': this.endDateObject, 'doorlist': this.doors})
-    //   console.log(stuff)
-    //   putAllUserData(stuff)
-    // },
+    sendDelete (payload) {
+      console.log(payload)
+      deleteUser(payload)
+    },
     changeattr (userin, attr, val) {
       // var key = attr
       // axios.put(url,{'username': this.username, 'keycode': message})

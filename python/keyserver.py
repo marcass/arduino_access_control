@@ -121,12 +121,12 @@ def add_user():
     doorlist = None
     if content.has_key('timeStart'):
         print 'has time start'
-        timeStart = content['timeStart'] # parse this to datetime
+        timeStart = content['timeStart'] # parse this to datetime in sql script
     else:
         content.update({'timeStart':0})
         print 'making timeStart content = '+str(content)
     if content.has_key('timeEnd'):
-        timeEnd = content['timeEnd'] # parse this to datetime
+        timeEnd = content['timeEnd'] # parse this to datetime in sql scrip
     else:
         content.update({'timeEnd':0})
     if not keycode_validation(content['keycode']):

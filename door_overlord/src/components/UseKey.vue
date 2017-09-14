@@ -12,9 +12,13 @@
     <div class="statusgood" v-if="resp.pin_correct === true">
      <p>Status</p>
     </div>
+    <!-- <div class="statusbad" v-if="resp.pin_correct === false"> -->
     <div class="statusbad" v-else>
      <p>Status</p>
     </div>
+     <!-- <div v-else>
+      <p>Status</p>
+     </div> -->
   </div>
 </template>
 

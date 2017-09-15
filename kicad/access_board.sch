@@ -1,0 +1,280 @@
+EESchema Schematic File Version 2
+LIBS:power
+LIBS:device
+LIBS:transistors
+LIBS:conn
+LIBS:linear
+LIBS:regul
+LIBS:74xx
+LIBS:cmos4000
+LIBS:adc-dac
+LIBS:memory
+LIBS:xilinx
+LIBS:microcontrollers
+LIBS:dsp
+LIBS:microchip
+LIBS:analog_switches
+LIBS:motorola
+LIBS:texas
+LIBS:intel
+LIBS:audio
+LIBS:interface
+LIBS:digital-audio
+LIBS:philips
+LIBS:display
+LIBS:cypress
+LIBS:siliconi
+LIBS:opto
+LIBS:atmel
+LIBS:contrib
+LIBS:valves
+LIBS:ArduinoProMicro
+LIBS:ESP8266
+LIBS:LM2596b
+LIBS:access_board-cache
+EELAYER 25 0
+EELAYER END
+$Descr A4 11693 8268
+encoding utf-8
+Sheet 1 1
+Title ""
+Date ""
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L ArduinoProMicro U1
+U 1 1 59BB208B
+P 2850 2650
+F 0 "U1" H 2850 2550 50  0000 C CNN
+F 1 "ArduinoProMicro" H 2850 2750 50  0000 C CNN
+F 2 "MODULE" H 2850 2650 50  0001 C CNN
+F 3 "DOCUMENTATION" H 2850 2650 50  0001 C CNN
+	1    2850 2650
+	1    0    0    -1  
+$EndComp
+$Comp
+L D D1
+U 1 1 59BB21D5
+P 8900 1250
+F 0 "D1" H 8900 1350 50  0000 C CNN
+F 1 "D" H 8900 1150 50  0000 C CNN
+F 2 "" H 8900 1250 50  0001 C CNN
+F 3 "" H 8900 1250 50  0001 C CNN
+	1    8900 1250
+	-1   0    0    1   
+$EndComp
+$Comp
+L CONN_01X02 J1
+U 1 1 59BB2248
+P 9700 1450
+F 0 "J1" H 9700 1600 50  0000 C CNN
+F 1 "CONN_01X02" V 9800 1450 50  0000 C CNN
+F 2 "" H 9700 1450 50  0001 C CNN
+F 3 "" H 9700 1450 50  0001 C CNN
+	1    9700 1450
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	9500 1400 9250 1400
+Wire Wire Line
+	9250 1400 9250 1250
+Wire Wire Line
+	9250 1250 9050 1250
+$Comp
+L +3.3V #PWR?
+U 1 1 59BB233B
+P 8600 900
+F 0 "#PWR?" H 8600 750 50  0001 C CNN
+F 1 "+3.3V" H 8600 1040 50  0000 C CNN
+F 2 "" H 8600 900 50  0001 C CNN
+F 3 "" H 8600 900 50  0001 C CNN
+	1    8600 900 
+	1    0    0    -1  
+$EndComp
+$Comp
+L GND #PWR?
+U 1 1 59BB2355
+P 9500 1700
+F 0 "#PWR?" H 9500 1450 50  0001 C CNN
+F 1 "GND" H 9500 1550 50  0000 C CNN
+F 2 "" H 9500 1700 50  0001 C CNN
+F 3 "" H 9500 1700 50  0001 C CNN
+	1    9500 1700
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	8750 1250 8600 1250
+Wire Wire Line
+	8600 1250 8600 900 
+Wire Wire Line
+	9500 1500 9500 1700
+$Comp
+L ESP-01v090 U3
+U 1 1 59BB251E
+P 5700 1650
+F 0 "U3" H 5700 1550 50  0000 C CNN
+F 1 "ESP-01v090" H 5700 1750 50  0000 C CNN
+F 2 "" H 5700 1650 50  0001 C CNN
+F 3 "" H 5700 1650 50  0001 C CNN
+	1    5700 1650
+	-1   0    0    1   
+$EndComp
+$Comp
+L CONN_01X10 J?
+U 1 1 59BB2541
+P 9750 2800
+F 0 "J?" H 9750 3350 50  0000 C CNN
+F 1 "CONN_01X10" V 9850 2800 50  0000 C CNN
+F 2 "" H 9750 2800 50  0001 C CNN
+F 3 "" H 9750 2800 50  0001 C CNN
+	1    9750 2800
+	1    0    0    -1  
+$EndComp
+Text GLabel 9350 2350 0    60   Input ~ 0
+LED_R
+Text GLabel 9350 2450 0    60   Input ~ 0
+LED_G
+Text GLabel 4350 3050 2    60   Input ~ 0
+LED_R
+Text GLabel 4350 2900 2    60   Input ~ 0
+LED_G
+$Comp
+L LM2596b U2
+U 1 1 59BB2754
+P 8500 3950
+F 0 "U2" H 8500 3850 50  0000 C CNN
+F 1 "LM2596b" H 8500 4050 50  0000 C CNN
+F 2 "MODULE" H 8500 3950 50  0001 C CNN
+F 3 "DOCUMENTATION" H 8500 3950 50  0001 C CNN
+	1    8500 3950
+	-1   0    0    1   
+$EndComp
+Text Notes 9000 1000 0    60   ~ 0
+Power out to pinpad
+$Comp
+L CONN_01X02 J?
+U 1 1 59BB278E
+P 9700 3950
+F 0 "J?" H 9700 4100 50  0000 C CNN
+F 1 "CONN_01X02" V 9800 3950 50  0000 C CNN
+F 2 "" H 9700 3950 50  0001 C CNN
+F 3 "" H 9700 3950 50  0001 C CNN
+	1    9700 3950
+	1    0    0    -1  
+$EndComp
+$Comp
+L +3.3V #PWR?
+U 1 1 59BB291B
+P 6900 4400
+F 0 "#PWR?" H 6900 4250 50  0001 C CNN
+F 1 "+3.3V" H 6900 4540 50  0000 C CNN
+F 2 "" H 6900 4400 50  0001 C CNN
+F 3 "" H 6900 4400 50  0001 C CNN
+	1    6900 4400
+	1    0    0    -1  
+$EndComp
+$Comp
+L GND #PWR?
+U 1 1 59BB293B
+P 7350 3950
+F 0 "#PWR?" H 7350 3700 50  0001 C CNN
+F 1 "GND" H 7350 3800 50  0000 C CNN
+F 2 "" H 7350 3950 50  0001 C CNN
+F 3 "" H 7350 3950 50  0001 C CNN
+	1    7350 3950
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	9250 3900 9500 3900
+Wire Wire Line
+	9250 4000 9500 4000
+Wire Wire Line
+	7750 3900 7350 3900
+Wire Wire Line
+	7350 3900 7350 3950
+Wire Wire Line
+	7750 4000 7750 4650
+Wire Wire Line
+	7750 4650 6900 4650
+Wire Wire Line
+	6900 4650 6900 4400
+Wire Wire Line
+	9350 2350 9550 2350
+Wire Wire Line
+	9350 2450 9550 2450
+$Comp
+L CP C?
+U 1 1 59BB2C05
+P 7450 1650
+F 0 "C?" H 7475 1750 50  0000 L CNN
+F 1 "CP" H 7475 1550 50  0000 L CNN
+F 2 "" H 7488 1500 50  0001 C CNN
+F 3 "" H 7450 1650 50  0001 C CNN
+	1    7450 1650
+	1    0    0    -1  
+$EndComp
+$Comp
+L +3.3V #PWR?
+U 1 1 59BB2D04
+P 7800 950
+F 0 "#PWR?" H 7800 800 50  0001 C CNN
+F 1 "+3.3V" H 7800 1090 50  0000 C CNN
+F 2 "" H 7800 950 50  0001 C CNN
+F 3 "" H 7800 950 50  0001 C CNN
+	1    7800 950 
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6650 1500 7800 1500
+Wire Wire Line
+	7800 1500 7800 950 
+Connection ~ 7450 1500
+$Comp
+L GND #PWR?
+U 1 1 59BB2D5B
+P 7450 1800
+F 0 "#PWR?" H 7450 1550 50  0001 C CNN
+F 1 "GND" H 7450 1650 50  0000 C CNN
+F 2 "" H 7450 1800 50  0001 C CNN
+F 3 "" H 7450 1800 50  0001 C CNN
+	1    7450 1800
+	1    0    0    -1  
+$EndComp
+$Comp
+L GND #PWR?
+U 1 1 59BB2D7E
+P 4650 2000
+F 0 "#PWR?" H 4650 1750 50  0001 C CNN
+F 1 "GND" H 4650 1850 50  0000 C CNN
+F 2 "" H 4650 2000 50  0001 C CNN
+F 3 "" H 4650 2000 50  0001 C CNN
+	1    4650 2000
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6650 1700 6850 1700
+Wire Wire Line
+	6850 1700 6850 1500
+Connection ~ 6850 1500
+Wire Wire Line
+	4750 1800 4650 1800
+Wire Wire Line
+	4650 1800 4650 2000
+Text GLabel 6650 1800 2    60   Input ~ 0
+RX
+Text GLabel 4750 1500 0    60   Input ~ 0
+TX
+Text GLabel 1750 3000 0    60   Input ~ 0
+TX
+Text GLabel 1750 2900 0    60   Input ~ 0
+RX
+Wire Wire Line
+	1750 2900 2100 2900
+Wire Wire Line
+	1750 3000 2100 3000
+$EndSCHEMATC

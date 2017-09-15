@@ -1,35 +1,37 @@
 <template>
   <div class="doors">
     <h1>Door Users for updating</h1>
-   <div class="col-md-5" v-for="(item, key, index) in userlist" :key="item.name">
-     <li>Username: {{ item.username }}</li>
-     <li>Existing keycode is:
-       <input v-model="item.keycode" :placeholder="item.keycode" v-on:keyup.enter="changeattr(item.username, 'keycode', item.keycode)">
-     </li>
-     <li>Enabled:
-      <input type="checkbox" id="checkbox" v-model="item.enabled">
-     </li>
-     <li>Valid from:
-       <date-picker v-model="item.startDateObject" :config="config" :placeholder="String(item.startDateObject)"></date-picker>
-     </li>
-     <li>Expires:
-       <date-picker v-model="item.endDateObject" :config="config" :placeholder="String(item.endDateObject)"></date-picker>
-      </li>
-      <li>
-        <div id='enabled-doors' v-for="x in doorlist">
-          <input type="checkbox" :id="x" :value="x" v-model="item.doors">
-          <label >{{ x }}</label>
+   <!-- <div class="col-md-5" v-for="(item, key, index) in userlist" :key="item.name"> -->
+   <div class="col-lg-7" v-for="(item, key, index) in userlist" :key="item.name">
+      <div class="col-lg-3">
+       <div class="col-sm-3"><h4>Username: {{ item.username }} </h4>
+         Keycode: <input v-model="item.keycode" :placeholder="item.keycode" v-on:keyup.enter="changeattr(item.username, 'keycode', item.keycode)">
+       </div>
+       <div class="col-sm-3" ><h4>Valid from:</h4> <date-picker v-model="item.startDateObject" :config="config" :placeholder="String(item.startDateObject)"></date-picker>
+         <br>
+       <h4>Expires: </h4><date-picker v-model="item.endDateObject" :config="config" :placeholder="String(item.endDateObject)"></date-picker>
+      </div>
+      </div>
+       <div class="col-lg-3">
+        <div class="col-sm-3">
+          <div id='enabled-doors' v-for="x in doorlist">
+            <input type="checkbox" :id="x" :value="x" v-model="item.doors">
+            <label >{{ x }}</label>
+          </div>
         </div>
-      </li>
-      <li>
-        <button v-on:click="blah(JSON.stringify({'username': item.username, 'keycode': item.keycode, 'enabled': item.enabled, 'timeStart': item.startDateObject, 'timeEnd': item.endDateObject, 'doorlist': item.doors}))">Submit</button>
-      </li>
+        <div class="col-sm-3">
+          <h4>Enabled: <input type="checkbox" id="checkbox" v-model="item.enabled"></h4>
+          <button v-on:click="sendData(JSON.stringify({'username': item.username, 'keycode': item.keycode, 'enabled': item.enabled, 'timeStart': item.startDateObject, 'timeEnd': item.endDateObject, 'doorlist': item.doors}))">Submit user data</button>
+          <button v-on:click="sendDelete(item.username)">Delete all user data</button>
+          <!-- <button v-on:click="deleteUser(JSON.stringify({'username': item.username}))">Delete all user data</button> -->
+        </div>
+      </div>
    </div>
   </div>
 </template>
 
 <script>
-import { getUsers, getDoors, putUserData, putAllUserData } from '../../utils/door-api'
+import { getUsers, getDoors, putUserData, putAllUserData, deleteUser } from '../../utils/door-api'
 import 'bootstrap/dist/css/bootstrap.css'
 import datePicker from 'vue-bootstrap-datetimepicker'
 import 'eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.css'
@@ -51,15 +53,13 @@ export default {
     datePicker
   },
   methods: {
-    blah (payload) {
+    sendData (payload) {
       putAllUserData(payload)
     },
-    // putUserDataAll () {
-    //   console.log()
-    //   const stuff = JSON.stringify({'username': this.username, 'keycode': this.keycode, 'enabled': this.enabled, 'timeStart': this.startDateObject, 'timeEnd': this.endDateObject, 'doorlist': this.doors})
-    //   console.log(stuff)
-    //   putAllUserData(stuff)
-    // },
+    sendDelete (payload) {
+      console.log(payload)
+      deleteUser(payload)
+    },
     changeattr (userin, attr, val) {
       // var key = attr
       // axios.put(url,{'username': this.username, 'keycode': message})
@@ -114,6 +114,20 @@ export default {
 <style scoped>
 h1, h2 {
   font-weight: normal;
+}
+
+div.col-sm-3 {
+  text-align: left;
+    padding-top: 40px;
+}
+
+div.col-lg-7 {
+  clear: both;;
+  margin: 15px;
+}
+
+div.col-lg-3 {
+  clear: right;
 }
 
 ul {

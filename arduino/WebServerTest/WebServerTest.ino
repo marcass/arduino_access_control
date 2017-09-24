@@ -19,12 +19,20 @@
 SoftwareSerial Serial1(6, 7); // RX, TX
 #endif
 
-char ssid[] = "Twim";            // your network SSID (name)
-char pass[] = "12345678";        // your network password
+char ssid[] = "skibo";            // your network SSID (name)
+char pass[] = "password";        // your network password
 int status = WL_IDLE_STATUS;     // the Wifi radio's status
 int reqCount = 0;                // number of requests received
+char ID[] = "topgarage";
+char APIserver[] = "skibo.duckdns.org";
+
+unsigned long lastConnectionTime = 0;         // last time you connected to the server, in milliseconds
+const unsigned long postingInterval = 10000L; // delay between updates, in milliseconds
 
 WiFiEspServer server(80);
+
+// Initialize the Ethernet client object
+WiFiEspClient APIclient;
 
 
 void setup()
@@ -52,10 +60,26 @@ void setup()
   }
 
   Serial.println("You're connected to the network");
+  
   printWifiStatus();
+  //IP = WiFi.localIP();
   
   // start the web server on port 80
   server.begin();
+
+  //**************** APIclient  **********888
+  Serial.println();
+  Serial.println("Starting connection to APIserver...");
+  // if you get a connection, report back via serial
+  if (APIclient.connectSSL(APIserver, 443)) {
+    Serial.println("Connected to APIserver");
+    // Make a HTTP request
+    APIclient.println("GET /api/ HTTP/1.1");
+    APIclient.println("Host: skibo.duckdns.org");
+    APIclient.println("Connection: close");
+    APIclient.println();
+  }
+  //*****************************************
 }
 
 
@@ -78,7 +102,7 @@ void loop()
           Serial.println("Sending response");
           
           // send a standard http response header
-          // use \r\n instead of many println statements to speedup data send
+          // use \r\n instead of many println statements to speedup data send     
           client.print(
             "HTTP/1.1 200 OK\r\n"
             "Content-Type: text/html\r\n"
@@ -114,8 +138,50 @@ void loop()
     client.stop();
     Serial.println("Client disconnected");
   }
+  //*************APIclient***************
+  // if there's incoming data from the net connection send it out the serial port
+  // this is for debugging purposes only
+  while (APIclient.available()) {
+    char c = APIclient.read();
+    Serial.write(c);
+  }
+
+  // if 10 seconds have passed since your last connection,
+  // then connect again and send data
+  if (millis() - lastConnectionTime > postingInterval) {
+    httpRequest();
+  }
+
+  //**************clienbt ****************
 }
 
+// this method makes a HTTP connection to the server
+void httpRequest()
+{
+  Serial.println();
+    
+  // close any connection before send a new request
+  // this will free the socket on the WiFi shield
+  APIclient.stop();
+
+  // if there's a successful connection
+  if (APIclient.connectSSL(APIserver, 443)) {
+    Serial.println("Connecting...");
+    
+    // send the HTTP PUT request
+    APIclient.println(F("GET /api/ HTTP/1.1"));
+    APIclient.println(F("Host: skibo.duckdns.org"));
+    APIclient.println("Connection: close");
+    APIclient.println();
+
+    // note the time that the connection was made
+    lastConnectionTime = millis();
+  }
+  else {
+    // if you couldn't make a connection
+    Serial.println("Connection failed");
+  }
+}
 
 void printWifiStatus()
 {

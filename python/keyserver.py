@@ -50,6 +50,7 @@ import re
 import sql
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from flask_jwt_extended import JWTManager
 
 
 def use_key(key, door):
@@ -83,6 +84,13 @@ def keycode_validation(keycode):
 sql.setup_db()
 app = Flask(__name__)
 CORS(app)
+
+app.secret_key = 'ksajdkhsadulaulkj1092830983no1y24'  # Change this!
+app.config['JWT_HEADER_TYPE'] = 'JWT'
+jwt = JWTManager(app)
+
+import views_auth
+
 
 @app.route("/")
 def hello():

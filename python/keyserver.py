@@ -50,6 +50,7 @@ import re
 import sql
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from flask_sockets import Sockets
 
 
 def use_key(key, door):
@@ -57,7 +58,8 @@ def use_key(key, door):
     if d is None:
         x = sql.insert_actionLog('Pinpad', door, key)
         print x
-        return False
+        return ws.send('allowed')
+        #return False
     else:
         if d == 'burner':
             print 'user tested true for burner'
@@ -65,7 +67,8 @@ def use_key(key, door):
         print 'username = '+str(d)+' for '+door
         y = sql.insert_actionLog('Pinpad', door, key, d)
         print y
-        return True
+        return ws.send('denied')
+        # return True
 
 def get_access_log(days):
     d = sql.get_doorlog(days)
@@ -83,6 +86,18 @@ def keycode_validation(keycode):
 sql.setup_db()
 app = Flask(__name__)
 CORS(app)
+sockets = Sockets(app)
+#https://github.com/kennethreitz/flask-sockets
+
+
+@sockets.route("/usekey")
+def usekeySocket():
+    content = ws.receive()
+    print content
+    door = content['door']
+    pin = content['pincode']
+    use_key(pin, door)
+
 
 @app.route("/")
 def hello():
@@ -102,11 +117,12 @@ def usekey():
     content = request.get_json(silent=False)
     door = content['door']
     pin = content['pincode']
-    if use_key(pin, door):
-        resp = {'pin_correct':True}
-    else:
-        resp = {'pin_correct':False}
-    return jsonify(resp), 200
+    use_key(pin, door)
+    # if use_key(pin, door):
+    #     resp = {'pin_correct':True}
+    # else:
+    #     resp = {'pin_correct':False}
+    # return jsonify(resp), 200
 
 @app.route("/user", methods=['POST',])
 def add_user():
@@ -269,3 +285,9 @@ def getAccessLog():
     content = request.get_json(silent=False)
     resp = get_access_log(content['days'])
     return jsonify(resp), 200
+
+if __name__ == "__main__":
+    from gevent import pywsgi
+    from geventwebsocket.handler import WebSocketHandler
+    server = pywsgi.WSGIServer(('', 5000), app, handler_class=WebSocketHandler)
+    server.serve_forever()

@@ -4,6 +4,10 @@
 #include <ArduinoJson.h>
 #include <Keypad.h>
 
+//#define debug
+
+const char door[] = "topgarage";
+
 const byte ROWS = 4; //four rows
 const byte COLS = 4; //four columns
 //define the symbols on the buttons of the keypads
@@ -14,7 +18,6 @@ char hexaKeys[ROWS][COLS] = {
   {'*','0','#','D'}
 };
 
-const char door[] = "topgarage";
 /*           Row pin
  * 1 2 3 A | 6
  * 4 5 6 B | 7
@@ -31,6 +34,8 @@ const char door[] = "topgarage";
 byte rowPins[ROWS] = {8,9,10,11}; //connect to the row pinouts of the keypad
 byte colPins[COLS] = {2,3,4,5}; //connect to the column pinouts of the keypad
 String key_str = "";
+bool sendKey = false;
+
 //initialize an instance of class NewKeypad
 Keypad customKeypad = Keypad( makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS);
 
@@ -63,57 +68,36 @@ void setup() {
 
   // check for the presence of the shield
   if (WiFi.status() == WL_NO_SHIELD) {
-    Serial.println("WiFi shield not present");
+    #ifdef debug
+      Serial.println("WiFi shield not present");
+    #endif
     // don't continue
     while (true);
   }
 
   // attempt to connect to WiFi network
   while ( status != WL_CONNECTED) {
-    const char ssid[] = "skibo";            // your network SSID (name)
-    const char pass[] = "r4bb1tshurtlegs";        // your network password
-    Serial.print("Attempting to connect to WPA SSID: ");
-    Serial.println(ssid);
+    char ssid[] = "skibo";            // your network SSID (name)
+    char pass[] = "r4bb1tshurtlegs";        // your network password
+    #ifdef debug
+      Serial.print("Attempting to connect to WPA SSID: ");
+      Serial.println(ssid);
+    #endif
     // Connect to WPA/WPA2 network
     status = WiFi.begin(ssid, pass);
   }
-
-  // you're connected now, so print out the data
-  Serial.println("You're connected to the network");
-  
-  //printWifiStatus();
-  //websocketCon();
-  const char server[] = "skibo.duckdns.org";
-  const byte port = 443;
-  const char serverPath[] = "/websocket/usekey";
-  // Connect to the websocket server
-  if (client.connectSSL(server, port)) {
-    Serial.println("Connected");
-  } else {
-    Serial.println("Connection failed.");
-    //while(1) {
-      // Hang on failure
-    //}
-  }
-
-  // Handshake with the server
-  webSocketClient.path = serverPath;
-  webSocketClient.host = server;
-
-  if (webSocketClient.handshake(client)) {
-    Serial.println("Handshake successful");
-  } else {
-    Serial.println("Handshake failed.");
-//    while(1) {
-//      // Hang on failure
-//    }
-  }
+  #ifdef debug
+    // you're connected now, so print out the data
+    Serial.println("You're connected to the network");
+    printWifiStatus();
+  #endif
+  websocketCon();
 }
 
 void websocketCon() {
-  const char server[] = "skibo.duckdns.org";
-  const byte port = 443;
-  const char serverPath[] = "/websocket/usekey";
+  char server[] = "skibo.duckdns.org";
+  int port = 443;
+  char serverPath[] = "/websocket/usekey";
   // Connect to the websocket server
   if (client.connectSSL(server, port)) {
     Serial.println("Connected");
@@ -138,7 +122,7 @@ void websocketCon() {
   }
 }
 
-String send_pin(String pin){
+bool send_pin(String pin){
   if (client.connected()) {
     //set buffer for json
     StaticJsonBuffer<30> jsonBuffer;
@@ -148,70 +132,82 @@ String send_pin(String pin){
     //input key
     root["door"] = door;
     root["pincode"] = key_str;
-  
-
+    //measure lenght of array
     int len = root.measureLength();
     //add 1 to len (as it comes up short)
     len = len + 1;
     char json[len];
     root.printTo(json, sizeof(json));
     webSocketClient.sendData(json);
-
-    //receive response
-    String data;
-    webSocketClient.getData(data);
-
-    if (data.length() > 0) {
-      Serial.print("Received data: ");
-      Serial.println(data);
-      return data;
-    }
+    return true;
   }else{
-   Serial.println("Client disconnected.");
-   //so connect and report error
-   websocketCon();
-   //while (1) {
+    #ifdef debug
+      Serial.println("Client disconnected.");
+    #endif
+    //so connect and report error
+    websocketCon();
+    //while (1) {
      // Hang on disconnect.
-    return "disconnected";  //so try again after waiting for connect
+    return false;  //so try again after waiting for connect
   }
 }
 
 void loop() {
+  //put timer in here for dumping key_str after certain time ahs elapsed
+  //receive response
+  if (client.connected()) {
+    String data;
+    webSocketClient.getData(data);
+  
+    if (data.length() > 0) {
+      #ifdef debug
+        Serial.print("Received data: ");
+        Serial.println(data);
+      #endif
+      //parse json for permissions here {"door":"topgarage","action":"open"/"none"}
+    }
+  }
   char key = customKeypad.getKey(); 
   if (key){
     if(key == '#'){
-      Serial.println(key_str);
-      String result = send_pin(key_str);
-      if (result == "allowed"){
-        Serial.println("do magic open stuff");
-      }else{
-        Serial.print("Result = ");
-        Serial.println(result);
-      }    
-      key_str = "";
+      sendKey = true;
     }else{
       key_str += key;
       Serial.print("Pressed key is: ");
       Serial.println(key);
     }
   }
+  if (sendKey){
+    Serial.println(key_str);
+    if (client.connected()) {
+      if (send_pin(key_str)){
+        key_str = "";
+        sendKey = false;
+      }else{
+        //do nothing and come back again
+      }
+    }else{
+      //connect
+      websocketCon();
+    }
+  }
 }
 
 
-//void printWifiStatus()
-//{
-//  // print the SSID of the network you're attached to
-//  Serial.print("SSID: ");
-//  Serial.println(WiFi.SSID());
-//
-//  // print your WiFi shield's IP address
-//  IPAddress ip = WiFi.localIP();
-//  Serial.print("IP Address: ");
-//  Serial.println(ip);
-//
-//  // print the received signal strength
-//  long rssi = WiFi.RSSI();
-//  Serial.print("Signal strength (RSSI):");
-//  Serial.print(rssi);
-//  Serial.println(" dBm");
-//}
+void printWifiStatus()
+{
+  // print the SSID of the network you're attached to
+  Serial.print("SSID: ");
+  Serial.println(WiFi.SSID());
+
+  // print your WiFi shield's IP address
+  IPAddress ip = WiFi.localIP();
+  Serial.print("IP Address: ");
+  Serial.println(ip);
+
+  // print the received signal strength
+  long rssi = WiFi.RSSI();
+  Serial.print("Signal strength (RSSI):");
+  Serial.print(rssi);
+  Serial.println(" dBm");
+}

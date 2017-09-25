@@ -3,8 +3,10 @@
 
 # USAGE:
 # INSTALL: sudo pip install flask flask-cors
-# START API with:
+# START REST API with:
 #    FLASK_APP=keyserver.py flask run
+# START REST and WebSockets with:
+#    gunicorn -k flask_sockets.worker keyserver:app
 
 # In another terminal:
 # curl -X GET http://127.0.0.1:5000/users
@@ -52,15 +54,15 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from flask_sockets import Sockets
-
+import json
 
 def use_key(key, door):
     d = sql.validate_key(key, door)
     if d is None:
         x = sql.insert_actionLog('Pinpad', door, key)
         print x
-        return ws.send('allowed')
-        #return False
+        #return ws.send('allowed')
+        return False
     else:
         if d == 'burner':
             print 'user tested true for burner'
@@ -68,8 +70,8 @@ def use_key(key, door):
         print 'username = '+str(d)+' for '+door
         y = sql.insert_actionLog('Pinpad', door, key, d)
         print y
-        return ws.send('denied')
-        # return True
+        #return ws.send('denied')
+        return True
 
 def get_access_log(days):
     d = sql.get_doorlog(days)
@@ -92,12 +94,25 @@ sockets = Sockets(app)
 
 
 @sockets.route("/usekey")
-def usekeySocket():
-    content = ws.receive()
-    print content
-    door = content['door']
-    pin = content['pincode']
-    use_key(pin, door)
+def usekeySocket(ws):
+    #while not ws.closed:
+    #    message = ws.receive()
+    #    ws.send(message)
+    #print ws.receive()["door"]
+    try:
+        content = json.loads(ws.receive())
+        print content
+        #print blah['door']
+        #print blah['pincode']
+        door = content['door']
+        pin = content['pincode']
+        if (use_key(pin, door)):
+            ws.send('allowed')
+        else:
+            ws.send('denied')
+    except:
+        print 'error'
+        ws.send('error')
 
 
 app.secret_key = 'ksajdkhsadulaulkj1092830983no1y24'  # Change this!

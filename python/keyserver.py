@@ -95,24 +95,17 @@ sockets = Sockets(app)
 
 @sockets.route("/usekey")
 def usekeySocket(ws):
-    #while not ws.closed:
-    #    message = ws.receive()
-    #    ws.send(message)
-    #print ws.receive()["door"]
     try:
         content = json.loads(ws.receive())
         print content
-        #print blah['door']
-        #print blah['pincode']
         door = content['door']
         pin = content['pincode']
         if (use_key(pin, door)):
             status = 'allowed'
         else:
             status = 'denied'
-        #payload = json.dumps({"door":door,"status":status})
-        payload = "{"+door+","+status+"}"
-        ws.send(payload)
+        ws.send('{"'+door+'","'+status+'"}')
+        #ws.send(json.dumps({"door":door,"status":status}))
     except:
         print 'error in websocket key check'
 

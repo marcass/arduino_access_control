@@ -95,6 +95,7 @@ sockets = Sockets(app)
 
 @sockets.route("/usekey")
 def usekeySocket(ws):
+    #content = json.loads(ws.receive())
     try:
         content = json.loads(ws.receive())
         print content
@@ -104,8 +105,11 @@ def usekeySocket(ws):
             status = 'allowed'
         else:
             status = 'denied'
-        ws.send('{"'+door+'","'+status+'"}')
-        #ws.send(json.dumps({"door":door,"status":status}))
+        #ws.send('{"'+door+'","'+status+'"}')
+        dict = {"door":door,"status":status}
+        data = json.dumps(dict)
+        print data
+        ws.send(data)
     except:
         print 'error in websocket key check'
 

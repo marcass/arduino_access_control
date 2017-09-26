@@ -164,7 +164,21 @@ void loop() {
         Serial.print("Received data: ");
         Serial.println(data);
       #endif
-      //parse json for permissions here {"door":"topgarage","action":"open"/"none"}
+      //parse json for permissions here {"door":"topgarage","action":"allowed"/"denied"}
+      StaticJsonBuffer<30> jsonBuffer;
+      JsonObject& root = jsonBuffer.parseObject(data);
+      if (root["door"] == door){
+        if (root["status"] == "allowed"){
+          Serial.println("Open door numbnuts!");
+        }
+        if (root["door"] == "denied"){
+          Serial.println("Won't open door numbnuts!");
+        }else{
+          Serial.println("Door vcerification error");
+        }
+      }else{
+        Serial.println("Wrong door");
+      }
     }
   }
   char key = customKeypad.getKey(); 

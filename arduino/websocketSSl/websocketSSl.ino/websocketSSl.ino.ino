@@ -4,6 +4,7 @@
 #include <ArduinoJson.h>
 
 const char door[] = "topgarage";
+bool send_key = true;
 
 // Here we define a maximum framelength to 64 bytes. Default is 256.
 //#define MAX_FRAME_LENGTH 64
@@ -17,13 +18,13 @@ const char door[] = "topgarage";
 SoftwareSerial Serial1(6, 7); // RX, TX
 #endif
 
-char ssid[] = "insecure";            // your network SSID (name)
-char pass[] = "blah";        // your network password
+char ssid[] = "ssid";            // your network SSID (name)
+char pass[] = "password";        // your network password
 int status = WL_IDLE_STATUS;     // the Wifi radio's status
 
 char server[] = "skibo.duckdns.org";
 int port = 443;
-char serverPath[] = "/websocket";
+char serverPath[] = "/websocket/usekey";
 
 unsigned long lastConnectionTime = 0;         // last time you connected to the server, in milliseconds
 const unsigned long postingInterval = 10000L; // delay between updates, in milliseconds
@@ -60,8 +61,9 @@ void setup() {
   Serial.println("You're connected to the network");
   
   printWifiStatus();
+}
 
-
+void websocketCon() {
   // Connect to the websocket server
   if (client.connectSSL(server, port)) {
     Serial.println("Connected");
@@ -88,40 +90,45 @@ void setup() {
 
 void loop() {
   String data;
-  //set buffer for json
-  StaticJsonBuffer<100> jsonBuffer;
-
-  //build json object tree in memmory
-  JsonObject& root = jsonBuffer.createObject();
-  //input key
-  root["door"] = door;
-  root["pincode"] = "1234";
-
   if (client.connected()) {
-    int len = root.measureLength();
-    //add 1 to len (as it comes up short)
-    len = len + 1;
-    char json[len];
-    root.printTo(json, sizeof(json));
-    webSocketClient.sendData(json);
-
+    if (send_key){
+      //set buffer for json
+      StaticJsonBuffer<100> jsonBuffer;
+    
+      //build json object tree in memmory
+      JsonObject& root = jsonBuffer.createObject();
+      //input key
+      root["door"] = door;
+      root["pincode"] = "1236";
+    
+  
+      int len = root.measureLength();
+      //add 1 to len (as it comes up short)
+      len = len + 1;
+      char json[len];
+      root.printTo(json, sizeof(json));
+      webSocketClient.sendData(json);
+      send_key = false;
+    }
+ 
     webSocketClient.getData(data);
 
     if (data.length() > 0) {
       Serial.print("Received data: ");
       Serial.println(data);
+      send_key = true;
+      //take a nap
+      delay(2000);
     }
-
   } else {
 
-    Serial.println("Client disconnected.");
-    while (1) {
-      // Hang on disconnect.
-    }
+  Serial.println("Client disconnected.");
+  websocketCon();
+  //while (1) {
+    // Hang on disconnect.
   }
-
   // wait to fully let the client disconnect
-  delay(3000);
+  //delay(3000);
 }
 
 

@@ -107,12 +107,14 @@ def usekeySocket(ws):
         door = content['door']
         pin = content['pincode']
         if (use_key(pin, door)):
+            status = 'allowed'
             ws.send('allowed')
         else:
+            status = 'denied'
             ws.send('denied')
+        ws.send(json.dumps({"door":door,"status":status}))
     except:
-        print 'error'
-        ws.send('error')
+        print 'error in websocket key check'
 
 
 app.secret_key = 'ksajdkhsadulaulkj1092830983no1y24'  # Change this!

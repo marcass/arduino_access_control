@@ -77,8 +77,8 @@ void setup() {
 
   // attempt to connect to WiFi network
   while ( status != WL_CONNECTED) {
-    char ssid[] = "skibo";            // your network SSID (name)
-    char pass[] = "r4bb1tshurtlegs";        // your network password
+    char ssid[] = "ssid";            // your network SSID (name)
+    char pass[] = "pass";        // your network password
     #ifdef debug
       Serial.print("Attempting to connect to WPA SSID: ");
       Serial.println(ssid);
@@ -171,7 +171,7 @@ void loop() {
         if (root["status"] == "allowed"){
           Serial.println("Open door numbnuts!");
         }
-        if (root["door"] == "denied"){
+        if (root["status"] == "denied"){
           Serial.println("Won't open door numbnuts!");
         }else{
           Serial.println("Door vcerification error");

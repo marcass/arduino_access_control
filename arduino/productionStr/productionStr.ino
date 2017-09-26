@@ -6,8 +6,8 @@
 //#define debug
 
 const char door[] = "topgarage";
-char ssid[] = "skibo";            // your network SSID (name)
-char pass[] = "r4bb1tshurtlegs";        // your network password
+char ssid[] = "ssid";            // your network SSID (name)
+char pass[] = "pass";        // your network password
 
 const byte ROWS = 4; //four rows
 const byte COLS = 4; //four columns

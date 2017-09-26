@@ -1,7 +1,6 @@
 #include <SPI.h>
 #include "WiFiEsp.h"
 #include <WebSocketClient.h>
-#include <ArduinoJson.h>
 #include <Keypad.h>
 
 //#define debug
@@ -35,6 +34,18 @@ byte rowPins[ROWS] = {8,9,10,11}; //connect to the row pinouts of the keypad
 byte colPins[COLS] = {2,3,4,5}; //connect to the column pinouts of the keypad
 String key_str = "";
 bool sendKey = false;
+unsigned long pin_start = 0;
+const unsigned long KEY_THRESH = 30000; //30sec to put pin in
+unsigned long relay_time = 0;
+const unsigned long RELAY_TRIG = 300;
+unsigned long status_time = 0;
+const unsigned long STATUS_TIME = 10000; //10sec
+const byte STATE_IDLE = 1;
+const byte STATE_TRIGGER = 2;
+byte state = STATE_IDLE;
+#define RELAY 12
+#define RED_LED 13
+#define GREEN_LED A0
 
 //initialize an instance of class NewKeypad
 Keypad customKeypad = Keypad( makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS);
@@ -63,6 +74,13 @@ void setup() {
   Serial.begin(115200);
   // initialize serial for ESP module
   Serial1.begin(9600);
+  //setup digital pins
+  pinMode(RELAY, OUTPUT);
+  digitalWrite(RELAY, LOW);
+  pinMode(RED_LED, OUTPUT);
+  digitalWrite(RED_LED, HIGH);
+  pinMode(GREEN_LED, OUTPUT);
+  digitalWrite(GREEN_LED, LOW);
   // initialize ESP module
   WiFi.init(&Serial1);
 
@@ -124,20 +142,8 @@ void websocketCon() {
 
 bool send_pin(String pin){
   if (client.connected()) {
-    //set buffer for json
-    StaticJsonBuffer<30> jsonBuffer;
-  
-    //build json object tree in memmory
-    JsonObject& root = jsonBuffer.createObject();
-    //input key
-    root["door"] = door;
-    root["pincode"] = key_str;
-    //measure lenght of array
-    int len = root.measureLength();
-    //add 1 to len (as it comes up short)
-    len = len + 1;
-    char json[len];
-    root.printTo(json, sizeof(json));
+    //build json-like object 
+    String json = "{'door':"+(String)door+",'pincode':"+pin+"}";
     webSocketClient.sendData(json);
     return true;
   }else{
@@ -152,37 +158,17 @@ bool send_pin(String pin){
   }
 }
 
-void loop() {
-  //put timer in here for dumping key_str after certain time ahs elapsed
-  //receive response
-  if (client.connected()) {
-    String data;
-    webSocketClient.getData(data);
-  
-    if (data.length() > 0) {
-      #ifdef debug
-        Serial.print("Received data: ");
-        Serial.println(data);
-      #endif
-      //parse json for permissions here {"door":"topgarage","action":"allowed"/"denied"}
-      StaticJsonBuffer<30> jsonBuffer;
-      JsonObject& root = jsonBuffer.parseObject(data);
-      if (root["door"] == door){
-        if (root["status"] == "allowed"){
-          Serial.println("Open door numbnuts!");
-        }
-        if (root["door"] == "denied"){
-          Serial.println("Won't open door numbnuts!");
-        }else{
-          Serial.println("Door vcerification error");
-        }
-      }else{
-        Serial.println("Wrong door");
-      }
+void keypadListen(){
+  //timeout for keys not pressed
+  if (millis() - pin_start > KEY_THRESH){
+    if (key_str != ""){
+      key_str = "";
     }
   }
   char key = customKeypad.getKey(); 
   if (key){
+    //restet timeout timer
+    pin_start = millis();
     if(key == '#'){
       sendKey = true;
     }else{
@@ -204,6 +190,73 @@ void loop() {
       //connect
       websocketCon();
     }
+  }
+}
+
+void open_door(){
+  if (relay_time == 0){
+    relay_time = millis();
+  }
+  if (millis() - relay_time > RELAY_TRIG){
+    digitalWrite(RELAY, LOW);
+  }else{
+    digitalWrite(RELAY, HIGH);
+  }
+  if (status_time == 0){
+    status_time = millis();
+  }
+  if (millis() - status_time > STATUS_TIME){
+    digitalWrite(GREEN_LED, LOW);
+    digitalWrite(RED_LED, HIGH);
+    relay_time = 0;
+    status_time = 0;
+    state = STATE_IDLE;
+  }else{
+    digitalWrite(GREEN_LED, HIGH);
+    digitalWrite(RED_LED, LOW);
+  }
+  
+}
+
+void loop() {
+  //state machine stuff
+  switch (state){
+    case STATE_IDLE:
+      keypadListen();
+      break;
+    case STATE_TRIGGER:
+      open_door();
+      break;
+  }
+  
+  //receive response
+  if (client.connected()) {
+    String data;
+    webSocketClient.getData(data);
+    if (data.length() > 0) {
+      #ifdef debug
+        Serial.print("Received data: ");
+        Serial.println(data);
+      #endif
+      //or send a list: {"topgarage", "allowed"}
+      String in_door = (String)data[0];
+      String in_status = (String)data[1];
+      if (in_door == door){
+        if (in_status == "allowed"){
+          Serial.println("Open door numbnuts!");
+          state = STATE_TRIGGER;
+        }
+        if (in_status == "denied"){
+          Serial.println("Won't open door numbnuts!");
+        }else{
+          Serial.println("Door vcerification error");
+        }          
+      }else{
+        Serial.println("Wrong door");
+      }
+    }
+  }else{
+    websocketCon();
   }
 }
 

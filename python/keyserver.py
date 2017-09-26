@@ -99,6 +99,7 @@ def usekeySocket(ws):
     #    message = ws.receive()
     #    ws.send(message)
     #print ws.receive()["door"]
+    #print json.loads(ws.receive())
     try:
         content = json.loads(ws.receive())
         print content
@@ -108,11 +109,12 @@ def usekeySocket(ws):
         pin = content['pincode']
         if (use_key(pin, door)):
             status = 'allowed'
-            ws.send('allowed')
+            #ws.send('allowed')
         else:
             status = 'denied'
-            ws.send('denied')
-        ws.send(json.dumps({"door":door,"status":status}))
+            #ws.send('denied')
+        ws.send('{"'+door+'","'+status+'"}')
+        #ws.send(json.dumps({"door":door,"status":status}))
     except:
         print 'error in websocket key check'
 

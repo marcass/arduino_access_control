@@ -51,6 +51,8 @@ int status = WL_IDLE_STATUS;     // the Wifi radio's status
 // Initialize the Ethernet client object
 WiFiEspClient client;
 WebSocketClient webSocketClient;
+// Define how many callback functions you have. Default is 1.
+#define CALLBACK_FUNCTIONS 1
 
 void setup() {
   // initialize serial for debugging

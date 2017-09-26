@@ -18,8 +18,8 @@ bool send_key = true;
 SoftwareSerial Serial1(6, 7); // RX, TX
 #endif
 
-char ssid[] = "ssid";            // your network SSID (name)
-char pass[] = "password";        // your network password
+char ssid[] = "skibo";            // your network SSID (name)
+char pass[] = "r4bb1tshurtlegs";        // your network password
 int status = WL_IDLE_STATUS;     // the Wifi radio's status
 
 char server[] = "skibo.duckdns.org";

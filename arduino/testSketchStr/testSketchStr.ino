@@ -1,9 +1,9 @@
-#include <SPI.h>
+//#include <SPI.h>
 #include "WiFiEsp.h"
 #include <WebSocketClient.h>
 #include <Keypad.h>
 
-//#define debug
+#define debug
 
 const char door[] = "topgarage";
 char ssid[] = "skibo";            // your network SSID (name)
@@ -19,19 +19,6 @@ char hexaKeys[ROWS][COLS] = {
   {'*','0','#','D'}
 };
 
-/*           Row pin
- * 1 2 3 A | 6
- * 4 5 6 B | 7
- * 7 8 9 C | 8
- * * 0 # D | 9
- * ---------
- * 2 3 4 5 <- Col pin
- * Pins numbered form left to right when looking at keys on keypad
- * Need D6 and D7 for software serial
- * 
- * byte rowPins[ROWS] = {6, 7, 8, 9}; //connect to the row pinouts of the keypad
- * byte colPins[COLS] = {2, 3, 4, 5}; //connect to the column pinouts of the keypad
- */
 byte rowPins[ROWS] = {8,9,10,11}; //connect to the row pinouts of the keypad
 byte colPins[COLS] = {2,3,4,5}; //connect to the column pinouts of the keypad
 String key_str = "";
@@ -52,12 +39,6 @@ byte state = STATE_IDLE;
 //initialize an instance of class NewKeypad
 Keypad customKeypad = Keypad( makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS);
 
-// Here we define a maximum framelength to 64 bytes. Default is 256.
-//#define MAX_FRAME_LENGTH 64
-
-// Define how many callback functions you have. Default is 1.
-#define CALLBACK_FUNCTIONS 1
-
 // Emulate Serial1 on pins 6/7 if not present
 #ifndef HAVE_HWSERIAL1
 #include "SoftwareSerial.h"
@@ -65,10 +46,11 @@ SoftwareSerial Serial1(6, 7); // RX, TX
 #endif
 
 int status = WL_IDLE_STATUS;     // the Wifi radio's status
+//char ssid[] = "skibo";            // your network SSID (name)
+//char pass[] = "r4bb1tshurtlegs";        // your network password
 
 // Initialize the Ethernet client object
 WiFiEspClient client;
-
 WebSocketClient webSocketClient;
 
 void setup() {
@@ -76,16 +58,8 @@ void setup() {
   Serial.begin(115200);
   // initialize serial for ESP module
   Serial1.begin(9600);
-  //setup digital pins
-  pinMode(RELAY, OUTPUT);
-  digitalWrite(RELAY, LOW);
-  pinMode(RED_LED, OUTPUT);
-  digitalWrite(RED_LED, HIGH);
-  pinMode(GREEN_LED, OUTPUT);
-  digitalWrite(GREEN_LED, LOW);
   // initialize ESP module
   WiFi.init(&Serial1);
-
   // check for the presence of the shield
   if (WiFi.status() == WL_NO_SHIELD) {
     #ifdef debug
@@ -94,11 +68,12 @@ void setup() {
     // don't continue
     while (true);
   }
-
   // attempt to connect to WiFi network
   while ( status != WL_CONNECTED) {
-    Serial.print("Attempting to connect to WPA SSID: ");
-    Serial.println(ssid);
+    #ifdef debug
+      Serial.print("Attempting to connect to WPA SSID: ");
+      Serial.println(ssid);
+    #endif
     // Connect to WPA/WPA2 network
     status = WiFi.begin(ssid, pass);
   }
@@ -112,6 +87,7 @@ void setup() {
     delay(5000);
     WSconnect();
   }
+  
 }
 
 bool WSconnect(){
@@ -225,7 +201,6 @@ void open_door(){
     digitalWrite(GREEN_LED, HIGH);
     digitalWrite(RED_LED, LOW);
   }
-  
 }
 
 void loop() {
@@ -238,38 +213,31 @@ void loop() {
       open_door();
       break;
   }
-  
-  //receive response
-  //if (client.connected()) {
-    String data;
-    webSocketClient.getData(data);
-    if (data.length() > 0) {
-      //#ifdef debug
-        Serial.print("Received data: ");
-        Serial.println(data);
-      //#endif
-      //or send a list: {"topgarage", "allowed"}
-      String in_door = (String)data[0];
-      String in_status = (String)data[1];
-      if (in_door == door){
-        if (in_status == "allowed"){
-          Serial.println("Open door numbnuts!");
-          state = STATE_TRIGGER;
-        }
-        if (in_status == "denied"){
-          Serial.println("Won't open door numbnuts!");
-        }else{
-          Serial.println("Door vcerification error");
-        }          
-      }else{
-        Serial.println("Wrong door");
+  String data;
+  webSocketClient.getData(data);
+  if (data.length() > 0) {
+    //#ifdef debug
+      Serial.print("Received data: ");
+      Serial.println(data);
+    //#endif
+    //or send a list: {"topgarage", "allowed"}
+    String in_door = (String)data[0];
+    String in_status = (String)data[1];
+    if (in_door == door){
+      if (in_status == "allowed"){
+        Serial.println("Open door numbnuts!");
+        state = STATE_TRIGGER;
       }
+      if (in_status == "denied"){
+        Serial.println("Won't open door numbnuts!");
+      }else{
+        Serial.println("Door vcerification error");
+      }          
+    }else{
+      Serial.println("Wrong door");
     }
-//  }else{
-//    //websocketCon();
-//  }
+  }
 }
-
 
 void printWifiStatus()
 {

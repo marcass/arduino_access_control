@@ -6,9 +6,10 @@
 
 //#define debug
 
-const char door[] = "topgarage";
+const String DOOR = "topgarage";
 char ssid[] = "ssid";            // your network SSID (name)
 char pass[] = "pass";        // your network password
+char HOST[] = "houseslave";
 
 const byte ROWS = 4; //four rows
 const byte COLS = 4; //four columns
@@ -49,6 +50,8 @@ byte state = STATE_IDLE;
 #define RELAY 12
 #define RED_LED 13
 #define GREEN_LED A0
+const String DOOR_PUB = "/door/"+DOOR;
+const String DOOR_SUB = "/"+DOOR;
 
 //initialize an instance of class NewKeypad
 Keypad customKeypad = Keypad( makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS);
@@ -83,7 +86,7 @@ void setup() {
   WiFi.init(&Serial1);
 
   // MQTT brokers usually use port 8883 for secure connections.
-  client.begin("skibo.duckdns.org", 443, net);
+  client.begin(HOST, net);
   client.onMessage(messageReceived);
 
   connect();
@@ -112,11 +115,11 @@ void connect(){
     printWifiStatus();
   #endif
 
-  client.subscribe("/doors");
+  client.subscribe(DOOR_SUB);
 }
 
 bool send_pin(String pin){
-
+  client.publish(DOOR_PUB, pin);
 }
 
 void keypadListen(){
@@ -188,10 +191,10 @@ void loop() {
   }
 
   // publish a message roughly every second.
-  if (millis() - lastMillis > 1000) {
-    lastMillis = millis();
-    client.publish("/hello", "world");
-  }  
+//  if (millis() - lastMillis > 1000) {
+//    lastMillis = millis();
+//    client.publish("/hello", "world");
+//  }  
   //state machine stuff
   switch (state){
     case STATE_IDLE:
@@ -207,6 +210,9 @@ void loop() {
 
 void messageReceived(String &topic, String &payload) {
   Serial.println("incoming: " + topic + " - " + payload);
+  if (payload == "1"){
+    state = STATE_TRIGGER;
+  }
 }
 
 void printWifiStatus()

@@ -55,6 +55,7 @@ from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from flask_sockets import Sockets
 import json
+import mqtt
 
 def use_key(key, door):
     d = sql.validate_key(key, door)
@@ -140,11 +141,11 @@ def usekey():
     door = content['door']
     pin = content['pincode']
     use_key(pin, door)
-    # if use_key(pin, door):
-    #     resp = {'pin_correct':True}
-    # else:
-    #     resp = {'pin_correct':False}
-    # return jsonify(resp), 200
+    if use_key(pin, door):
+        resp = {'pin_correct':1}
+    else:
+        resp = {'pin_correct':0}
+    return jsonify(resp), 200
 
 @app.route("/user", methods=['POST',])
 def add_user():
@@ -313,3 +314,5 @@ if __name__ == "__main__":
     from geventwebsocket.handler import WebSocketHandler
     server = pywsgi.WSGIServer(('', 5000), app, handler_class=WebSocketHandler)
     server.serve_forever()
+
+mqtt.client.loop_start()

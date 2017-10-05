@@ -1,0 +1,4 @@
+(fp_lib_table
+  (lib (name arduino_nano)(type KiCad)(uri "$(KIPRJMOD)/lib/arduino_nano.pretty")(options "")(descr ""))
+  (lib (name ESP8266)(type KiCad)(uri "$(KIPRJMOD)/lib/esp8266/kicad-ESP8266/ESP8266.pretty")(options "")(descr ""))
+)

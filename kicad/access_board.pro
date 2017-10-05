@@ -1,4 +1,4 @@
-update=Fri 15 Sep 2017 12:59:29 NZST
+update=Thu 05 Oct 2017 12:06:59 NZDT
 version=1
 last_client=kicad
 [pcbnew]
@@ -61,3 +61,4 @@ LibName29=valves
 LibName30=lib/ArduinoProMicro
 LibName31=lib/esp8266/kicad-ESP8266/ESP8266
 LibName32=lib/LM2596b
+LibName33=lib/arduino

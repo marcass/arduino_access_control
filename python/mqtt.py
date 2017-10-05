@@ -3,6 +3,7 @@ import paho.mqtt.publish as publish
 import requests
 import creds
 import time
+import json
 
 broker = creds.mosq_auth['broker']
 auth = creds.mosq_auth
@@ -12,7 +13,11 @@ auth = {'username':creds.mosq_auth['username'], 'password':creds.mosq_auth['pass
 broker = creds.mosq_auth['broker']
 
 def check_key(door, pin):
-    r = requests.post(API_URL, data = {'door':door, 'pincode': pin})
+    print door
+    print pin
+    payload ={'door':door, 'pincode': pin}
+    print payload
+    r = requests.post(API_URL, json=payload)
     print r
     topic = 'doors/response/'+door
     try:
@@ -47,8 +52,8 @@ client.connect(broker, 1883, 60)
 client.loop_start()
 
 
-while 1:
+#while 1:
     #time.sleep(5)
-    a = 'b'
+    #a = 'b'
 
 

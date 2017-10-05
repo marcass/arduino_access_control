@@ -55,7 +55,7 @@ from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from flask_sockets import Sockets
 import json
-#import mqtt
+import mqtt
 
 def use_key(key, door):
     d = sql.validate_key(key, door)
@@ -137,8 +137,11 @@ def list_allowed_keys():
 
 @app.route("/usekey", methods=['POST',])
 def usekey():
-    content = request.get_json(silent=False)
-    print content
+    try:
+        content = request.get_json(silent=False)
+        print content
+    except:
+        print 'failed to get data'
     door = content['door']
     pin = content['pincode']
     use_key(pin, door)

@@ -4,15 +4,15 @@
 #include <MQTTClient.h>
 
 
-//#define debug
+#define debug
 
-const String DOOR = "topgarage";
+char DOOR[] = "topgarage";
 char ssid[] = "ssid";            // your network SSID (name)
 char pass[] = "pass";            // your network password
 char HOST[] = "houseslave";
 
-const char USER[] = "mosquitto user";
-const char MOSQ_PASS[] = "mosquitto pass";
+const char USER[] = "user";
+const char MOSQ_PASS[] = "pass";
 
 const byte ROWS = 4; //four rows
 const byte COLS = 4; //four columns
@@ -53,8 +53,8 @@ byte state = STATE_IDLE;
 #define RELAY 12
 #define RED_LED 13
 #define GREEN_LED A0
-const String DOOR_PUB = "/door/request/"+DOOR;
-const String DOOR_SUB = "/door/response/"+DOOR;
+char DOOR_PUB[] = "doors/request/topgarage";
+char DOOR_SUB[] = "doors/response/topgarage";
 
 //initialize an instance of class NewKeypad
 Keypad customKeypad = Keypad( makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS);
@@ -118,14 +118,20 @@ void connect(){
     printWifiStatus();
   #endif
 
+  Serial.print("\nconnecting...");
+  while (!client.connect(DOOR, USER, MOSQ_PASS)) {
+    Serial.print(".");
+    delay(1000);
+  }
+  
   //boolean connect(const char clientId[], const char username[], const char password[]);
-  client.connect(DOOR, USER, MOSQ_PASS);
+  //client.connect(DOOR, USER, MOSQ_PASS);
   client.subscribe(DOOR_SUB);
 }
 
-bool send_pin(String pin){
+void send_pin(String pin){
   //boolean publish(const String &topic, const String &payload, bool retained, int qos);
-  client.publish(DOOR_PUB, pin, false, 2);
+  client.publish(DOOR_PUB, pin);
 }
 
 void keypadListen(){
@@ -149,12 +155,11 @@ void keypadListen(){
   }
   if (sendKey){
     Serial.println(key_str);
-    if (send_pin(key_str)){
-      key_str = "";
-      sendKey = false;
-    }else{
-      //do nothing and come back again
-    }
+    send_pin(key_str);
+    key_str = "";
+    sendKey = false;
+  }else{
+    //do nothing and come back again
   }
 }
 

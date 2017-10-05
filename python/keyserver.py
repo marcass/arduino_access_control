@@ -55,7 +55,7 @@ from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from flask_sockets import Sockets
 import json
-import mqtt
+#import mqtt
 
 def use_key(key, door):
     d = sql.validate_key(key, door)
@@ -138,6 +138,7 @@ def list_allowed_keys():
 @app.route("/usekey", methods=['POST',])
 def usekey():
     content = request.get_json(silent=False)
+    print content
     door = content['door']
     pin = content['pincode']
     use_key(pin, door)
@@ -315,4 +316,4 @@ if __name__ == "__main__":
     server = pywsgi.WSGIServer(('', 5000), app, handler_class=WebSocketHandler)
     server.serve_forever()
 
-mqtt.client.loop_start()
+#mqtt.client.loop_start()

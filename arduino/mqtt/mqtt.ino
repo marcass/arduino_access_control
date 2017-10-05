@@ -8,8 +8,11 @@
 
 const String DOOR = "topgarage";
 char ssid[] = "ssid";            // your network SSID (name)
-char pass[] = "pass";        // your network password
+char pass[] = "pass";            // your network password
 char HOST[] = "houseslave";
+
+const char USER[] = "mosquitto user";
+const char MOSQ_PASS[] = "mosquitto pass";
 
 const byte ROWS = 4; //four rows
 const byte COLS = 4; //four columns
@@ -50,8 +53,8 @@ byte state = STATE_IDLE;
 #define RELAY 12
 #define RED_LED 13
 #define GREEN_LED A0
-const String DOOR_PUB = "/door/"+DOOR;
-const String DOOR_SUB = "/"+DOOR;
+const String DOOR_PUB = "/door/request/"+DOOR;
+const String DOOR_SUB = "/door/response/"+DOOR;
 
 //initialize an instance of class NewKeypad
 Keypad customKeypad = Keypad( makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS);
@@ -115,11 +118,14 @@ void connect(){
     printWifiStatus();
   #endif
 
+  //boolean connect(const char clientId[], const char username[], const char password[]);
+  client.connect(DOOR, USER, MOSQ_PASS);
   client.subscribe(DOOR_SUB);
 }
 
 bool send_pin(String pin){
-  client.publish(DOOR_PUB, pin);
+  //boolean publish(const String &topic, const String &payload, bool retained, int qos);
+  client.publish(DOOR_PUB, pin, false, 2);
 }
 
 void keypadListen(){
@@ -143,22 +149,19 @@ void keypadListen(){
   }
   if (sendKey){
     Serial.println(key_str);
-   // if (net.connected()) {
-      if (send_pin(key_str)){
-        key_str = "";
-        sendKey = false;
-      }else{
-        //do nothing and come back again
-      }
-//    }else{
-//      //connect
-//      //websocketCon();
-//      Serial.print("Not connected, can't send");
-//    }
+    if (send_pin(key_str)){
+      key_str = "";
+      sendKey = false;
+    }else{
+      //do nothing and come back again
+    }
   }
 }
 
 void open_door(){
+  #ifdef debug
+    Serial.println("Opening door as requested");
+  #endif
   if (relay_time == 0){
     relay_time = millis();
   }
@@ -204,14 +207,16 @@ void loop() {
       open_door();
       break;
   }
-  
-  //receive response
 }
 
 void messageReceived(String &topic, String &payload) {
   Serial.println("incoming: " + topic + " - " + payload);
   if (payload == "1"){
     state = STATE_TRIGGER;
+  }else{
+    #ifdef debug
+      Serial.println("get fucked, open it yourself");
+    #endif
   }
 }
 

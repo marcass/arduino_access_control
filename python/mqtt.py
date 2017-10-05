@@ -9,7 +9,7 @@ API_URL = 'https://skibo.duckdns.org/api/usekey'
 def check_key(door, pin):
     r = requests.post(API_URL, data = {'door':door, 'pincode': pin})
     print r
-    topic = '/'+door
+    topic = '/door/response/'+door
     try:
         resp = r['pin_correct']
         publish.single(topic, resp, qos=2, auth=auth, hostname=broker)
@@ -22,7 +22,7 @@ def on_connect(client, userdata, flags, rc):
 
     # Subscribing in on_connect() means that if we lose the connection and
     # reconnect then subscriptions will be renewed.
-    client.subscribe("/door/#")
+    client.subscribe("/door/requests/#")
     
 # The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
@@ -33,7 +33,7 @@ def on_message(client, userdata, msg):
     
         
 #subscribe to broker and test for messages below alert values
-client = mqtt.Client()
+client = mqtt.Client(client_id="Python_doors")
 client.username_pw_set(username=creds.mosq_auth['username'], password=creds.mosq_auth['password'])
 client.on_connect = on_connect
 client.on_message = on_message

@@ -30,7 +30,7 @@ def on_connect(client, userdata, flags, rc):
 
     # Subscribing in on_connect() means that if we lose the connection and
     # reconnect then subscriptions will be renewed.
-    client.subscribe("doors/requests/#", qos=2)
+    client.subscribe("doors/request/#", qos=2)
     #client.subscribe("doors/requests/#")
 
 # The callback for when a PUBLISH message is received from the server.

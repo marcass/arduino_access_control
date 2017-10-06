@@ -29,7 +29,6 @@ LIBS:atmel
 LIBS:contrib
 LIBS:valves
 LIBS:ArduinoProMicro
-LIBS:ESP8266
 LIBS:LM2596b
 LIBS:arduino
 LIBS:access_board-cache
@@ -193,10 +192,6 @@ Text GLabel 3650 2350 2    60   Input ~ 0
 TX
 Text GLabel 3650 2450 2    60   Input ~ 0
 RX
-Wire Wire Line
-	1900 2400 2250 2400
-Wire Wire Line
-	1900 2500 2250 2500
 $Comp
 L CONN_01X04 J3
 U 1 1 59BEF50E
@@ -284,7 +279,7 @@ Wire Wire Line
 	3500 5300 3950 5300
 Text Notes 7700 4650 0    60   ~ 0
 Power in from garage door
-Text Notes 8650 1850 0    60   ~ 0
+Text Notes 8750 2000 0    60   ~ 0
 Connector for keypad
 $Comp
 L GND #PWR?
@@ -534,4 +529,60 @@ F 3 "" H 9100 3100 50  0001 C CNN
 	1    9100 3100
 	1    0    0    -1  
 $EndComp
+Text GLabel 2250 2200 0    60   Input ~ 0
+OPEN
+Text GLabel 2250 2300 0    60   Input ~ 0
+Closed
+$Comp
+L CONN_01X07 J4
+U 1 1 59D71F3D
+P 9500 1250
+F 0 "J4" H 9500 1650 50  0000 C CNN
+F 1 "CONN_01X07" V 9600 1250 50  0000 C CNN
+F 2 "" H 9500 1250 50  0001 C CNN
+F 3 "" H 9500 1250 50  0001 C CNN
+	1    9500 1250
+	1    0    0    -1  
+$EndComp
+Text GLabel 3650 1750 2    60   Input ~ 0
+relay
+Text GLabel 9300 1050 0    60   Input ~ 0
+relay
+$Comp
+L +5V #PWR?
+U 1 1 59D72015
+P 8650 800
+F 0 "#PWR?" H 8650 650 50  0001 C CNN
+F 1 "+5V" H 8650 940 50  0000 C CNN
+F 2 "" H 8650 800 50  0001 C CNN
+F 3 "" H 8650 800 50  0001 C CNN
+	1    8650 800 
+	1    0    0    -1  
+$EndComp
+Text GLabel 9300 1150 0    60   Input ~ 0
+OPEN
+Text GLabel 9300 1250 0    60   Input ~ 0
+Closed
+$Comp
+L GND #PWR?
+U 1 1 59D720EC
+P 8750 1550
+F 0 "#PWR?" H 8750 1300 50  0001 C CNN
+F 1 "GND" H 8750 1400 50  0000 C CNN
+F 2 "" H 8750 1550 50  0001 C CNN
+F 3 "" H 8750 1550 50  0001 C CNN
+	1    8750 1550
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	9300 1550 8750 1550
+Wire Wire Line
+	9300 1350 9300 1550
+Connection ~ 9300 1450
+Wire Wire Line
+	9300 950  8650 950 
+Wire Wire Line
+	8650 950  8650 800 
+Text Notes 8850 700  0    60   ~ 0
+Relay and sensor connectors
 $EndSCHEMATC

@@ -50,11 +50,18 @@ const unsigned long STATUS_TIME = 10000; //10sec
 const byte STATE_IDLE = 1;
 const byte STATE_TRIGGER = 2;
 byte state = STATE_IDLE;
-#define RELAY 12
-#define RED_LED 13
-#define GREEN_LED A0
+#define RELAY 13
+#define LED 12
+const int SW_OPEN = A0;
+const int SW_CLOSED = A1;
 char DOOR_PUB[] = "doors/request/topgarage";
 char DOOR_SUB[] = "doors/response/topgarage";
+char DOOR_STATE[] = "doors/status/topgarage";
+const int STATE_OPEN = 0;
+const int STATE_CLOSED = 1;
+const int STATE_UNKNOWN = 2;
+int door_state = STATE_UNKNOWN;
+int prev_door_state;
 
 //initialize an instance of class NewKeypad
 Keypad customKeypad = Keypad( makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS);
@@ -81,10 +88,11 @@ void setup() {
   //setup digital pins
   pinMode(RELAY, OUTPUT);
   digitalWrite(RELAY, LOW);
-  pinMode(RED_LED, OUTPUT);
-  digitalWrite(RED_LED, HIGH);
-  pinMode(GREEN_LED, OUTPUT);
-  digitalWrite(GREEN_LED, LOW);
+  pinMode(LED, OUTPUT);
+  digitalWrite(LED, LOW);
+  pinMode(SW_OPEN, INPUT_PULLUP);
+  pinMode(SW_CLOSED, INPUT_PULLUP);
+  digitalWrite(LED, LOW);
   // initialize ESP module
   WiFi.init(&Serial1);
 
@@ -188,16 +196,28 @@ void open_door(){
     status_time = millis();
   }
   if (millis() - status_time > STATUS_TIME){
-    digitalWrite(GREEN_LED, LOW);
-    digitalWrite(RED_LED, HIGH);
+    Serial.print("Do LED stuff for here");
     relay_time = 0;
     status_time = 0;
     state = STATE_IDLE;
   }else{
-    digitalWrite(GREEN_LED, HIGH);
-    digitalWrite(RED_LED, LOW);
+    Serial.print("Do LED stuff for here");
   }
+}
 
+void check_state(){
+  //if SW_OPEN is LOW (and SW_CLOSED is HIGH) door is open and vice versa. Unkown if not in either of these
+  if ((digitalRead(SW_OPEN) == LOW) and (digitalRead(SW_CLOSED == HIGH))){
+    door_state = STATE_OPEN;
+  }else if((digitalRead(SW_OPEN) == HIGH) and (digitalRead(SW_CLOSED == LOW))){
+    door_state = STATE_CLOSED;
+  }else{
+    door_state = STATE_UNKNOWN;
+  }
+  if (door_state != prev_door_state){
+    client.publish(DOOR_STATE, door_state, true, 2);
+    prev_door_state = door_state;
+  }
 }
 
 void loop() {
@@ -209,6 +229,7 @@ void loop() {
   switch (state){
     case STATE_IDLE:
       keypadListen();
+      check_state();
       break;
     case STATE_TRIGGER:
       open_door();

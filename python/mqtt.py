@@ -16,10 +16,10 @@ def check_key(door, pin):
     payload ={'door':door, 'pincode': pin}
     # print payload
     r = requests.post(API_URL, json=payload)
-    # print r
+    print r.json()
     topic = 'doors/response/'+door
     try:
-        resp = r['pin_correct']
+        resp = r.json()['pin_correct']
         publish.single(topic, resp, qos=2, auth=auth, hostname=broker)
     except:
         print 'failed to publish'

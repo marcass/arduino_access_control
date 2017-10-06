@@ -33,7 +33,7 @@ char hexaKeys[ROWS][COLS] = {
  * 2 3 4 5 <- Col pin
  * Pins numbered form left to right when looking at keys on keypad
  * Need D6 and D7 for software serial
- * 
+ *
  * byte rowPins[ROWS] = {6, 7, 8, 9}; //connect to the row pinouts of the keypad
  * byte colPins[COLS] = {2, 3, 4, 5}; //connect to the column pinouts of the keypad
  */
@@ -119,11 +119,12 @@ void connect(){
   #endif
 
   Serial.print("\nconnecting...");
-  while (!client.connect(DOOR, USER, MOSQ_PASS)) {
+  while (!client.connect(DOOR, USER, MOSQ_PASS, false, 2)) {
+  //while (!client.connect(DOOR, USER, MOSQ_PASS)) {
     Serial.print(".");
     delay(1000);
   }
-  
+
   //boolean connect(const char clientId[], const char username[], const char password[]);
   //client.connect(DOOR, USER, MOSQ_PASS);
   client.subscribe(DOOR_SUB);
@@ -141,7 +142,7 @@ void keypadListen(){
       key_str = "";
     }
   }
-  char key = customKeypad.getKey(); 
+  char key = customKeypad.getKey();
   if (key){
     //restet timeout timer
     pin_start = millis();
@@ -188,7 +189,7 @@ void open_door(){
     digitalWrite(GREEN_LED, HIGH);
     digitalWrite(RED_LED, LOW);
   }
-  
+
 }
 
 void loop() {
@@ -197,13 +198,6 @@ void loop() {
   if (!client.connected()) {
     connect();
   }
-
-  // publish a message roughly every second.
-//  if (millis() - lastMillis > 1000) {
-//    lastMillis = millis();
-//    client.publish("/hello", "world");
-//  }  
-  //state machine stuff
   switch (state){
     case STATE_IDLE:
       keypadListen();

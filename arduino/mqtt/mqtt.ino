@@ -119,7 +119,7 @@ void connect(){
   #endif
 
   Serial.print("\nconnecting...");
-  while (!client.connect(DOOR, USER, MOSQ_PASS, false, 2)) {
+  while (!client.connect(DOOR, USER, MOSQ_PASS)) {
   //while (!client.connect(DOOR, USER, MOSQ_PASS)) {
     Serial.print(".");
     delay(1000);
@@ -132,7 +132,15 @@ void connect(){
 
 void send_pin(String pin){
   //boolean publish(const String &topic, const String &payload, bool retained, int qos);
-  client.publish(DOOR_PUB, pin);
+  if (client.publish(DOOR_PUB, pin, false, 2)){
+    #ifdef debug
+      Serial.println("Send successful");
+    #endif
+  }else{
+    #ifdef debug
+      Serial.println("Send failed");
+    #endif
+  }
 }
 
 void keypadListen(){

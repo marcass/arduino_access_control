@@ -50,10 +50,10 @@ const unsigned long STATUS_TIME = 10000; //10sec
 const byte STATE_IDLE = 1;
 const byte STATE_TRIGGER = 2;
 byte state = STATE_IDLE;
-#define RELAY 13
-#define LED 12
-const int SW_OPEN = A0;
-const int SW_CLOSED = A1;
+#define RELAY 12
+#define LED 13
+#define SW_OPEN A0
+#define SW_CLOSED A1
 char DOOR_PUB[] = "doors/request/topgarage";
 char DOOR_SUB[] = "doors/response/topgarage";
 char DOOR_STATE[] = "doors/status/topgarage";
@@ -215,7 +215,11 @@ void check_state(){
     door_state = STATE_UNKNOWN;
   }
   if (door_state != prev_door_state){
-    client.publish(DOOR_STATE, door_state, true, 2);
+    #ifdef debug
+      Serial.print("Publishing state change to: ");
+      Serial.println(door_state);
+    #endif
+    client.publish(DOOR_STATE, (String)door_state);
     prev_door_state = door_state;
   }
 }

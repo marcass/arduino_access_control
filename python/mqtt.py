@@ -44,11 +44,16 @@ def on_message(client, userdata, msg):
         check_key(door, msg.payload)
     if 'status' in msg.topic:
         #publish status
-        status_dict = {0: 'Open', 1: 'Closed', 2:'Unknown'}
-        payload = {'door': door, 'status':status_dict[msg.payload]}
-        print 'Sending status update '+payload
-        r = requests.put(API_URL, json=payload)
-        print r.json()
+        status_dict = {'0': 'Open', '1': 'Closed', '2':'Unknown'}
+        try:
+            print status_dict[msg.payload]
+            status = status_dict[msg.payload]
+            payload = {'door': door, 'status':status}
+            print 'Sending status update '+payload
+            r = requests.put(API_URL, json=payload)
+            print r.json()
+        except:
+            print 'Status error'
 
 
 #subscribe to broker and test for messages below alert values

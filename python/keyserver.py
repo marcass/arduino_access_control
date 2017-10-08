@@ -2,7 +2,7 @@
 #- front end https://auth0.com/blog/vuejs2-authentication-tutorial/
 
 # USAGE:
-# INSTALL: sudo pip install flask flask-cors
+# INSTALL: sudo pip install flask flask-cors pyopenssl
 # START REST API with:
 #    FLASK_APP=keyserver.py flask run
 # START REST and WebSockets with:
@@ -90,29 +90,29 @@ def keycode_validation(keycode):
 sql.setup_db()
 app = Flask(__name__)
 CORS(app)
-sockets = Sockets(app)
+#sockets = Sockets(app)
 #https://github.com/kennethreitz/flask-sockets
 
 
-@sockets.route("/usekey")
-def usekeySocket(ws):
-    #content = json.loads(ws.receive())
-    try:
-        content = json.loads(ws.receive())
-        print content
-        door = content['door']
-        pin = content['pincode']
-        if (use_key(pin, door)):
-            status = 'allowed'
-        else:
-            status = 'denied'
-        #ws.send('{"'+door+'","'+status+'"}')
-        dict = {"door":door,"status":status}
-        data = json.dumps(dict)
-        print data
-        ws.send(data)
-    except:
-        print 'error in websocket key check'
+#@sockets.route("/usekey")
+#def usekeySocket(ws):
+#    #content = json.loads(ws.receive())
+#    try:
+#        content = json.loads(ws.receive())
+#        print content
+#        door = content['door']
+#        pin = content['pincode']
+#        if (use_key(pin, door)):
+#            status = 'allowed'
+#        else:
+#            status = 'denied'
+#        #ws.send('{"'+door+'","'+status+'"}')
+#        dict = {"door":door,"status":status}
+#        data = json.dumps(dict)
+#        print data
+#        ws.send(data)
+#    except:
+#        print 'error in websocket key check'
 
 
 app.secret_key = 'ksajdkhsadulaulkj1092830983no1y24'  # Change this!
@@ -314,9 +314,8 @@ def getAccessLog():
     return jsonify(resp), 200
 
 if __name__ == "__main__":
-    from gevent import pywsgi
-    from geventwebsocket.handler import WebSocketHandler
-    server = pywsgi.WSGIServer(('', 5000), app, handler_class=WebSocketHandler)
-    server.serve_forever()
-
-#mqtt.client.loop_start()
+    app.run(ssl_context='adhoc')
+#    from gevent import pywsgi
+#    from geventwebsocket.handler import WebSocketHandler
+#    server = pywsgi.WSGIServer(('', 5000), app, handler_class=WebSocketHandler)
+#    server.serve_forever()

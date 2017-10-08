@@ -90,9 +90,10 @@ void setup() {
   digitalWrite(RELAY, LOW);
   pinMode(LED, OUTPUT);
   digitalWrite(LED, LOW);
-  pinMode(SW_OPEN, INPUT_PULLUP);
-  pinMode(SW_CLOSED, INPUT_PULLUP);
-  digitalWrite(LED, LOW);
+  pinMode(SW_OPEN, INPUT);
+  pinMode(SW_CLOSED, INPUT);
+  digitalWrite(SW_OPEN, INPUT_PULLUP);
+  digitalWrite(SW_CLOSED, INPUT_PULLUP);
   // initialize ESP module
   WiFi.init(&Serial1);
 
@@ -207,11 +208,15 @@ void open_door(){
 
 void check_state(){
   //if SW_OPEN is LOW (and SW_CLOSED is HIGH) door is open and vice versa. Unkown if not in either of these
-  if ((digitalRead(SW_OPEN) == LOW) and (digitalRead(SW_CLOSED == HIGH))){
+  int open_reed = digitalRead(SW_OPEN);
+  int closed_reed = digitalRead(SW_CLOSED);
+  if ((open_reed == LOW) && (closed_reed == HIGH)){
     door_state = STATE_OPEN;
-  }else if((digitalRead(SW_OPEN) == HIGH) and (digitalRead(SW_CLOSED == LOW))){
+  }
+  else if((open_reed == HIGH) && (closed_reed == LOW)){
     door_state = STATE_CLOSED;
-  }else{
+  }
+  else{
     door_state = STATE_UNKNOWN;
   }
   if (door_state != prev_door_state){

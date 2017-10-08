@@ -8,14 +8,14 @@ import json
 broker = creds.mosq_auth['broker']
 auth = creds.mosq_auth
 #API_URL = 'https://skibo.duckdns.org/api/usekey'
-API_URL = 'http://localhost:5000/usekey'
+API_URL = 'http://localhost:5000/'
 auth = {'username':creds.mosq_auth['username'], 'password':creds.mosq_auth['password']}
 broker = creds.mosq_auth['broker']
 
 def check_key(door, pin):
     payload ={'door':door, 'pincode': pin}
     # print payload
-    r = requests.post(API_URL, json=payload)
+    r = requests.post(API_URL+'usekey', json=payload)
     print r.json()
     topic = 'doors/response/'+door
     try:
@@ -49,8 +49,8 @@ def on_message(client, userdata, msg):
             print status_dict[msg.payload]
             status = status_dict[msg.payload]
             payload = {'door': door, 'status':status}
-            print 'Sending status update '+payload
-            r = requests.put(API_URL, json=payload)
+            print payload
+            r = requests.put(API_URL+'door/status', json=payload)
             print r.json()
         except:
             print 'Status error'

@@ -4,6 +4,7 @@ import requests
 import creds
 import time
 import json
+import ast
 
 broker = creds.mosq_auth['broker']
 auth = creds.mosq_auth
@@ -12,10 +13,10 @@ API_URL = 'http://localhost:5000/'
 auth = {'username':creds.mosq_auth['username'], 'password':creds.mosq_auth['password']}
 broker = creds.mosq_auth['broker']
 
-def check_key(door, pin):
-    payload ={'door':door, 'pincode': pin}
+def check(door, data, route):
+    payload ={'door':door, 'pincode': data}
     # print payload
-    r = requests.post(API_URL+'usekey', json=payload)
+    r = requests.post(API_URL+route, json=payload)
     print r.json()
     topic = 'doors/response/'+door
     try:
@@ -41,7 +42,9 @@ def on_message(client, userdata, msg):
     print 'Door is '+door
     if 'request' in msg.topic:
         print 'Checking door key'
-        check_key(door, msg.payload)
+        check(door, msg.payload, 'usekey')
+    if 'command' in msg.topic:
+        check(door, msg.payload, 'mqtt')
     if 'status' in msg.topic:
         #publish status
         status_dict = {'0': 'Open', '1': 'Closed', '2':'Unknown'}

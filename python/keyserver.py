@@ -74,6 +74,9 @@ def use_key(key, door):
         #return ws.send('denied')
         return True
 
+def use_mqtt(key, door):
+    print 'validate user here'
+
 def get_access_log(days):
     d = sql.get_doorlog(days)
     return d
@@ -144,8 +147,24 @@ def usekey():
         print 'failed to get data'
     door = content['door']
     pin = content['pincode']
-    use_key(pin, door)
+    #use_key(pin, door)
     if use_key(pin, door):
+        resp = {'pin_correct':1}
+    else:
+        resp = {'pin_correct':0}
+    return jsonify(resp), 200
+
+@app.route("/mqtt", methods=['POST',])
+def mqtt_user():
+    try:
+        content = request.get_json(silent=False)
+        print content
+    except:
+        print 'failed to get data'
+    door = content['door']
+    pin = content['pincode']
+    #use_mqtt(pin, door)
+    if use_mqtt(pin, door):
         resp = {'pin_correct':1}
     else:
         resp = {'pin_correct':0}

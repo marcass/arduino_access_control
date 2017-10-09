@@ -13,10 +13,10 @@ API_URL = 'http://localhost:5000/'
 auth = {'username':creds.mosq_auth['username'], 'password':creds.mosq_auth['password']}
 broker = creds.mosq_auth['broker']
 
-def check(door, data, route):
+def check_key(door, data):
     payload ={'door':door, 'pincode': data}
     # print payload
-    r = requests.post(API_URL+route, json=payload)
+    r = requests.post(API_URL+'usekey', json=payload)
     print r.json()
     topic = 'doors/response/'+door
     try:
@@ -32,7 +32,7 @@ def on_connect(client, userdata, flags, rc):
     # Subscribing in on_connect() means that if we lose the connection and
     # reconnect then subscriptions will be renewed.
     client.subscribe([("doors/request/#", 2), ("doors/status/#", 2)])
-    
+
     #client.subscribe("doors/requests/#")
 
 # The callback for when a PUBLISH message is received from the server.
@@ -42,9 +42,7 @@ def on_message(client, userdata, msg):
     print 'Door is '+door
     if 'request' in msg.topic:
         print 'Checking door key'
-        check(door, msg.payload, 'usekey')
-    if 'command' in msg.topic:
-        check(door, msg.payload, 'mqtt')
+        check_key(door, msg.payload)
     if 'status' in msg.topic:
         #publish status
         status_dict = {'0': 'Open', '1': 'Closed', '2':'Unknown'}

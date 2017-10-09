@@ -53,7 +53,6 @@ import sql
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
-from flask_sockets import Sockets
 import json
 import mqtt
 
@@ -124,12 +123,36 @@ jwt = JWTManager(app)
 
 import views_auth
 
+# Provide a method to create access tokens. The create_access_token()
+# function is used to actually generate the token
+# place @jwt_required above route to protect it
+@app.route('/login', methods=['POST'])
+def login():
+    if not request.is_json:
+        return jsonify({"msg": "Missing JSON in request"}), 400
+
+    params = request.get_json()
+    username = params.get('username', None)
+    password = params.get('password', None)
+
+    if not username:
+        return jsonify({"msg": "Missing username parameter"}), 400
+    if not password
+        return jsonify({"msg": "Missing password parameter"}), 400
+
+    if username != 'test' or password != 'test':
+        return jsonify({"msg": "Bad username or password"}), 401
+
+    # Identity can be any data that is json serializable
+    ret = {'access_token': create_access_token(identity=username)}
+    return jsonify(ret), 200
 
 @app.route("/")
 def hello():
     return "Hello World!"
 
 @app.route("/listallowed", methods=['GET',])
+@jwt_required
 def list_allowed_keys():
     '''
     List doors with allowed users

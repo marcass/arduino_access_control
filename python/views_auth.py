@@ -1,5 +1,6 @@
 # Mostly obtained from:
 # https://github.com/vimalloc/flask-jwt-extended
+# also check out: https://gist.github.com/jslvtr/139cf76db7132b53f2b20c5b6a9fa7ad
 
 from flask import Flask, request, jsonify 
 from flask_jwt_extended import jwt_required, \

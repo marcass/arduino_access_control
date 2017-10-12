@@ -322,12 +322,12 @@ Text GLabel 3650 1950 2    60   Input ~ 0
 $Comp
 L CONN_01X03 J1
 U 1 1 59D57AA6
-P 1050 5950
-F 0 "J1" H 1050 6150 50  0000 C CNN
-F 1 "CONN_01X03" V 1150 5950 50  0000 C CNN
-F 2 "Connectors_Phoenix:PhoenixContact_MCV-G_03x3.81mm_Vertical" H 1050 5950 50  0001 C CNN
-F 3 "" H 1050 5950 50  0001 C CNN
-	1    1050 5950
+P 1450 6450
+F 0 "J1" H 1450 6650 50  0000 C CNN
+F 1 "CONN_01X03" V 1550 6450 50  0000 C CNN
+F 2 "Connectors_Phoenix:PhoenixContact_MCV-G_03x3.81mm_Vertical" H 1450 6450 50  0001 C CNN
+F 3 "" H 1450 6450 50  0001 C CNN
+	1    1450 6450
 	1    0    0    -1  
 $EndComp
 $Comp
@@ -432,7 +432,7 @@ Text GLabel 2250 2300 0    60   Input ~ 0
 Closed
 Text GLabel 3650 1750 2    60   Input ~ 0
 relay
-Text GLabel 9550 1550 0    60   Input ~ 0
+Text GLabel 8950 2750 0    60   Input ~ 0
 relay
 $Comp
 L +5V #PWR012
@@ -445,9 +445,9 @@ F 3 "" H 8900 1300 50  0001 C CNN
 	1    8900 1300
 	1    0    0    -1  
 $EndComp
-Text GLabel 9550 1650 0    60   Input ~ 0
+Text GLabel 8950 2650 0    60   Input ~ 0
 OPEN
-Text GLabel 9550 1750 0    60   Input ~ 0
+Text GLabel 8950 2550 0    60   Input ~ 0
 Closed
 $Comp
 L GND #PWR013
@@ -591,4 +591,26 @@ F 3 "" H 2250 6450 50  0001 C CNN
 $EndComp
 Text Notes 3900 6500 0    60   ~ 0
 http://support.seeedstudio.com/knowledgebase/articles/388503-what-are-the-pcb-panelization-rules
+$Comp
+L CONN_01X03 J13
+U 1 1 59DD964A
+P 1050 6450
+F 0 "J13" H 1050 6650 50  0000 C CNN
+F 1 "CONN_01X03" V 1150 6450 50  0000 C CNN
+F 2 "Connectors_Phoenix:PhoenixContact_MCV-G_03x3.81mm_Vertical" H 1050 6450 50  0001 C CNN
+F 3 "" H 1050 6450 50  0001 C CNN
+	1    1050 6450
+	-1   0    0    1   
+$EndComp
+$Comp
+L +5V #PWR?
+U 1 1 59DE983C
+P 2950 1250
+F 0 "#PWR?" H 2950 1100 50  0001 C CNN
+F 1 "+5V" H 2950 1390 50  0000 C CNN
+F 2 "" H 2950 1250 50  0001 C CNN
+F 3 "" H 2950 1250 50  0001 C CNN
+	1    2950 1250
+	1    0    0    -1  
+$EndComp
 $EndSCHEMATC

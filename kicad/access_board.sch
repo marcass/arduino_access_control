@@ -432,7 +432,7 @@ Text GLabel 2250 2300 0    60   Input ~ 0
 Closed
 Text GLabel 3650 1750 2    60   Input ~ 0
 relay
-Text GLabel 9550 1550 0    60   Input ~ 0
+Text GLabel 9550 2150 0    60   Input ~ 0
 relay
 $Comp
 L +5V #PWR012
@@ -445,9 +445,9 @@ F 3 "" H 8900 1300 50  0001 C CNN
 	1    8900 1300
 	1    0    0    -1  
 $EndComp
-Text GLabel 9550 1650 0    60   Input ~ 0
+Text GLabel 9550 2050 0    60   Input ~ 0
 OPEN
-Text GLabel 9550 1750 0    60   Input ~ 0
+Text GLabel 9550 1950 0    60   Input ~ 0
 Closed
 $Comp
 L GND #PWR013
@@ -460,11 +460,6 @@ F 3 "" H 9000 2050 50  0001 C CNN
 	1    9000 2050
 	1    0    0    -1  
 $EndComp
-Wire Wire Line
-	9550 2050 9000 2050
-Wire Wire Line
-	9550 1850 9550 2050
-Connection ~ 9550 1950
 Wire Wire Line
 	9550 1450 8900 1450
 Wire Wire Line
@@ -528,7 +523,7 @@ F 3 "" H 9750 1800 50  0001 C CNN
 	1    9750 1800
 	1    0    0    -1  
 $EndComp
-Text GLabel 9550 2150 0    60   Input ~ 0
+Text GLabel 9550 1550 0    60   Input ~ 0
 A2
 Text GLabel 2250 2400 0    60   Input ~ 0
 A2
@@ -602,4 +597,22 @@ F 3 "" H 1050 6450 50  0001 C CNN
 	1    1050 6450
 	-1   0    0    1   
 $EndComp
+$Comp
+L +5V #PWR?
+U 1 1 59DE983C
+P 2950 1250
+F 0 "#PWR?" H 2950 1100 50  0001 C CNN
+F 1 "+5V" H 2950 1390 50  0000 C CNN
+F 2 "" H 2950 1250 50  0001 C CNN
+F 3 "" H 2950 1250 50  0001 C CNN
+	1    2950 1250
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	9550 1850 9000 1850
+Wire Wire Line
+	9000 1850 9000 2050
+Wire Wire Line
+	9550 1650 9550 1850
+Connection ~ 9550 1750
 $EndSCHEMATC

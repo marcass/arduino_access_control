@@ -137,7 +137,7 @@ def login():
 
     if not username:
         return jsonify({"msg": "Missing username parameter"}), 400
-    if not password
+    if not password:
         return jsonify({"msg": "Missing password parameter"}), 400
 
     if username != 'test' or password != 'test':
@@ -152,7 +152,7 @@ def hello():
     return "Hello World!"
 
 @app.route("/listallowed", methods=['GET',])
-@jwt_required
+#@jwt_required
 def list_allowed_keys():
     '''
     List doors with allowed users

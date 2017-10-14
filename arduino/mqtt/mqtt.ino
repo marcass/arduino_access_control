@@ -136,7 +136,8 @@ void connect(){
 
   //boolean connect(const char clientId[], const char username[], const char password[]);
   //client.connect(DOOR, USER, MOSQ_PASS);
-  client.subscribe(DOOR_SUB);
+  //boolean subscribe(const String &topic, int qos);
+  client.subscribe(DOOR_SUB, 2);
 }
 
 void send_pin(String pin){
@@ -224,8 +225,16 @@ void check_state(){
       Serial.print("Publishing state change to: ");
       Serial.println(door_state);
     #endif
-    client.publish(DOOR_STATE, (String)door_state);
-    prev_door_state = door_state;
+    if (client.publish(DOOR_STATE, (String)door_state, true, 2)){
+    #ifdef debug
+      Serial.println("Status send successful");
+    #endif
+  }else{
+    #ifdef debug
+      Serial.println("Status send failed");
+    #endif
+  }
+  prev_door_state = door_state;
   }
 }
 

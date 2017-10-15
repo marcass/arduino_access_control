@@ -1,8 +1,8 @@
 (export (version D)
   (design
     (source /home/mw/git/arduino_access_control/kicad/access_board.sch)
-    (date "Thu 12 Oct 2017 11:24:10 NZDT")
-    (tool "Eeschema 4.0.6+dfsg1-1")
+    (date "Sun 15 Oct 2017 08:43:05 NZDT")
+    (tool "Eeschema 4.0.5+dfsg1-4")
     (sheet (number 1) (name /) (tstamps /)
       (title_block
         (title)
@@ -24,12 +24,12 @@
     (comp (ref U2)
       (value ESP-01v090)
       (footprint ESP8266:ESP-01)
-      (libsource (lib ESP8266) (part ESP-01v090))
+      (libsource (lib access_board-cache) (part ESP-01v090))
       (sheetpath (names /) (tstamps /))
       (tstamp 59BB251E))
     (comp (ref C1)
-      (value 100uF)
-      (footprint Capacitors_THT:CP_Radial_D10.0mm_P2.50mm)
+      (value 1000uF)
+      (footprint Capacitors_THT:CP_Radial_D13.0mm_P5.00mm)
       (libsource (lib device) (part CP))
       (sheetpath (names /) (tstamps /))
       (tstamp 59BB2C05))
@@ -89,7 +89,7 @@
       (tstamp 59D5820E))
     (comp (ref C2)
       (value 1000uF)
-      (footprint Capacitors_THT:CP_Radial_D10.0mm_P2.50mm)
+      (footprint Capacitors_THT:CP_Radial_D13.0mm_P5.00mm)
       (libsource (lib device) (part CP))
       (sheetpath (names /) (tstamps /))
       (tstamp 59D5933F))
@@ -232,9 +232,7 @@
       (pins
         (pin (num 1) (name K) (type passive))
         (pin (num 2) (name A) (type passive))))
-    (libpart (lib ESP8266) (part ESP-01v090)
-      (description "ESP8266 ESP-01 module, v090")
-      (docs http://l0l.org.uk/2014/12/esp8266-modules-hardware-guide-gotta-catch-em-all/)
+    (libpart (lib access_board-cache) (part ESP-01v090)
       (footprints
         (fp ESP-01*))
       (fields
@@ -326,8 +324,8 @@
       (uri /usr/share/kicad/library/conn.lib))
     (library (logical regul)
       (uri /usr/share/kicad/library/regul.lib))
-    (library (logical ESP8266)
-      (uri /home/mw/git/arduino_access_control/kicad/lib/esp8266/kicad-ESP8266/ESP8266.lib))
+    (library (logical access_board-cache)
+      (uri /home/mw/git/arduino_access_control/kicad/access_board-cache.lib))
     (library (logical arduino)
       (uri /home/mw/git/arduino_access_control/kicad/lib/arduino.lib)))
   (nets

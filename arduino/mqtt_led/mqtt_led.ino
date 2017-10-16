@@ -67,9 +67,12 @@ const int STATE_UNKNOWN = 2;
 int door_state = STATE_UNKNOWN;
 int prev_door_state;
 //led states
-const int NOT_CONN = 3;
-int led_state = NOT_CONN;
-int pix;
+const byte NOT_CONN = 3;
+const byte KEY_IN = 4;
+const byte KEY_RESP = 5;
+const byte DENIED = 6;
+byte led_state = NOT_CONN;
+byte disp_pix = 0;
 
 //initialize an instance of class NewKeypad
 Keypad customKeypad = Keypad( makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS);
@@ -146,11 +149,35 @@ void connect(){
     Serial.print(".");
     delay(1000);
   }
+  led_state = state;
 
   //boolean connect(const char clientId[], const char username[], const char password[]);
   //client.connect(DOOR, USER, MOSQ_PASS);
   client.subscribe(DOOR_SUB);
   led_state = state;
+}
+
+void check_state(){
+  //if SW_OPEN is LOW (and SW_CLOSED is HIGH) door is open and vice versa. Unkown if not in either of these
+  int open_reed = digitalRead(SW_OPEN);
+  int closed_reed = digitalRead(SW_CLOSED);
+  if ((open_reed == LOW) && (closed_reed == HIGH)){
+    door_state = STATE_OPEN;
+  }
+  else if((open_reed == HIGH) && (closed_reed == LOW)){
+    door_state = STATE_CLOSED;
+  }
+  else{
+    door_state = STATE_UNKNOWN;
+  }
+  if (door_state != prev_door_state){
+    #ifdef debug
+      Serial.print("Publishing state change to: ");
+      Serial.println(door_state);
+    #endif
+    client.publish(DOOR_STATE, (String)door_state);
+    prev_door_state = door_state;
+  }
 }
 
 void send_pin(String pin){
@@ -171,34 +198,36 @@ void keypadListen(){
   if (millis() - pin_start > KEY_THRESH){
     if (key_str != ""){
       key_str = "";
+      disp_pix = 0;
     }
   }
   char key = customKeypad.getKey();
   if (key){
+    led_state = KEY_IN;
     //reset timeout timer
     pin_start = millis();
     if(key == '#'){
       sendKey = true;
+      disp_pix = 0;
+      led_state = KEY_RESP;
     }else{
       key_str += key;
-      Serial.print("Pressed key is: ");
-      Serial.println(key);
-      pix = pix + 3;
-      set_led(pix, 0, 127, 0);
+      #ifdef debug
+        Serial.print("Pressed key is: ");
+        Serial.println(key);
+      #endif
+      disp_pix = disp_pix + 3;      
     }
   }
   if (sendKey){
-    Serial.println(key_str);
+    #ifdef debug
+      Serial.println(key_str);
+    #endif
     send_pin(key_str);
     key_str = "";
     sendKey = false;
-    set_led(NUMPIXELS, 0, 0, 250);
   }else{
     //do nothing and come back again
-  }
-  if (key_str ==""){
-    set_led(5, 80, 0, 0);
-    pix = 0;
   }
 }
 
@@ -234,27 +263,28 @@ void open_door(){
   }
 }
 
-void check_state(){
-  //if SW_OPEN is LOW (and SW_CLOSED is HIGH) door is open and vice versa. Unkown if not in either of these
-  int open_reed = digitalRead(SW_OPEN);
-  int closed_reed = digitalRead(SW_CLOSED);
-  if ((open_reed == LOW) && (closed_reed == HIGH)){
-    door_state = STATE_OPEN;
+void manage_led(){
+  switch (led_state){
+    case NOT_CONN:
+      ledNotConn();
+      break;
+    case STATE_IDLE:
+      ledIdle();
+      break;
+    case KEY_IN:
+      ledKeys();
+      break;
+    case KEY_RESP:
+      ledResp();
+      break;
+    case STATE_TRIGGER:
+      led_triggered();
+      break;
+    case DENIED:
+      led_denied();
+      break;
   }
-  else if((open_reed == HIGH) && (closed_reed == LOW)){
-    door_state = STATE_CLOSED;
-  }
-  else{
-    door_state = STATE_UNKNOWN;
-  }
-  if (door_state != prev_door_state){
-    #ifdef debug
-      Serial.print("Publishing state change to: ");
-      Serial.println(door_state);
-    #endif
-    client.publish(DOOR_STATE, (String)door_state);
-    prev_door_state = door_state;
-  }
+  pixels.show(); // This sends the updated pixel color to the hardware.
 }
 
 void loop() {
@@ -273,13 +303,18 @@ void loop() {
       open_door();
       break;
   }
+  manage_led();
 }
 
 void messageReceived(String &topic, String &payload) {
-  Serial.println("incoming: " + topic + " - " + payload);
+  #ifdef debug
+    Serial.println("incoming: " + topic + " - " + payload);
+  #endif
   if (payload == "1"){
     state = STATE_TRIGGER;
+    led_state = state;
   }else{
+    led_state = DENIED;
     #ifdef debug
       Serial.println("get fucked, open it yourself");
     #endif

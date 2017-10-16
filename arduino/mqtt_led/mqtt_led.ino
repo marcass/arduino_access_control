@@ -60,11 +60,15 @@ byte state = STATE_IDLE;
 char DOOR_PUB[] = "doors/request/topgarage";
 char DOOR_SUB[] = "doors/response/topgarage";
 char DOOR_STATE[] = "doors/status/topgarage";
+//door states
 const int STATE_OPEN = 0;
 const int STATE_CLOSED = 1;
 const int STATE_UNKNOWN = 2;
 int door_state = STATE_UNKNOWN;
 int prev_door_state;
+//led states
+const int NOT_CONN = 3;
+int led_state = NOT_CONN;
 int pix;
 
 //initialize an instance of class NewKeypad
@@ -139,7 +143,6 @@ void connect(){
 
   Serial.print("\nconnecting...");
   while (!client.connect(DOOR, USER, MOSQ_PASS)) {
-  //while (!client.connect(DOOR, USER, MOSQ_PASS)) {
     Serial.print(".");
     delay(1000);
   }
@@ -147,6 +150,7 @@ void connect(){
   //boolean connect(const char clientId[], const char username[], const char password[]);
   //client.connect(DOOR, USER, MOSQ_PASS);
   client.subscribe(DOOR_SUB);
+  led_state = state;
 }
 
 void send_pin(String pin){
@@ -257,6 +261,7 @@ void loop() {
   client.loop();
 
   if (!client.connected()) {
+    led_state = NOT_CONN;
     connect();
   }
   switch (state){

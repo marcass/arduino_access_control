@@ -209,12 +209,6 @@ void open_door(){
   }
 }
 
-void led_stuff(int lights){
-  switch (lights){
-    case 
-  }
-}
-
 void check_state(){
   //if SW_OPEN is LOW (and SW_CLOSED is HIGH) door is open and vice versa. Unkown if not in either of these
   int open_reed = digitalRead(SW_OPEN);

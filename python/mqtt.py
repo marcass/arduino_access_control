@@ -5,6 +5,7 @@ import creds
 import time
 import json
 import ast
+import keycheck
 
 broker = creds.mosq_auth['broker']
 auth = creds.mosq_auth
@@ -13,17 +14,8 @@ API_URL = 'http://localhost:5000/'
 auth = {'username':creds.mosq_auth['username'], 'password':creds.mosq_auth['password']}
 broker = creds.mosq_auth['broker']
 
-def check_key(door, data):
-    payload ={'door':door, 'pincode': data}
-    # print payload
-    r = requests.post(API_URL+'usekey', json=payload)
-    print r.json()
-    topic = 'doors/response/'+door
-    try:
-        resp = r.json()['pin_correct']
-        publish.single(topic, resp, qos=2, auth=auth, hostname=broker)
-    except:
-        print 'failed to publish'
+def notify_door(resp, door):
+    publish.single(topic, resp, qos=2, auth=auth, hostname=broker)
 
 # The callback for when the client receives a CONNACK response from the server.
 def on_connect(client, userdata, flags, rc):
@@ -42,7 +34,15 @@ def on_message(client, userdata, msg):
     print 'Door is '+door
     if 'request' in msg.topic:
         print 'Checking door key'
-        check_key(door, msg.payload)
+        topic = 'doors/response/'+door
+        if (keycheck.use_key(msg.payload, door)):
+            resp = "1"
+        else:
+            resp = "0"
+        try:
+            notify_door(resp, door)
+        except:
+            print 'failed to publish'
     if 'status' in msg.topic:
         #publish status
         status_dict = {'0': 'Open', '1': 'Closed', '2':'Unknown'}

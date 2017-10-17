@@ -55,26 +55,7 @@ from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 import json
 import mqtt
-
-def use_key(key, door):
-    d = sql.validate_key(key, door)
-    if d is None:
-        x = sql.insert_actionLog('Pinpad', door, key)
-        print x
-        #return ws.send('allowed')
-        return False
-    else:
-        if d == 'burner':
-            print 'user tested true for burner'
-            sql.remove_disable_key(d)
-        print 'username = '+str(d)+' for '+door
-        y = sql.insert_actionLog('Pinpad', door, key, d)
-        print y
-        #return ws.send('denied')
-        return True
-
-def use_mqtt(key, door):
-    print 'validate user here'
+import keycheck
 
 def get_access_log(days):
     d = sql.get_doorlog(days)
@@ -92,30 +73,6 @@ def keycode_validation(keycode):
 sql.setup_db()
 app = Flask(__name__)
 CORS(app)
-#sockets = Sockets(app)
-#https://github.com/kennethreitz/flask-sockets
-
-
-#@sockets.route("/usekey")
-#def usekeySocket(ws):
-#    #content = json.loads(ws.receive())
-#    try:
-#        content = json.loads(ws.receive())
-#        print content
-#        door = content['door']
-#        pin = content['pincode']
-#        if (use_key(pin, door)):
-#            status = 'allowed'
-#        else:
-#            status = 'denied'
-#        #ws.send('{"'+door+'","'+status+'"}')
-#        dict = {"door":door,"status":status}
-#        data = json.dumps(dict)
-#        print data
-#        ws.send(data)
-#    except:
-#        print 'error in websocket key check'
-
 
 app.secret_key = 'ksajdkhsadulaulkj1092830983no1y24'  # Change this!
 app.config['JWT_HEADER_TYPE'] = 'JWT'
@@ -171,25 +128,11 @@ def usekey():
     door = content['door']
     pin = content['pincode']
     #use_key(pin, door)
-    if use_key(pin, door):
+    if keycheck.use_key(pin, door):
+        mqtt.notify_door(1, door)
         resp = {'pin_correct':1}
     else:
-        resp = {'pin_correct':0}
-    return jsonify(resp), 200
-
-@app.route("/mqtt", methods=['POST',])
-def mqtt_user():
-    try:
-        content = request.get_json(silent=False)
-        print content
-    except:
-        print 'failed to get data'
-    door = content['door']
-    pin = content['pincode']
-    #use_mqtt(pin, door)
-    if use_mqtt(pin, door):
-        resp = {'pin_correct':1}
-    else:
+        mqtt.notify_door(0, door)
         resp = {'pin_correct':0}
     return jsonify(resp), 200
 

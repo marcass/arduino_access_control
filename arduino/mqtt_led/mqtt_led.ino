@@ -46,8 +46,10 @@ unsigned long pin_start = 0;
 const unsigned long KEY_THRESH = 30000; //30sec to put pin in
 unsigned long relay_time = 0;
 const unsigned long RELAY_TRIG = 300;
-unsigned long status_time = 0;
-const unsigned long STATUS_TIME = 10000; //10sec
+unsigned long led_time = 0;
+const unsigned long LED_TIME = 3000; //3sec
+unsigned long INTERVAL = 50;  // the time we need to wait for led update
+unsigned long previousMillis = 0;
 const byte STATE_IDLE = 1;
 const byte STATE_TRIGGER = 2;
 byte state = STATE_IDLE;
@@ -69,10 +71,10 @@ int prev_door_state;
 //led states
 const byte NOT_CONN = 3;
 const byte KEY_IN = 4;
-const byte KEY_RESP = 5;
-const byte DENIED = 6;
+const byte DENIED = 5;
 byte led_state = NOT_CONN;
 byte disp_pix = 0;
+bool ledState = false;
 
 //initialize an instance of class NewKeypad
 Keypad customKeypad = Keypad( makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS);
@@ -209,7 +211,7 @@ void keypadListen(){
     if(key == '#'){
       sendKey = true;
       disp_pix = 0;
-      led_state = KEY_RESP;
+      led_time = millis();
     }else{
       key_str += key;
       #ifdef debug
@@ -231,13 +233,6 @@ void keypadListen(){
   }
 }
 
-void set_led(int in_pix, int red, int green, int blue){
-  // pixels.Color takes RGB values, from 0,0,0 up to 255,255,255
-    pixels.setPixelColor(in_pix, pixels.Color(red,green,blue)); // Moderately bright green color.
-
-    pixels.show(); // This sends the updated pixel color to the hardware.
-}
-
 void open_door(){
   #ifdef debug
     Serial.println("Opening door as requested");
@@ -247,41 +242,53 @@ void open_door(){
   }
   if (millis() - relay_time > RELAY_TRIG){
     digitalWrite(RELAY, LOW);
+    relay_time = 0;
   }else{
     digitalWrite(RELAY, HIGH);
   }
-  if (status_time == 0){
-    status_time = millis();
-  }
-  if (millis() - status_time > STATUS_TIME){
-    Serial.print("Do LED stuff for here");
-    relay_time = 0;
-    status_time = 0;
-    state = STATE_IDLE;
-  }else{
-    Serial.print("Do LED stuff for here");
+}
+
+
+void set_led(int in_pix, int red, int green, int blue){
+  for (int i = 0; i < in_pix; i++){
+    pixels.setPixelColor(i, pixels.Color(red,green,blue));
   }
 }
 
 void manage_led(){
+  //reset state when the flashing is done
+  if (led_time != 0){
+    if (millis() - led_time > LED_TIME){
+      led_state = state;
+      led_time = 0;
+    }
+  }
+  //flash in the appropriate way
   switch (led_state){
     case NOT_CONN:
-      ledNotConn();
+      ledState != ledState;
+      if (ledState){
+        set_led(NUMPIXELS, 150, 0, 0);
+      }else{
+        set_led(NUMPIXELS, 0, 0, 0);
+      }
       break;
     case STATE_IDLE:
-      ledIdle();
+      set_led(NUMPIXELS, 150, 0, 0);
       break;
     case KEY_IN:
-      ledKeys();
-      break;
-    case KEY_RESP:
-      ledResp();
+      set_led(disp_pix, 0, 80, 0);
       break;
     case STATE_TRIGGER:
-      led_triggered();
+      set_led(NUMPIXELS, 0, 100, 0);
       break;
     case DENIED:
-      led_denied();
+      ledState != ledState;
+      if (ledState){
+        set_led(NUMPIXELS, 0, 0, 150);
+      }else{
+        set_led(NUMPIXELS, 0, 0, 0);
+      }
       break;
   }
   pixels.show(); // This sends the updated pixel color to the hardware.
@@ -303,7 +310,11 @@ void loop() {
       open_door();
       break;
   }
-  manage_led();
+  //run led stuff
+  if (millis() - previousMillis > INTERVAL) {
+    previousMillis = millis();
+    manage_led();
+  }
 }
 
 void messageReceived(String &topic, String &payload) {

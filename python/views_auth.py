@@ -2,12 +2,16 @@
 # https://github.com/vimalloc/flask-jwt-extended
 # also check out: https://gist.github.com/jslvtr/139cf76db7132b53f2b20c5b6a9fa7ad
 
-from flask import Flask, request, jsonify 
+from flask import Flask, request, jsonify
 from flask_jwt_extended import jwt_required, \
     create_access_token, jwt_refresh_token_required, \
     create_refresh_token, get_jwt_identity
 
-from keyserver import app, jwt
+from keyserver1 import app, jwt
+
+app.secret_key = 'ksajdkhsadulaulkj1092830983no1y24'  # Change this!
+app.config['JWT_HEADER_TYPE'] = 'JWT'
+jwt = JWTManager(app)
 
 import os
 if os.environ.has_key('LOGIN_PW'):
@@ -52,5 +56,3 @@ def my_expired_token_callback():
         'sub_status': 101,
         'msg': 'The token has expired'
     }), 401
-
-

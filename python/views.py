@@ -48,6 +48,14 @@
 
 # curl -X GET -H "Content-Type: application/json" -d '{"username":"max"}' http://127.0.0.1:5000/user
 
+# curl -X POST -H "Content-Type: application/json" -d '{"username":"admin", "password":"password"}' http://127.0.0.1:5000/auth
+#response = {
+#  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIyMGU4OTg2NS0wNjM5LTQ3ZDEtYWU0YS1hYTg4ODQxNDIwNjciLCJleHAiOjE1MDg0NTU2NDgsImZyZXNoIjpmYWxzZSwiaWF0IjoxNTA4NDU0NzQ4LCJ0eXBlIjoiYWNjZXNzIiwibmJmIjoxNTA4NDU0NzQ4LCJpZGVudGl0eSI6ImFkbWluIn0.NT7t_17Hd3hT6_uTwy5FgGSN-koq8UeybEEKaLbRjIk", 
+#  "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI2MWZmMDcxMC1hYjFlLTRhMTYtYTU1NS0yZjY0NjdlZDgyZjgiLCJleHAiOjE1MTEwNDY3NDgsImlhdCI6MTUwODQ1NDc0OCwidHlwZSI6InJlZnJlc2giLCJuYmYiOjE1MDg0NTQ3NDgsImlkZW50aXR5IjoiYWRtaW4ifQ.MMOMZCLxJbW9v2GwIgndtDZq_VpCKsueiqwXLgU04eg"
+#}
+
+#curl -X GET -H "Authorization: JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIyMGU4OTg2NS0wNjM5LTQ3ZDEtYWU0YS1hYTg4ODQxNDIwNjciLCJleHAiOjE1MDg0NTU2NDgsImZyZXNoIjpmYWxzZSwiaWF0IjoxNTA4NDU0NzQ4LCJ0eXBlIjoiYWNjZXNzIiwibmJmIjoxNTA4NDU0NzQ4LCJpZGVudGl0eSI6ImFkbWluIn0.NT7t_17Hd3hT6_uTwy5FgGSN-koq8UeybEEKaLbRjIk" http://127.0.0.1:5000/listallowed
+
 import re
 import sql
 from flask import Flask, request, jsonify
@@ -56,6 +64,12 @@ from flask import Flask, request, jsonify
 import json
 import mqtt
 import keycheck
+import views_auth
+from init import app, jwt
+from flask_jwt_extended import jwt_required, \
+    create_access_token, jwt_refresh_token_required, \
+    create_refresh_token, get_jwt_identity
+
 
 def get_access_log(days):
     d = sql.get_doorlog(days)
@@ -109,7 +123,7 @@ def hello():
     return "Hello World!"
 
 @app.route("/listallowed", methods=['GET',])
-#@jwt_required
+@jwt_required
 def list_allowed_keys():
     '''
     List doors with allowed users
@@ -298,8 +312,9 @@ def getAccessLog():
     resp = get_access_log(content['days'])
     return jsonify(resp), 200
 
-# if __name__ == "__main__":
-#     app.run(ssl_context='adhoc')
+if __name__ == "__main__":
+    app.run()
+#    app.run(ssl_context='adhoc')
 #    from gevent import pywsgi
 #    from geventwebsocket.handler import WebSocketHandler
 #    server = pywsgi.WSGIServer(('', 5000), app, handler_class=WebSocketHandler)

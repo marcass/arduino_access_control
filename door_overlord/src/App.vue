@@ -1,7 +1,12 @@
 <template>
   <div id="app">
-   <!-- <img src="./assets/logo.png"> -->
-   <router-view></router-view>
+    <div v-if="$auth.ready()">
+     <!-- <img src="./assets/logo.png"> -->
+     <router-view></router-view>
+    </div>
+    <div v-else>
+      Loading ...
+    </div>
   </div>
 </template>
 

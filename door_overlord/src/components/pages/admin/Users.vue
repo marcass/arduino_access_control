@@ -28,7 +28,7 @@
 </template>
 
 <script>
-import { getUsers, getDoors, getDoorStatus, getAllowedUsers } from '../../utils/door-api'
+import { getUsers, getDoors, getDoorStatus, getAllowedUsers } from '../../../../utils/door-api'
 import 'bootstrap/dist/css/bootstrap.css'
 // Import this component
 import datePicker from 'vue-bootstrap-datetimepicker'

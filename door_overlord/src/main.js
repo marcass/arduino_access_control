@@ -9,17 +9,12 @@ Vue.router = new VueRouter({
     routes: [{
         path: '/',
         name: 'default',
-        component: require('./components/pages/Home.vue')
+        component: require('./components/pages/Hello.vue')
     }, {
         path: '/login',
         name: 'login',
         component: require('./components/pages/Login.vue'),
         meta: {auth: false}
-    }, {
-        path: '/account',
-        name: 'account',
-        component: require('./components/pages/Account.vue'),
-        meta: {auth: true}
     }, {
         path: '/admin',
         name: 'admin',
@@ -32,8 +27,8 @@ Vue.router = new VueRouter({
         },
         {
           path: 'adduser',
-          name: 'add-user'
-          component: require('.components/pages/admin/Adduser.vue')
+          name: 'add-user',
+          component: require('./components/pages/admin/AddUser.vue')
         }]
     }, {
         path: '/404',
@@ -67,13 +62,19 @@ Vue.axios.defaults.baseURL = 'https://skibo.duckdns.org/api';
 // });
 
 // Vue Auth
-Vue.use(require('../../../src/index.js'), {
-    auth: require('../../../drivers/auth/bearer.js'),
-    http: require('../../../drivers/http/vue-resource.1.x.js'),
-    // http: require('../../../drivers/http/axios.1.x.js'),
-    router: require('../../../drivers/router/vue-router.2.x.js'),
-    rolesVar: 'role'
-});
+// Vue.use(require('../../../src/index.js'), {
+//     auth: require('../../../drivers/auth/bearer.js'),
+//     http: require('../../../drivers/http/vue-resource.1.x.js'),
+//     // http: require('../../../drivers/http/axios.1.x.js'),
+//     router: require('../../../drivers/router/vue-router.2.x.js'),
+//     rolesVar: 'role'
+// });
+Vue.use(require('@websanova/vue-auth'), {
+  auth: require('@websanova/vue-auth/drivers/auth/bearer.js'),
+  http: require('@websanova/vue-auth/drivers/http/axios.1.x.js'),
+  router: require('@websanova/vue-auth/drivers/router/vue-router.2.x.js'),
+  rolesVar: 'role'
+})
 
 // Start
 var component = require('./components/App.vue');

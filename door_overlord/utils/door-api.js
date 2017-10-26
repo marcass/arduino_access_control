@@ -2,9 +2,9 @@ import axios from 'axios'
 import Vue from 'vue'
 
 //following block for jwt (see https://github.com/websanova/vue-auth/blob/master/docs/StepByStepGuide.md)
-import VueAxios from 'vue-axios'
-Vue.use(VueAxios, axios);
-Vue.axios.defaults.baseURL = 'https://skibo.duckdns.org/api';
+// import VueAxios from 'vue-axios'
+// Vue.use(VueAxios, axios);
+// Vue.axios.defaults.baseURL = 'https://skibo.duckdns.org/api';
 
 //const BASE_URL = 'https://skibo.duckdns.org/api';
 axios.defaults.headers.post['Content-Type'] = 'application/json';

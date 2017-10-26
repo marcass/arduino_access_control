@@ -32,7 +32,7 @@
 </template>
 
 <script>
-import { getUsers, getDoors, postUserData } from '../../utils/door-api'
+import { getUsers, getDoors, postUserData } from '../../../../utils/door-api'
 import 'bootstrap/dist/css/bootstrap.css'
 import datePicker from 'vue-bootstrap-datetimepicker'
 import 'eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.css'

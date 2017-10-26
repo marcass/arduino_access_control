@@ -6,52 +6,61 @@ import Doors from '@/components/Doors'
 import UpdateUser from '@/components/UpdateUser'
 import AddUser from '@/components/AddUser'
 import UseKey from '@/components/UseKey'
+import Register from '@/components/Register'
 
 // Vue.use(Router)
 // for jwt:
 Vue.router = Router
+
 Vue.use(require('@websanova/vue-auth'), {
   auth: require('@websanova/vue-auth/drivers/auth/bearer.js'),
   http: require('@websanova/vue-auth/drivers/http/axios.1.x.js'),
-  router: require('@websanova/vue-auth/drivers/router/vue-router.2.x.js')
+  Router: require('@websanova/vue-auth/drivers/router/vue-router.2.x.js')
 })
 
 export default new Router({
   routes: [
     {
       path: '/auth',
-      name: 'Auth',
-      component: Auth
+      name: 'Register',
+      component: Register,
+      meta: {auth: false}
     },
     {
       path: '/hello',
       name: 'Hello',
-      component: Hello
+      component: Hello,
+      meta: {auth: false}
     },
     {
       path: '/',
       name: 'Users',
-      component: Users
+      component: Users,
+      meta: {auth: ['admin']}
     },
     {
       path: '/updateuser',
       name: 'UpdateUser',
-      component: UpdateUser
+      component: UpdateUser,
+      meta: {auth: true}
     },
     {
       path: '/doors',
       name: 'Doors',
-      component: Doors
+      component: Doors,
+      meta: {auth: true}
     },
     {
       path: '/usekey',
       name: 'UseKey',
-      component: UseKey
+      component: UseKey,
+      meta: {auth: true}
     },
     {
       path: '/adduser',
       name: 'AddUser',
-      component: AddUser
+      component: AddUser,
+      meta: {auth: ['admin']}
     }
   ]
 })

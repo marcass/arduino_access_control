@@ -5,7 +5,6 @@ import App from './App'
 import router from './router'
 // for jwt:
 Vue.router = router
-// window.Vue = Vue
 
 Vue.config.productionTip = false
 

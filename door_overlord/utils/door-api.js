@@ -6,7 +6,7 @@ import Vue from 'vue'
 // Vue.use(VueAxios, axios);
 // Vue.axios.defaults.baseURL = 'https://skibo.duckdns.org/api';
 
-//const BASE_URL = 'https://skibo.duckdns.org/api';
+const BASE_URL = 'https://skibo.duckdns.org/api';
 axios.defaults.headers.post['Content-Type'] = 'application/json';
 axios.defaults.headers.put['Content-Type'] = 'application/json';
 axios.defaults.headers.delete['Content-Type'] = 'application/json';

@@ -47,6 +47,7 @@
 </template>
 
 <script>
+  // import Vue from 'vue'
   export default {
     data () {
       return {
@@ -72,12 +73,12 @@
       })
 
       // Vue.http.interceptors.push(function (req, next) {
-      //     next(function (res) {
-      //         if ( ! res.ok) {
-      //             _this.$router.push({name: 'error-502'})
-      //         }
-      //     });
-      // });
+      //   next(function (res) {
+      //     if (!res.ok) {
+      //       _this.$router.push({name: 'error-502'})
+      //     }
+      //   })
+      // })
     },
 
     methods: {

@@ -36,7 +36,8 @@ Vue.router = new Router({
   routes: [{
     path: '/',
     name: 'default',
-    component: require('./components/pages/Hello.vue')
+    component: require('./components/pages/Hello.vue'),
+    meta: {auth: undefined}
   },
   {
     path: '/login',

@@ -15,6 +15,7 @@ auth = {'username':creds.mosq_auth['username'], 'password':creds.mosq_auth['pass
 broker = creds.mosq_auth['broker']
 
 def notify_door(resp, door):
+    topic = 'doors/response/'+door
     publish.single(topic, resp, qos=2, auth=auth, hostname=broker)
 
 # The callback for when the client receives a CONNACK response from the server.

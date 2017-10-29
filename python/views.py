@@ -50,7 +50,7 @@
 
 # curl -X POST -H "Content-Type: application/json" -d '{"username":"admin", "password":"password"}' http://127.0.0.1:5000/auth
 #response = {
-#  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIyMGU4OTg2NS0wNjM5LTQ3ZDEtYWU0YS1hYTg4ODQxNDIwNjciLCJleHAiOjE1MDg0NTU2NDgsImZyZXNoIjpmYWxzZSwiaWF0IjoxNTA4NDU0NzQ4LCJ0eXBlIjoiYWNjZXNzIiwibmJmIjoxNTA4NDU0NzQ4LCJpZGVudGl0eSI6ImFkbWluIn0.NT7t_17Hd3hT6_uTwy5FgGSN-koq8UeybEEKaLbRjIk", 
+#  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIyMGU4OTg2NS0wNjM5LTQ3ZDEtYWU0YS1hYTg4ODQxNDIwNjciLCJleHAiOjE1MDg0NTU2NDgsImZyZXNoIjpmYWxzZSwiaWF0IjoxNTA4NDU0NzQ4LCJ0eXBlIjoiYWNjZXNzIiwibmJmIjoxNTA4NDU0NzQ4LCJpZGVudGl0eSI6ImFkbWluIn0.NT7t_17Hd3hT6_uTwy5FgGSN-koq8UeybEEKaLbRjIk",
 #  "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI2MWZmMDcxMC1hYjFlLTRhMTYtYTU1NS0yZjY0NjdlZDgyZjgiLCJleHAiOjE1MTEwNDY3NDgsImlhdCI6MTUwODQ1NDc0OCwidHlwZSI6InJlZnJlc2giLCJuYmYiOjE1MDg0NTQ3NDgsImlkZW50aXR5IjoiYWRtaW4ifQ.MMOMZCLxJbW9v2GwIgndtDZq_VpCKsueiqwXLgU04eg"
 #}
 
@@ -99,6 +99,7 @@ def list_allowed_keys():
 
 
 @app.route("/usekey", methods=['POST',])
+@jwt_required
 def usekey():
     try:
         content = request.get_json(silent=False)
@@ -117,6 +118,7 @@ def usekey():
     return jsonify(resp), 200
 
 @app.route("/user", methods=['POST',])
+@jwt_required
 def add_user():
     '''
     Add a new user to everything.
@@ -143,6 +145,7 @@ def add_user():
     return jsonify(sql.write_userdata(content)), 200
 
 @app.route("/user/<username>", methods=['DELETE',])
+@jwt_required
 def remove_user(username):
     '''
     Remove Username in user doorUsers table, and update all tables...
@@ -153,6 +156,7 @@ def remove_user(username):
     return jsonify(resp), 200
 
 @app.route("/user", methods=['GET',])
+@jwt_required
 def get_user():
     '''
     Receives: {'username':'max'}
@@ -162,6 +166,7 @@ def get_user():
     return jsonify(sql.fetch_user_data(content['username'])), 200
 
 @app.route("/user", methods=['PUT',])
+@jwt_required
 def update_user():
     '''
     Select Username and update in user doorUsers table. Json must contain old username
@@ -188,6 +193,7 @@ def update_user():
     return jsonify(sql.write_userdata(content)), 200
 
 @app.route("/user/keycode", methods=['PUT',])
+@jwt_required
 def update_user_keycode():
     '''
     Select Username and update in user doorUsers table
@@ -203,6 +209,7 @@ def update_user_keycode():
         return jsonify(resp), 200
 
 @app.route("/user/enabled", methods=['PUT',])
+@jwt_required
 def update_user_enabled():
     '''
     Select Username and update in user doorUsers table
@@ -214,6 +221,7 @@ def update_user_enabled():
     return jsonify(resp), 200
 
 @app.route("/user/timeStart", methods=['PUT',])
+@jwt_required
 def update_user_timestart():
     '''
     Select Username and update in user doorUsers table
@@ -224,6 +232,7 @@ def update_user_timestart():
     return jsonify(resp), 200
 
 @app.route("/user/timeEnd", methods=['PUT',])
+@jwt_required
 def update_user_timeend():
     '''
     Select Username and update in user doorUsers table
@@ -234,6 +243,7 @@ def update_user_timeend():
     return jsonify(resp), 200
 
 @app.route("/user/doors", methods=['PUT',])
+@jwt_required
 def update_user_doors():
     '''
     Select Username and update canOpen table
@@ -245,6 +255,7 @@ def update_user_doors():
 
 @app.route("/users", methods=['GET',])
 @jwt_required
+@jwt_required
 def get_users():
     '''
     Returns [{'username':, 'keycode':, enabled:'', timeStart:, timeEnd, doors: [...]}, {...}, ...]
@@ -252,6 +263,7 @@ def get_users():
     return jsonify(sql.get_all_users()), 200
 
 @app.route("/doors", methods=['GET',])
+@jwt_required
 def get_doors():
     '''
     Returns all possible door names in db as a list['door1','door2',...]
@@ -260,6 +272,7 @@ def get_doors():
     return jsonify(sql.get_all_doors()), 200
 
 @app.route("/door/status", methods=['GET',])
+@jwt_required
 def getStatus():
     content = request.get_json(silent=False)
     return jsonify(sql.get_doorstatus()), 200
@@ -271,6 +284,7 @@ def update_status():
     return jsonify(content), 200
 
 @app.route("/getlog", methods=['GET',])
+@jwt_required
 def getAccessLog():
     '''
     curl -X GET -H "Content-Type: application/json" -d '{"days":"5"}' http://127.0.0.1:5000/getlog

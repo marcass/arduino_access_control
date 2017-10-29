@@ -99,6 +99,7 @@ def list_allowed_keys():
 
 
 @app.route("/usekey", methods=['POST',])
+@jwt_required
 def usekey():
     try:
         content = request.get_json(silent=False)

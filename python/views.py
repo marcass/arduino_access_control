@@ -63,7 +63,7 @@ from flask import Flask, request, jsonify
 # from flask_jwt_extended import JWTManager
 import json
 import mqtt
-import keycheck
+import middleman
 import views_auth
 from init import app, jwt
 from flask_jwt_extended import jwt_required, \
@@ -109,7 +109,7 @@ def usekey():
     door = content['door']
     pin = content['pincode']
     #use_key(pin, door)
-    if keycheck.use_key(pin, door):
+    if middleman.use_key(pin, door):
         mqtt.notify_door(1, door)
         resp = {'pin_correct':1}
     else:
@@ -278,6 +278,7 @@ def getStatus():
     return jsonify(sql.get_doorstatus()), 200
 
 @app.route("/door/status", methods=['PUT',])
+@jwt_required
 def update_status():
     content = request.get_json(silent=False)
     sql.update_doorstatus(content["status"], content['door'])

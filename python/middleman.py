@@ -15,3 +15,6 @@ def use_key(key, door):
         y = sql.insert_actionLog('Pinpad', door, key, d)
         print y
         return True
+
+def update_door_status(door, status):
+    sql.update_doorstatus(status, door)

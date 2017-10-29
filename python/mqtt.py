@@ -5,7 +5,7 @@ import creds
 import time
 import json
 import ast
-import keycheck
+import middleman
 
 broker = creds.mosq_auth['broker']
 auth = creds.mosq_auth
@@ -36,7 +36,7 @@ def on_message(client, userdata, msg):
     if 'request' in msg.topic:
         print 'Checking door key'
         topic = 'doors/response/'+door
-        if (keycheck.use_key(msg.payload, door)):
+        if (middleman.use_key(msg.payload, door)):
             resp = "1"
         else:
             resp = "0"
@@ -50,9 +50,10 @@ def on_message(client, userdata, msg):
         try:
             print status_dict[msg.payload]
             status = status_dict[msg.payload]
-            payload = {'door': door, 'status':status}
-            print payload
-            r = requests.put(API_URL+'door/status', json=payload)
+            # payload = {'door': door, 'status':status}
+            # print payload
+            middleman.update_door_status(door, status)
+            # r = requests.put(API_URL+'door/status', json=payload)
             print r.json()
         except:
             print 'Status error'

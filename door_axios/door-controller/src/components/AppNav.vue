@@ -1,34 +1,39 @@
 <template>
   <nav class="navbar navbar-default">
     <div class="navbar-header">
-      <router-link to="/" class="navbar-brand"> fuck you by mw</router-link>
+      <!-- <router-link to="/" class="navbar-brand"> fuck you by mw</router-link>
     </div>
-    <!-- <ul class="nav navbar-nav navbar-right">
+    <ul class="nav navbar-nav navbar-right">
       <li>
-        <button class="btn btn-danger log" v-show="isLoggedIn()" @click="handleLogout()">Log out </button>
-        <button class="btn btn-info log" v-show="!isLoggedIn()" @click="handleLogin()">Log In</button>
+        <button class="auth button" v-show="isLoggedIn()" @click="handleLogout()">Log out </button>
+        <button class="auth button" v-show="!isLoggedIn()" @click="handleLogin()">Log In</button>
       </li>
     </ul> -->
+      <ul>
+        <li><a v-link="'login'">Login</a></li>
+        <li><a v-link="'login'">Login</a></li>
+      </ul>
+    </div>
   </nav>
 </template>
 
 <script>
 // import { isLoggedIn, login, logout } from '../../utils/auth'
 //
-// export default {
-//   name: 'app-nav',
+export default {
+  name: 'app-nav'
 //   methods: {
 //     handleLogin () {
-//       login()
+//
 //     },
 //     handleLogout () {
-//       logout()
-//     },
-//     isLoggedIn () {
-//       return isLoggedIn()
+//       console.log('log out')
 //     }
+// //     isLoggedIn () {
+// //       return isLoggedIn()
+// //     }
 //   }
-// }
+}
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

@@ -7,6 +7,7 @@ import Vue from 'vue'
 Vue.use(VueAxios, axios)
 
 const BASE_URL = 'https://skibo.duckdns.org/api';
+Vue.axios.defaults.baseURL = BASE_URL;
 axios.defaults.headers.post['Content-Type'] = 'application/json';
 axios.defaults.headers.put['Content-Type'] = 'application/json';
 axios.defaults.headers.delete['Content-Type'] = 'application/json';
@@ -45,7 +46,7 @@ function getAllowedUsers() {
   return simple_get(url)
 }
 
-function postCreds(payload) {
+function login(payload) {
   // console.log(payload)
   const url = BASE_URL+'/auth'
   return axios.post(url, payload)

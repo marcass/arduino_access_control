@@ -32,7 +32,7 @@
 </template>
 
 <script>
-  import { postCreds } from '../../../utils/door-api'
+  // import { postCreds } from '../../../utils/door-api'
   export default {
     data () {
       return {
@@ -45,7 +45,7 @@
             password: 'password'
           },
           rememberMe: false,
-          fetchUser: true
+          fetchUser: false
         },
 
         error: null
@@ -61,31 +61,32 @@
     methods: {
       login () {
         // console.log(JSON.stringify(this.data.body))
-        postCreds(JSON.stringify(this.data.body)).then((res) => {
-          console.log('RES', res)
-          console.log('access token', res.data.access_token)
-          console.log('refresh token', res.data.refresh_token)
-          this.token = res.data.access_token
-          this.refresh_token = res.data.refresh_token
-        })
-        console.log(this.token)
-        console.log(this.refresh_token)
-        // var redirect = this.$auth.redirect()
-        // this.$auth.login({
-        //   // body: this.data.body, // Vue-resource
-        //   data: this.data.body, // Axios
-        //   rememberMe: this.data.rememberMe,
-        //   redirect: {name: redirect ? redirect.from.name : 'users'},
-        //   fetchUser: this.data.fetchUser,
-        //   success () {
-        //     console.log('success ' + this.context)
-        //   },
-        //   error (res) {
-        //     console.log('error ' + this.context)
-        //
-        //     this.error = res.data
-        //   }
+        // postCreds(JSON.stringify(this.data.body)).then((res) => {
+        //   console.log('RES', res)
+        //   console.log('access token', res.data.access_token)
+        //   console.log('refresh token', res.data.refresh_token)
+        //   this.token = res.data.access_token
+        //   this.refresh_token = res.data.refresh_token
         // })
+        // console.log(this.token)
+        // console.log(this.refresh_token)
+
+        var redirect = this.$auth.redirect()
+        this.$auth.login({
+          // body: this.data.body, // Vue-resource
+          data: this.data.body, // Axios
+          rememberMe: this.data.rememberMe,
+          redirect: {name: redirect ? redirect.from.name : 'Users'},
+          fetchUser: this.data.fetchUser,
+          success () {
+            console.log('success ' + this.context)
+          },
+          error (res) {
+            console.log('error ' + this.context)
+
+            this.error = res.data
+          }
+        })
       }
     }
   }

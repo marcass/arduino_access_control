@@ -22,7 +22,7 @@ export default new Router({
     },
     {
       path: '/auth/login',
-      name: 'Login',
+      name: 'login',
       component: Login,
       meta: {auth: false}
     }

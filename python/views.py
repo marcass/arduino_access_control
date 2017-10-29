@@ -54,7 +54,7 @@
 #  "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI2MWZmMDcxMC1hYjFlLTRhMTYtYTU1NS0yZjY0NjdlZDgyZjgiLCJleHAiOjE1MTEwNDY3NDgsImlhdCI6MTUwODQ1NDc0OCwidHlwZSI6InJlZnJlc2giLCJuYmYiOjE1MDg0NTQ3NDgsImlkZW50aXR5IjoiYWRtaW4ifQ.MMOMZCLxJbW9v2GwIgndtDZq_VpCKsueiqwXLgU04eg"
 #}
 
-#curl -X GET -H "Authorization: JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIyMGU4OTg2NS0wNjM5LTQ3ZDEtYWU0YS1hYTg4ODQxNDIwNjciLCJleHAiOjE1MDg0NTU2NDgsImZyZXNoIjpmYWxzZSwiaWF0IjoxNTA4NDU0NzQ4LCJ0eXBlIjoiYWNjZXNzIiwibmJmIjoxNTA4NDU0NzQ4LCJpZGVudGl0eSI6ImFkbWluIn0.NT7t_17Hd3hT6_uTwy5FgGSN-koq8UeybEEKaLbRjIk" http://127.0.0.1:5000/listallowed
+#curl -X GET -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIyMGU4OTg2NS0wNjM5LTQ3ZDEtYWU0YS1hYTg4ODQxNDIwNjciLCJleHAiOjE1MDg0NTU2NDgsImZyZXNoIjpmYWxzZSwiaWF0IjoxNTA4NDU0NzQ4LCJ0eXBlIjoiYWNjZXNzIiwibmJmIjoxNTA4NDU0NzQ4LCJpZGVudGl0eSI6ImFkbWluIn0.NT7t_17Hd3hT6_uTwy5FgGSN-koq8UeybEEKaLbRjIk" http://127.0.0.1:5000/listallowed
 
 import re
 import sql
@@ -83,40 +83,6 @@ def keycode_validation(keycode):
         return True
     else:
         return False
-
-# sql.setup_db()
-# app = Flask(__name__)
-# CORS(app)
-
-# app.secret_key = 'ksajdkhsadulaulkj1092830983no1y24'  # Change this!
-# app.config['JWT_HEADER_TYPE'] = 'JWT'
-# jwt = JWTManager(app)
-#
-# import views_auth
-
-# Provide a method to create access tokens. The create_access_token()
-# function is used to actually generate the token
-# place @jwt_required above route to protect it
-# @app.route('/login', methods=['POST'])
-# def login():
-#     if not request.is_json:
-#         return jsonify({"msg": "Missing JSON in request"}), 400
-#
-#     params = request.get_json()
-#     username = params.get('username', None)
-#     password = params.get('password', None)
-#
-#     if not username:
-#         return jsonify({"msg": "Missing username parameter"}), 400
-#     if not password:
-#         return jsonify({"msg": "Missing password parameter"}), 400
-#
-#     if username != 'test' or password != 'test':
-#         return jsonify({"msg": "Bad username or password"}), 401
-#
-#     # Identity can be any data that is json serializable
-#     ret = {'access_token': create_access_token(identity=username)}
-    # return jsonify(ret), 200
 
 @app.route("/")
 def hello():
@@ -278,6 +244,7 @@ def update_user_doors():
     return jsonify(resp), 200
 
 @app.route("/users", methods=['GET',])
+@jwt_required
 def get_users():
     '''
     Returns [{'username':, 'keycode':, enabled:'', timeStart:, timeEnd, doors: [...]}, {...}, ...]

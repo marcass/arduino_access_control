@@ -1,5 +1,6 @@
 <template>
   <div class="keypad">
+    <app-nav></app-nav>
     <h2>Input your keycode, then press #</h2>
     <p>
       <div id='doors' v-for="x in doorstatus">
@@ -23,8 +24,9 @@
 </template>
 
 <script>
-import { postKeycode, getDoors, getDoorStatus } from '../../utils/door-api'
+import { postKeycode, getDoors, getDoorStatus } from '../../../utils/door-api'
 import keyboard from 'vue-keyboard'
+import AppNav from '../AppNav'
 export default {
   name: 'updateuser',
   data () {
@@ -37,7 +39,8 @@ export default {
     }
   },
   components: {
-    keyboard
+    keyboard,
+    AppNav
   },
   methods: {
     postkey () {

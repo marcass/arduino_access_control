@@ -1,5 +1,6 @@
 <template>
   <div class="doors">
+    <app-nav></app-nav>
     <h1>Existing users</h1>
     <p v-for="item in userlist"> {{ item.username }} </p>
    <div class="col-md-5">
@@ -35,6 +36,7 @@
 import { getUsers, getDoors, postUserData } from '../../../../utils/door-api'
 import 'bootstrap/dist/css/bootstrap.css'
 import datePicker from 'vue-bootstrap-datetimepicker'
+import AppNav from '../../AppNav'
 import 'eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.css'
 export default {
   name: 'updateuser',
@@ -55,7 +57,8 @@ export default {
     }
   },
   components: {
-    datePicker
+    datePicker,
+    AppNav
   },
   methods: {
     blah (payload) {

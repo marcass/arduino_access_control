@@ -1,17 +1,23 @@
+//following block for jwt (see https://github.com/websanova/vue-auth/blob/master/docs/StepByStepGuide.md)
+
 import axios from 'axios'
+import VueAxios from 'vue-axios'
 import Vue from 'vue'
 
-//following block for jwt (see https://github.com/websanova/vue-auth/blob/master/docs/StepByStepGuide.md)
-// import VueAxios from 'vue-axios'
-// Vue.use(VueAxios, axios);
-// Vue.axios.defaults.baseURL = 'https://skibo.duckdns.org/api';
+Vue.use(VueAxios, axios)
 
 const BASE_URL = 'https://skibo.duckdns.org/api';
+Vue.axios.defaults.baseURL = BASE_URL;
 axios.defaults.headers.post['Content-Type'] = 'application/json';
 axios.defaults.headers.put['Content-Type'] = 'application/json';
 axios.defaults.headers.delete['Content-Type'] = 'application/json';
 
-export {getUsers, getDoors, getDoorStatus, getAllowedUsers, putUserData, putAllUserData, postUserData, postKeycode, deleteUser, postAuth};
+// access axios with Vue or use the 'this' reference in components
+// Vue.axios.post(...).then(res => {
+//     console.log('RES', res);
+// });
+
+export {getUsers, getDoors, getDoorStatus, getAllowedUsers, postCreds, putUserData, putAllUserData, postUserData, postKeycode, deleteUser, postAuth};
 
 function simple_get(url) {
   return axios.get(url)
@@ -40,6 +46,14 @@ function getAllowedUsers() {
   return simple_get(url)
 }
 
+function login(payload) {
+  // console.log(payload)
+  const url = BASE_URL+'/auth'
+  return axios.post(url, payload)
+  // .then(res => {
+  //   console.log('RES', res)
+  // })
+}
 function putUserData(payload, route) {
   const url = BASE_URL+'/user/'
   return axios.put(url+route, payload);

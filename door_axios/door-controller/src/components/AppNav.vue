@@ -10,8 +10,21 @@
       </li>
     </ul> -->
       <ul>
-        <li><a v-link="'login'">Login</a></li>
-        <li><a v-link="'login'">Login</a></li>
+        <li>
+          <!-- <a v-link="'login'">Login</a> -->
+          <span v-show="!$auth.check()">
+            <router-link :to="{name: 'login'}">login</router-link>
+          </span>
+          <span v-show="$auth.check()">
+            <a v-on:click='logout()' href="javascript:void(0);">Logout</a> &bull;
+            <router-link :to="{name: 'Users'}">All Users</router-link> &bull;
+            <router-link :to="{name: 'usekey'}">Open a door</router-link> &bull;
+            <router-link :to="{name: 'listallowed'}">Allowed users</router-link> &bull;
+            <router-link :to="{name: 'adduser'}">Add a user</router-link> &bull;
+            <router-link :to="{name: 'edituser'}">Edit users</router-link> &bull;
+            <router-link :to="{name: 'doors'}">Door status</router-link>
+          </span>
+        </li>
       </ul>
     </div>
   </nav>
@@ -21,18 +34,23 @@
 // import { isLoggedIn, login, logout } from '../../utils/auth'
 //
 export default {
-  name: 'app-nav'
-//   methods: {
-//     handleLogin () {
-//
-//     },
-//     handleLogout () {
-//       console.log('log out')
+  name: 'app-nav',
+  methods: {
+    logout () {
+      this.$auth.logout({
+        makeRequest: false,
+        success () {
+          console.log('success ' + this.context)
+        },
+        error () {
+          console.log('error ' + this.context)
+        }
+      })
+    }
+  }
+//     isLoggedIn () {
+//       return isLoggedIn()
 //     }
-// //     isLoggedIn () {
-// //       return isLoggedIn()
-// //     }
-//   }
 }
 </script>
 

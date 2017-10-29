@@ -10,7 +10,7 @@ from flask_jwt_extended import jwt_required, \
 from init import app, jwt
 
 app.secret_key = 'ksajdkhsadulaulkj1092830983no1y24'  # Change this!
-app.config['JWT_HEADER_TYPE'] = 'JWT'
+app.config['JWT_HEADER_TYPE'] = 'Bearer'
 #jwt = JWTManager(app)
 
 import os
@@ -19,7 +19,7 @@ if os.environ.has_key('LOGIN_PW'):
 else:
   pw = 'password'
 
-@app.route('/auth', methods=['POST'])
+@app.route('/auth/login', methods=['POST'])
 def auth():
     username = request.json.get('username', None)
     password = request.json.get('password', None)
@@ -32,9 +32,13 @@ def auth():
         'access_token': create_access_token(identity=username),
         'refresh_token': create_refresh_token(identity=username)
     }
+    print ret
     return jsonify(ret), 200
 
-
+#@app.route('/auth/refresh', methods=['POST'])
+#def refresh():
+#    content = request.get_json(silent=False)
+    
 # The jwt_refresh_token_required decorator insures a valid refresh
 # token is present in the request before calling this endpoint. We
 # can use the get_jwt_identity() function to get the identity of

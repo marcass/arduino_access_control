@@ -1,5 +1,6 @@
 <template>
   <div class="users">
+    <app-nav></app-nav>
     <h1>User Table</h1>
       <div v-for="item in userlist">
         <div class="col-md-5">
@@ -34,6 +35,8 @@ import 'bootstrap/dist/css/bootstrap.css'
 import datePicker from 'vue-bootstrap-datetimepicker'
 // Import date picker css
 import 'eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.css'
+import AppNav from '../../AppNav'
+// import { isLoggedIn } from '../../../../utils/auth'
 
 export default {
   name: 'users',
@@ -46,7 +49,8 @@ export default {
     }
   },
   components: {
-    datePicker
+    datePicker,
+    AppNav
   },
   methods: {
     enabled (x) {

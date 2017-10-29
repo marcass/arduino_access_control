@@ -2,7 +2,7 @@
     <div>
         <h1>Admin</h1>
 
-        <router-link :to="{name: 'admin-products'}">products</router-link>
+        <router-link :to="{name: 'users-list'}">User list</router-link>
 
         <hr/>
 

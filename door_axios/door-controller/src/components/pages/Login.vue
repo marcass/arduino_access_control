@@ -2,7 +2,7 @@
   <div>
     <h1>Login</h1>
 
-    <b>Test users:</b> (admin / secret) &bull; (test / secret)
+    <b>Test users:</b> (admin / password)
 
     <hr/>
 
@@ -18,7 +18,7 @@
         <td><label><input v-model="data.rememberMe" type="checkbox" /> Remember Me</label></td>
       </tr><tr>
         <td></td>
-        <td><label><input v-model="data.fetchUser" type="checkbox" /> Fetch User (test)</label></td>
+        <!-- <td><label><input v-model="data.fetchUser" type="checkbox" /> Fetch User (test)</label></td> -->
       </tr><tr>
         <td></td>
         <td><button type="submit">Login</button></td>
@@ -32,18 +32,20 @@
 </template>
 
 <script>
+  // import { postCreds } from '../../../utils/door-api'
   export default {
     data () {
       return {
-        context: 'login context',
-
+        // context: 'login context',
+        token: '',
+        refresh_token: '',
         data: {
           body: {
             username: 'admin',
-            password: 'secret'
+            password: 'password'
           },
           rememberMe: false,
-          fetchUser: true
+          fetchUser: false
         },
 
         error: null
@@ -58,13 +60,23 @@
 
     methods: {
       login () {
-        var redirect = this.$auth.redirect()
+        // console.log(JSON.stringify(this.data.body))
+        // postCreds(JSON.stringify(this.data.body)).then((res) => {
+        //   console.log('RES', res)
+        //   console.log('access token', res.data.access_token)
+        //   console.log('refresh token', res.data.refresh_token)
+        //   this.token = res.data.access_token
+        //   this.refresh_token = res.data.refresh_token
+        // })
+        // console.log(this.token)
+        // console.log(this.refresh_token)
 
+        var redirect = this.$auth.redirect()
         this.$auth.login({
-          body: this.data.body, // Vue-resource
+          // body: this.data.body, // Vue-resource
           data: this.data.body, // Axios
           rememberMe: this.data.rememberMe,
-          redirect: {name: redirect ? redirect.from.name : 'account'},
+          redirect: {name: redirect ? redirect.from.name : 'Users'},
           fetchUser: this.data.fetchUser,
           success () {
             console.log('success ' + this.context)

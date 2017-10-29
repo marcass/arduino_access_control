@@ -1,10 +1,8 @@
 <template>
-    <div>
+    <div id="app">
         <div v-if="$auth.ready() && loaded">
             <div style="text-align:center;">
-                <router-link :to="{name: 'default'}">home</router-link> &bull;
-
-                <router-link :to="{name: 'async'}">async</router-link> &bull;
+                <router-link :to="{name: 'default'}">Hello</router-link> &bull;
 
                 <span v-show="!$auth.check()">
                     <router-link :to="{name: 'login'}">login</router-link> &bull;
@@ -36,7 +34,7 @@
             <hr/>
 
             <div style="text-align:center; font-size:12px;">
-                Websanova <a href="https://skibo.duckdns.org/api">demo server</a> available on Nowhere
+                Websanova <a href="https://skibo.duckdns.org">demo server</a> available on Nowhere
             </div>
         </div>
 
@@ -49,62 +47,63 @@
 </template>
 
 <script>
-    export default {
-        data() {
-            return {
-                context: 'app context',
-                loaded: false
-            };
-        },
+  // import Vue from 'vue'
+  export default {
+    data () {
+      return {
+        context: 'app context',
+        loaded: false
+      }
+    },
 
-        mounted() {
-            var _this = this;
+    mounted () {
+      var _this = this
 
-            // Set up $auth.ready with other arbitrary loaders (ex: language file).
-            setTimeout(function () {
-                _this.loaded = true;
-            }, 500);
-        },
+      // Set up $auth.ready with other arbitrary loaders (ex: language file).
+      setTimeout(function () {
+        _this.loaded = true
+      }, 500)
+    },
 
-        created() {
-            var _this = this;
+    created () {
+      // var _this = this
 
-            this.$auth.ready(function () {
-                console.log('ready ' + this.context);
-            });
+      this.$auth.ready(function () {
+        console.log('ready ' + this.context)
+      })
 
-            // Vue.http.interceptors.push(function (req, next) {
-            //     next(function (res) {
-            //         if ( ! res.ok) {
-            //             _this.$router.push({name: 'error-502'})
-            //         }
-            //     });
-            // });
-        },
+      // Vue.http.interceptors.push(function (req, next) {
+      //   next(function (res) {
+      //     if (!res.ok) {
+      //       _this.$router.push({name: 'error-502'})
+      //     }
+      //   })
+      // })
+    },
 
-        methods: {
-            logout() {
-                this.$auth.logout({
-                    makeRequest: true,
-                    success() {
-                        console.log('success ' + this.context);
-                    },
-                    error() {
-                        console.log('error ' + this.context);
-                    }
-                });
-            },
+    methods: {
+      logout () {
+        this.$auth.logout({
+          makeRequest: true,
+          success () {
+            console.log('success ' + this.context)
+          },
+          error () {
+            console.log('error ' + this.context)
+          }
+        })
+      },
 
-            unimpersonate() {
-                this.$auth.unimpersonate({
-                    success() {
-                        console.log('success ' + this.context);
-                    },
-                    error() {
-                        console.log('error ' + this.context);
-                    }
-                });
-            }
-        }
+      unimpersonate () {
+        this.$auth.unimpersonate({
+          success () {
+            console.log('success ' + this.context)
+          },
+          error () {
+            console.log('error ' + this.context)
+          }
+        })
+      }
     }
+  }
 </script>

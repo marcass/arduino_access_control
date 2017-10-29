@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import { getDoorStatus } from '../../utils/door-api'
+import { getDoorStatus } from '../../../utils/door-api'
 // import 'bootstrap/dist/css/bootstrap.css'
 export default {
   name: 'doors',

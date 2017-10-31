@@ -301,4 +301,5 @@ if __name__ == "__main__":
 #    from geventwebsocket.handler import WebSocketHandler
 #    server = pywsgi.WSGIServer(('', 5000), app, handler_class=WebSocketHandler)
 #    server.serve_forever()
-sql.setup_admin_user()
+print ssy.argv
+sql.setup_admin_user(sys.argv[1], sys.argv[2])

@@ -58,15 +58,15 @@ def setup_doors():
             c.execute("INSERT INTO doorID VALUES (?)", (i,) )
         conn.commit()
 
-def setup_admin_user():
+def setup_admin_user(user, passw):
     conn, c = get_db()
     c.execute("SELECT * FROM userAuth")
     if len(c.fetchall()) > 0:
         return
     else:
-        print sys.argv[1]
-        print sys.argv[2]
-        c.execute("INSERT INTO userAuth VALUES (?,?)", (sys.argv[1],sys.argv[2]))
+        print user
+        print passw
+        c.execute("INSERT INTO userAuth VALUES (?,?)", (user, passw))
         conn.commit()
 
 #######  Get data #############################
@@ -78,14 +78,18 @@ def get_user(thisuser, passw):
         print passw
         c.execute("SELECT * FROM userAuth WHERE username=?", (thisuser,))
         ret = c.fetchall()
+        print 'following is the fetch'
         print ret
-        hash = ret[1]
-        print hash
-        if (pbkdf2_sha256.verify(passw, hash)):
+        pw_hash = ret[1]
+        print pw_hash
+        if (pbkdf2_sha256.verify(passw, pw_hash)):
+            print 'hash OK'
             return True
         else:
+            print 'Hash not OK'
             return False
     except:
+        print 'exception'
 	return False
 
 def get_allowed():
@@ -182,8 +186,8 @@ def get_doorlog(days):
 def setup_user(user_in, passw):
     conn, c = get_db()
     try:
-        hash = pbkdf2_sha256.hash(passw)
-        c.execute("INSERT INTO userAuth VALUES (?,?)", (user_in, hash))
+        pw_hash = pbkdf2_sha256.hash(passw)
+        c.execute("INSERT INTO userAuth VALUES (?,?)", (user_in, pw_hash))
         conn.commit()
         return True
     except:
@@ -227,6 +231,9 @@ def write_userdata(resp):
     print users_in
     if resp['username'] not in users_in:
         try:
+            print 'Username and pw detail for setup follows'
+            print 'Username = '+resp['username']
+            print 'PW = '+resp['password']
             if (setup_user(resp['username'], resp['password'])):
                 #c.execute("INSERT INTO doorUsers VALUES (?,?,?,?,?)",(resp['username'], resp['keycode'], resp['enabled'], timeStart, timeEnd))
                 c.execute("UPDATE doorUsers SET keycode=?, enabled=?, timeStart=?, timeEnd=? WHERE user=?", (resp['keycode'], resp['enabled'], timeStart, timeEnd, resp['username']))

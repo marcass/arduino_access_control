@@ -46,6 +46,7 @@
           },
           rememberMe: false,
           fetchUser: false
+          // redirect: '/users'
         },
 
         error: null
@@ -80,6 +81,8 @@
           fetchUser: this.data.fetchUser,
           success () {
             console.log('success ' + this.context)
+            // console.log('success ' + this.$auth.user())
+            // console.log('success', +this.data.fetchUser)
           },
           error (res) {
             console.log('error ' + this.context)

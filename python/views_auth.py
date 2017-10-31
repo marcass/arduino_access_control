@@ -39,6 +39,8 @@ app.config['JWT_HEADER_TYPE'] = 'Bearer'
 def auth():
     username = request.json.get('username', None)
     password = request.json.get('password', None)
+    print username
+    print password
     if sql.get_user(username, password):
         # Use create_access_token() and create_refresh_token() to create our
         # access and refresh tokens

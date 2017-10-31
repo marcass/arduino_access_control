@@ -74,10 +74,13 @@ def setup_admin_user():
 def get_user(thisuser, passw):
     conn, c = get_db()
     try:
+        print thisuser
+        print passw
         c.execute("SELECT * FROM userAuth WHERE username=?", (thisuser,))
         ret = c.fetchall()
         print ret
         hash = ret[1]
+        print hash
         if (pbkdf2_sha256.verify(passw, hash)):
             return True
         else:

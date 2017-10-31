@@ -40,7 +40,7 @@ def setup_db():
     c.execute('''CREATE TABLE IF NOT EXISTS actionLog
                     (timestamp TIMESTAMP, message TEXT, type TEXT)''')
     c.execute('''CREATE TABLE IF NOT EXISTS doorUsers
-                    (FOREIGN KEY(user) REFERENCES userAuth(username) ON DELETE CASCADE, keycode TEXT UNIQUE, enabled INTEGER, timeStart TIMESTAMP, timeEnd TIMESTAMP )''' )
+                    (user TEXT, keycode TEXT UNIQUE, enabled INTEGER, timeStart TIMESTAMP, timeEnd TIMESTAMP, FOREIGN KEY(user) REFERENCES userAuth(username) ON DELETE CASCADE)''' )
     c.execute('''CREATE TABLE IF NOT EXISTS doorStates
                     (timestamp TIMESTAMP, door TEXT, state TEXT )''')
     c.execute('''CREATE TABLE IF NOT EXISTS canOpen
@@ -64,21 +64,26 @@ def setup_admin_user():
     if len(c.fetchall()) > 0:
         return
     else:
-        c.execute("INSERT INTO userAuth VALUES (?,?)", (sys.argv[1],sys.argv[2]) )
+        print sys.argv[1]
+        print sys.argv[2]
+        c.execute("INSERT INTO userAuth VALUES (?,?)", (sys.argv[1],sys.argv[2]))
         conn.commit()
 
 #######  Get data #############################
-def get_user(this_user, pass):
+
+def get_user(thisuser, passw):
     conn, c = get_db()
     try:
-        c.execute("SELECT * FROM userAuth WHERE username=?", (this_user,))
+        c.execute("SELECT * FROM userAuth WHERE username=?", (thisuser,))
         ret = c.fetchall()
         print ret
         hash = ret[1]
-        if (pbkdf2_sha256.verify(pass, hash)):
+        if (pbkdf2_sha256.verify(passw, hash)):
             return True
         else:
             return False
+    except:
+	return False
 
 def get_allowed():
     conn, c = get_db()
@@ -171,10 +176,10 @@ def get_doorlog(days):
     return ret_dict
 
 ############  Write data ########################
-def setup_user(user_in, pass):
+def setup_user(user_in, passw):
     conn, c = get_db()
     try:
-        hash = pbkdf2_sha256.hash(pass)
+        hash = pbkdf2_sha256.hash(passw)
         c.execute("INSERT INTO userAuth VALUES (?,?)", (user_in, hash))
         conn.commit()
         return True
@@ -219,7 +224,7 @@ def write_userdata(resp):
     print users_in
     if resp['username'] not in users_in:
         try:
-            if (setup_user(resp['username'], resp['password']))
+            if (setup_user(resp['username'], resp['password'])):
                 #c.execute("INSERT INTO doorUsers VALUES (?,?,?,?,?)",(resp['username'], resp['keycode'], resp['enabled'], timeStart, timeEnd))
                 c.execute("UPDATE doorUsers SET keycode=?, enabled=?, timeStart=?, timeEnd=? WHERE user=?", (resp['keycode'], resp['enabled'], timeStart, timeEnd, resp['username']))
             else:
@@ -251,7 +256,7 @@ def delete_user(user):
     conn, c = get_db()
     #cascade delete in canOpen and doorUsers table (set in table initialisation)
     #c.execute("DELETE FROM doorUsers WHERE user=?", (user,))
-    c.execute("DELETE FROM userAuth WHERE username=?", (user,)
+    c.execute("DELETE FROM userAuth WHERE username=?", (user,))
     conn.commit()
 
 def update_doorstatus(status, door):
@@ -305,4 +310,3 @@ def validate_key(key, door):
 
 setup_db()
 setup_doors()
-setup_admin_user()

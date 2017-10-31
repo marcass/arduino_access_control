@@ -44,7 +44,7 @@ def setup_db():
     c.execute('''CREATE TABLE IF NOT EXISTS doorStates
                     (timestamp TIMESTAMP, door TEXT, state TEXT )''')
     c.execute('''CREATE TABLE IF NOT EXISTS canOpen
-                    (door TEXT, userallowed TEXT, FOREIGN KEY(door) REFERENCES doorID(door_id), FOREIGN KEY(userallowed) REFERENCES doorUsers(user) ON DELETE CASCADE)''')
+                    (door TEXT, userallowed TEXT, FOREIGN KEY(door) REFERENCES doorID(door_id), FOREIGN KEY(userallowed) REFERENCES userAuth(username) ON DELETE CASCADE)''')
     conn.commit() # Save (commit) the changes
 
 
@@ -64,9 +64,11 @@ def setup_admin_user(user, passw):
     if len(c.fetchall()) > 0:
         return
     else:
-        print user
-        print passw
-        c.execute("INSERT INTO userAuth VALUES (?,?)", (user, passw))
+        # print user
+        # print passw
+        pw_hash = pbkdf2_sha256.hash(passw)
+        # print pw_hash
+        c.execute("INSERT INTO userAuth VALUES (?,?)", (user, pw_hash))
         conn.commit()
 
 #######  Get data #############################
@@ -80,8 +82,9 @@ def get_user(thisuser, passw):
         ret = c.fetchall()
         print 'following is the fetch'
         print ret
-        pw_hash = ret[1]
-        print pw_hash
+        pw_hash = ret[0][1]
+        print type(pw_hash)
+        print str(pw_hash)
         if (pbkdf2_sha256.verify(passw, pw_hash)):
             print 'hash OK'
             return True
@@ -137,8 +140,9 @@ def fetch_user_data(user_in):
 def get_all_users():
     conn, c = get_db()
     ret = []
-    for username in get_doorUser_col('username'):
-        ret.append(fetch_user_data(username))
+    for user_in in get_doorUser_col('user'):
+        ret.append(fetch_user_data(user_in))
+        print ret
     return ret
 
 def get_doorstatus():
@@ -227,7 +231,7 @@ def write_userdata(resp):
         from dateutil.relativedelta import relativedelta
         timeEnd = utcnow + relativedelta(years=+20)
     print resp['username']
-    users_in = get_doorUser_col('username')
+    users_in = get_doorUser_col('user')
     print users_in
     if resp['username'] not in users_in:
         try:
@@ -235,8 +239,10 @@ def write_userdata(resp):
             print 'Username = '+resp['username']
             print 'PW = '+resp['password']
             if (setup_user(resp['username'], resp['password'])):
-                #c.execute("INSERT INTO doorUsers VALUES (?,?,?,?,?)",(resp['username'], resp['keycode'], resp['enabled'], timeStart, timeEnd))
-                c.execute("UPDATE doorUsers SET keycode=?, enabled=?, timeStart=?, timeEnd=? WHERE user=?", (resp['keycode'], resp['enabled'], timeStart, timeEnd, resp['username']))
+                print 'adding user '+resp['username']
+                c.execute("INSERT INTO doorUsers VALUES (?,?,?,?,?)",(resp['username'], resp['keycode'], resp['enabled'], timeStart, timeEnd))
+                #c.execute("UPDATE doorUsers SET keycode=?, enabled=?, timeStart=?, timeEnd=? WHERE user=?", (resp['keycode'], resp['enabled'], timeStart, timeEnd, resp['username']))
+                conn.commit()
             else:
                 return {'status':'Failed to setup user'}
         except:
@@ -249,7 +255,11 @@ def write_userdata(resp):
 
 def update_canOpen(user, doors):
     conn, c = get_db()
-    c.execute("DELETE FROM canOpen WHERE userallowed=?", (user,))
+    try:
+        c.execute("DELETE FROM canOpen WHERE userallowed=?", (user,))
+        print 'deleting new user from any existing door access'
+    except:
+        print 'this user is not in canOpen so passing'
     # if len(c.fetchall()) > 0:
     #     #flush detail from canOpen then rewrite it
     #     c.execute("DELETE FROM canOpen WHERE userallowed=?", (user,))

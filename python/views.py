@@ -55,7 +55,7 @@
 #}
 
 #curl -X GET -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIyMGU4OTg2NS0wNjM5LTQ3ZDEtYWU0YS1hYTg4ODQxNDIwNjciLCJleHAiOjE1MDg0NTU2NDgsImZyZXNoIjpmYWxzZSwiaWF0IjoxNTA4NDU0NzQ4LCJ0eXBlIjoiYWNjZXNzIiwibmJmIjoxNTA4NDU0NzQ4LCJpZGVudGl0eSI6ImFkbWluIn0.NT7t_17Hd3hT6_uTwy5FgGSN-koq8UeybEEKaLbRjIk" http://127.0.0.1:5000/listallowed
-
+import sys
 import re
 import sql
 from flask import Flask, request, jsonify
@@ -294,6 +294,11 @@ def getAccessLog():
     resp = get_access_log(content['days'])
     return jsonify(resp), 200
 
+try:
+    sql.setup_admin_user(sys.argv[1], sys.argv[2])
+except:
+    pass
+
 if __name__ == "__main__":
     app.run()
 #    app.run(ssl_context='adhoc')
@@ -301,5 +306,3 @@ if __name__ == "__main__":
 #    from geventwebsocket.handler import WebSocketHandler
 #    server = pywsgi.WSGIServer(('', 5000), app, handler_class=WebSocketHandler)
 #    server.serve_forever()
-print ssy.argv
-sql.setup_admin_user(sys.argv[1], sys.argv[2])

@@ -13,32 +13,43 @@ app.secret_key = 'ksajdkhsadulaulkj1092830983no1y24'  # Change this!
 app.config['JWT_HEADER_TYPE'] = 'Bearer'
 #jwt = JWTManager(app)
 
-import os
-if os.environ.has_key('LOGIN_PW'):
-  pw = os.environ['LOGIN_PW']
-else:
-  pw = 'password'
+# import os
+# if os.environ.has_key('LOGIN_PW'):
+#   pw = os.environ['LOGIN_PW']
+# else:
+#   pw = 'password'
+
+# @app.route('/auth/login', methods=['POST'])
+# def auth():
+#     username = request.json.get('username', None)
+#     password = request.json.get('password', None)
+#     if username != 'admin' or password != pw:
+#         return jsonify({"msg": "Bad username or password"}), 401
+#
+#     # Use create_access_token() and create_refresh_token() to create our
+#     # access and refresh tokens
+#     ret = {
+#         'access_token': create_access_token(identity=username),
+#         'refresh_token': create_refresh_token(identity=username)
+#     }
+#     print ret
+#     return jsonify(ret), 200
 
 @app.route('/auth/login', methods=['POST'])
 def auth():
     username = request.json.get('username', None)
     password = request.json.get('password', None)
-    if username != 'admin' or password != pw:
+    if sql.get_user(username, password):
+        # Use create_access_token() and create_refresh_token() to create our
+        # access and refresh tokens
+        ret = {
+            'access_token': create_access_token(identity=username),
+            'refresh_token': create_refresh_token(identity=username)
+        }
+        return jsonify(ret), 200
+    else:
         return jsonify({"msg": "Bad username or password"}), 401
 
-    # Use create_access_token() and create_refresh_token() to create our
-    # access and refresh tokens
-    ret = {
-        'access_token': create_access_token(identity=username),
-        'refresh_token': create_refresh_token(identity=username)
-    }
-    print ret
-    return jsonify(ret), 200
-
-#@app.route('/auth/refresh', methods=['POST'])
-#def refresh():
-#    content = request.get_json(silent=False)
-    
 # The jwt_refresh_token_required decorator insures a valid refresh
 # token is present in the request before calling this endpoint. We
 # can use the get_jwt_identity() function to get the identity of

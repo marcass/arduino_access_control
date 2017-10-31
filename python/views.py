@@ -1,12 +1,12 @@
-# todo
-#- front end https://auth0.com/blog/vuejs2-authentication-tutorial/
-
 # USAGE:
 # INSTALL: sudo pip install flask flask-cors pyopenssl
 # START REST API with:
 #    FLASK_APP=keyserver.py flask run
 # START REST and WebSockets with:
 #    gunicorn -k flask_sockets.worker keyserver:app
+#
+# START REST API WITH ADMIN AUTH:
+# python views.py admin pass
 
 # In another terminal:
 # curl -X GET http://127.0.0.1:5000/users
@@ -125,7 +125,7 @@ def add_user():
     '''
     content = request.get_json(silent=False)
     #{"username":invalid", "keycode":"invalid", "doorlist":["topgarage","frontdoor","bottomgarage"], "enabled":"1"}
-    #{"username":pell", "keycode":"00003", "doorlist":["topgarage","frontdoor","bottomgarage"], "enabled":"1"}
+    #{"username":pell", "password":"blah","keycode":"00003", "doorlist":["topgarage","frontdoor","bottomgarage"], "enabled":"1"}
     timeStart = None
     timeEnd = None
     doorlist = None
@@ -141,7 +141,7 @@ def add_user():
         content.update({'timeEnd':0})
     if not keycode_validation(content['keycode']):
         return jsonify({'Status':'keycode failure'}), 200
-    sql.write_userdata(content)
+    #sql.write_userdata(content)
     return jsonify(sql.write_userdata(content)), 200
 
 @app.route("/user/<username>", methods=['DELETE',])

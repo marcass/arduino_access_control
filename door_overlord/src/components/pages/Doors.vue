@@ -1,5 +1,6 @@
 <template>
   <div class="doors">
+    <app-nav></app-nav>
     <h1>Door Table</h1>
    <div class="col-md-5" v-for="item in doorstatus">
      <li>{{ item.door }} was {{ item.status }} at {{ item.time }}</li>
@@ -10,7 +11,7 @@
 
 <script>
 import { getDoorStatus } from '../../../utils/door-api'
-// import 'bootstrap/dist/css/bootstrap.css'
+import AppNav from '../AppNav'
 export default {
   name: 'doors',
   data () {
@@ -20,7 +21,7 @@ export default {
     }
   },
   components: {
-    // datePicker
+    AppNav
   },
   methods: {
     getDoorStatus () {

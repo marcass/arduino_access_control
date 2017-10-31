@@ -7,6 +7,9 @@
      <li>Username:
        <input v-model="username">
      </li>
+     <li>Password:
+       <input v-model="password">
+     </li>
      <li>Keycode:
        <input v-model="keycode">
      </li>
@@ -26,7 +29,7 @@
         </div>
       </li>
       <li>
-        <button v-on:click="blah(JSON.stringify({'username':username, 'keycode': keycode, 'enabled': enabled, 'timeStart': startDateObject, 'timeEnd': endDateObject, 'doorlist': enableddoorlist}))">Submit</button>
+        <button v-on:click="blah(JSON.stringify({'username':username, 'password':password, 'keycode': keycode, 'enabled': enabled, 'timeStart': startDateObject, 'timeEnd': endDateObject, 'doorlist': enableddoorlist}))">Submit</button>
       </li>
    </div>
   </div>
@@ -51,6 +54,7 @@ export default {
         format: 'ddd, MMM Do YYYY, HH:mm'
       },
       username: '',
+      password: '',
       endDateObject: '',
       startDateObject: '',
       enabled: ''

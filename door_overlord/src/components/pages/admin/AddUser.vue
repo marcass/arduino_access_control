@@ -10,6 +10,14 @@
      <li>Password:
        <input v-model="password">
      </li>
+     <li>Role:
+       <input type="radio" id="admin" value="admin" v-model="role">
+       <label for="admin">Admin</label>
+       <br>
+       <input type="radio" id="user" value="user" v-model="role">
+       <label for="user">User</label>
+       <span>Picked: {{ role }}</span>
+     </li>
      <li>Keycode:
        <input v-model="keycode">
      </li>
@@ -29,7 +37,7 @@
         </div>
       </li>
       <li>
-        <button v-on:click="blah(JSON.stringify({'username':username, 'password':password, 'keycode': keycode, 'enabled': enabled, 'timeStart': startDateObject, 'timeEnd': endDateObject, 'doorlist': enableddoorlist}))">Submit</button>
+        <button v-on:click="blah(JSON.stringify({'username':username, 'password':password, 'role':role, 'keycode': keycode, 'enabled': enabled, 'timeStart': startDateObject, 'timeEnd': endDateObject, 'doorlist': enableddoorlist}))">Submit</button>
       </li>
    </div>
   </div>
@@ -55,6 +63,7 @@ export default {
       },
       username: '',
       password: '',
+      role: '',
       endDateObject: '',
       startDateObject: '',
       enabled: ''

@@ -15,10 +15,10 @@ Vue.use(VueAuth, {
   authRedirect: {path: '/users'},
   refreshData: {enabled: false},
   rolesVar: 'role',
-  fetchUser: {
+  fetchData: {
     url: '/auth/user',
     method: 'GET',
-    enabled: true
+    enabled: false
   }
 })
 

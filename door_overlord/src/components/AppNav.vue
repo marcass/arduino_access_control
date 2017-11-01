@@ -16,7 +16,7 @@
             <router-link :to="{name: 'login'}">login</router-link>
           </span>
           <span v-show="$auth.check()">
-            <span v-if="$auth.user() === 'admin'">
+            <span v-if="$auth.user('admin')">
               <a v-on:click='logout()' href="javascript:void(0);">Logout</a> &bull;
               <router-link :to="{name: 'Users'}">All Users</router-link> &bull;
               <router-link :to="{name: 'usekey'}">Open a door</router-link> &bull;

@@ -155,6 +155,17 @@ def remove_user(username):
     resp = {}
     return jsonify(resp), 200
 
+@app.route("/auth/user", methods=['GET',])
+@jwt_required
+def get_user_role():
+    '''
+    Receives: nothing
+    Returns {'username': max, 'role':'user'}
+    '''
+    content = request.get_json(silent=False)
+    print content
+    return jsonify(sql.get_user_role(content['username'])), 200
+
 @app.route("/user", methods=['GET',])
 @jwt_required
 def get_user():

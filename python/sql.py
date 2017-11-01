@@ -34,7 +34,7 @@ def setup_db():
     conn, c = get_db()
     #type is of 'mqtt', 'keycode' or 'rfid'
     c.execute('''CREATE TABLE IF NOT EXISTS userAuth
-                    (username TEXT UNIQUE, password TEXT)''')
+                    (username TEXT UNIQUE, password TEXT, role TEXT)''')
     c.execute('''CREATE TABLE IF NOT EXISTS doorID
                     (door_id TEXT)''')
     c.execute('''CREATE TABLE IF NOT EXISTS actionLog
@@ -68,32 +68,44 @@ def setup_admin_user(user, passw):
         # print passw
         pw_hash = pbkdf2_sha256.hash(passw)
         # print pw_hash
-        c.execute("INSERT INTO userAuth VALUES (?,?)", (user, pw_hash))
+        c.execute("INSERT INTO userAuth VALUES (?,?,?)", (user, pw_hash, 'admin'))
         conn.commit()
 
 #######  Get data #############################
 
-def get_user(thisuser, passw):
+def auth_user(thisuser, passw):
     conn, c = get_db()
     try:
         print thisuser
         print passw
         c.execute("SELECT * FROM userAuth WHERE username=?", (thisuser,))
         ret = c.fetchall()
-        print 'following is the fetch'
-        print ret
+        # print 'following is the fetch'
+        # print ret
         pw_hash = ret[0][1]
-        print type(pw_hash)
-        print str(pw_hash)
+        role = ret[0][2]
+        # print type(pw_hash)
+        # print str(pw_hash)
         if (pbkdf2_sha256.verify(passw, pw_hash)):
-            print 'hash OK'
-            return True
+            # print 'hash OK'
+            status = 'passed'
         else:
             print 'Hash not OK'
-            return False
+            status = 'failed'
     except:
-        print 'exception'
-	return False
+        status = 'exception'
+    ret_dict = {'status': status, 'role': role}
+    return ret_dict
+
+def get_user_role(thisuser):
+    conn, c = get_db()
+    try:
+        c.execute("SELECT role FROM userAuth WHERE username=?", (thisuser,))
+        ret = c.fetchall()
+        print ret
+    except:
+        print 'Problem getting role'
+    return {'username':thisuser, 'role':role}
 
 def get_allowed():
     conn, c = get_db()
@@ -187,11 +199,15 @@ def get_doorlog(days):
     return ret_dict
 
 ############  Write data ########################
-def setup_user(user_in, passw):
+def setup_user(user_in, passw, role=0):
     conn, c = get_db()
     try:
+        if user_in == 'burner':
+            role = 'burner'
+        if role == 0:
+            role = 'user'
         pw_hash = pbkdf2_sha256.hash(passw)
-        c.execute("INSERT INTO userAuth VALUES (?,?)", (user_in, pw_hash))
+        c.execute("INSERT INTO userAuth VALUES (?,?,?)", (user_in, pw_hash, role))
         conn.commit()
         return True
     except:
@@ -238,7 +254,7 @@ def write_userdata(resp):
             print 'Username and pw detail for setup follows'
             print 'Username = '+resp['username']
             print 'PW = '+resp['password']
-            if (setup_user(resp['username'], resp['password'])):
+            if (setup_user(resp['username'], resp['password'], resp['role'])):
                 print 'adding user '+resp['username']
                 c.execute("INSERT INTO doorUsers VALUES (?,?,?,?,?)",(resp['username'], resp['keycode'], resp['enabled'], timeStart, timeEnd))
                 #c.execute("UPDATE doorUsers SET keycode=?, enabled=?, timeStart=?, timeEnd=? WHERE user=?", (resp['keycode'], resp['enabled'], timeStart, timeEnd, resp['username']))

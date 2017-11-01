@@ -39,13 +39,14 @@
         // context: 'login context',
         token: '',
         refresh_token: '',
+        role: '',
         data: {
           body: {
             username: 'admin',
             password: 'password'
           },
           rememberMe: true,
-          fetchUser: true
+          fetchUser: false
           // redirect: '/users'
         },
 
@@ -79,8 +80,10 @@
           rememberMe: this.data.rememberMe,
           redirect: {name: redirect ? redirect.from.name : 'Users'},
           fetchUser: this.data.fetchUser,
+          role: this.data.role,
           success () {
             console.log('success ' + this.context)
+            console.log('role' + this.data.role)
             // console.log('success ' + this.$auth.user())
             // console.log('success', +this.data.fetchUser)
           },

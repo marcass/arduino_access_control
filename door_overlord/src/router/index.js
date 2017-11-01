@@ -23,6 +23,7 @@ export default new Router({
       path: '/users',
       name: 'Users',
       component: Users,
+      // meta: {auth: {roles: 'admin'}}
       meta: {auth: true}
     },
     {

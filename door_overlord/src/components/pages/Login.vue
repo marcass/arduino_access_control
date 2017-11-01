@@ -53,7 +53,9 @@
         error: null
       }
     },
-
+    // components: {
+    //   role
+    // },
     mounted () {
       console.log(this.$auth.redirect())
 
@@ -72,7 +74,7 @@
         // })
         // console.log(this.token)
         // console.log(this.refresh_token)
-
+        // var role
         var redirect = this.$auth.redirect()
         this.$auth.login({
           // body: this.data.body, // Vue-resource
@@ -80,13 +82,15 @@
           rememberMe: this.data.rememberMe,
           redirect: {name: redirect ? redirect.from.name : 'Users'},
           fetchUser: this.data.fetchUser,
-          role: this.data.role,
-          success () {
-            console.log('success ' + this.context)
-            console.log('role' + this.data.role)
-            // console.log('success ' + this.$auth.user())
-            // console.log('success', +this.data.fetchUser)
+          // role: this.data.data.role,
+          success (res) {
+            var role = res.data.data.role
+            console.log('res =' + role)
           },
+          // success () {
+          //   console.log('success ' + this.context)
+          //   // console.log('role' + this.data.data.role)
+          // },
           error (res) {
             console.log('error ' + this.context)
 

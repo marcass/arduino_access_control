@@ -18,7 +18,11 @@ Vue.use(VueAuth, {
   fetchData: {
     url: '/auth/user',
     method: 'GET',
-    enabled: false
+    enabled: true
+  // },
+  // _parseUserData: function (data) {
+  //   console.log(data.data)
+  //   return data.data
   }
 })
 

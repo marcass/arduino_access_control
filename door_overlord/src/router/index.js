@@ -23,8 +23,8 @@ export default new Router({
       path: '/users',
       name: 'Users',
       component: Users,
-      // meta: {auth: {roles: 'admin'}}
-      meta: {auth: true}
+      meta: {auth: {roles: 'admin'}}
+      // meta: {auth: true}
     },
     {
       path: '/auth/login',
@@ -36,13 +36,15 @@ export default new Router({
       path: '/adduser',
       name: 'adduser',
       component: Adduser,
-      meta: {auth: true}
+      meta: {auth: {roles: 'admin'}}
+      // meta: {auth: true}
     },
     {
       path: '/listallowed',
       name: 'listallowed',
       component: Listallowed,
-      meta: {auth: true}
+      meta: {auth: {roles: 'admin'}}
+      // meta: {auth: true}
     },
     {
       path: '/doors',
@@ -60,7 +62,8 @@ export default new Router({
       path: '/updateuser',
       name: 'edituser',
       component: Updateuser,
-      meta: {auth: true}
+      meta: {auth: {roles: 'admin'}}
+      // meta: {auth: true}
     }
   ]
 })

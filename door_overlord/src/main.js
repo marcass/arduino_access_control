@@ -16,14 +16,14 @@ Vue.use(VueAuth, {
   refreshData: {enabled: false},
   rolesVar: 'role',
   fetchData: {
-    url: '/auth/user',
-    method: 'GET',
-    enabled: true
-  // },
+    // url: '/auth/user/blah',
+    // method: 'GET',
+    enabled: false
+  }
   // _parseUserData: function (data) {
   //   console.log(data.data)
   //   return data.data
-  }
+  // }
 })
 
 Vue.config.productionTip = false

@@ -15,9 +15,8 @@
           <span v-show="!$auth.check()">
             <router-link :to="{name: 'login'}">login</router-link>
           </span>
-          <span v-show="$auth.check()">
+          <span v-show="$auth.check('admin')">
             <!-- <span v-if="$auth.user('admin')"> -->
-              <a v-on:click='logout()' href="javascript:void(0);">Logout</a> &bull;
               <router-link :to="{name: 'Users'}">All Users</router-link> &bull;
               <router-link :to="{name: 'usekey'}">Open a door</router-link> &bull;
               <router-link :to="{name: 'listallowed'}">Allowed users</router-link> &bull;
@@ -26,7 +25,10 @@
               <router-link :to="{name: 'doors'}">Door status</router-link>
             <!-- </span>
             <span v-else> -->
+            </span>
+            <span v-show="$auth.check()">
               <router-link :to="{name: 'Hello'}">Hello</router-link> &bull;
+              <a v-on:click='logout()' href="javascript:void(0);">Logout</a> &bull;
             </span>
           </span>
         </li>

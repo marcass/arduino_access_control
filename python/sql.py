@@ -80,8 +80,8 @@ def auth_user(thisuser, passw):
         print passw
         c.execute("SELECT * FROM userAuth WHERE username=?", (thisuser,))
         ret = c.fetchall()
-        # print 'following is the fetch'
-        # print ret
+        print 'following is the fetch'
+        print ret
         pw_hash = ret[0][1]
         role = ret[0][2]
         # print type(pw_hash)
@@ -92,9 +92,10 @@ def auth_user(thisuser, passw):
         else:
             print 'Hash not OK'
             status = 'failed'
+        ret_dict = {'status': status, 'role': role}
     except:
-        status = 'exception'
-    ret_dict = {'status': status, 'role': role}
+        ret_dict = {'status': 'exception', 'role': 'undefined'}
+    print ret_dict
     return ret_dict
 
 def get_user_role(thisuser):

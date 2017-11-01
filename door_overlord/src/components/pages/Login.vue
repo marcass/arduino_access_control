@@ -44,8 +44,8 @@
             username: 'admin',
             password: 'password'
           },
-          rememberMe: false,
-          fetchUser: false
+          rememberMe: true,
+          fetchUser: true
           // redirect: '/users'
         },
 

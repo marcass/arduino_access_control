@@ -14,7 +14,12 @@ Vue.use(VueAuth, {
   router: require('@websanova/vue-auth/drivers/router/vue-router.2.x.js'),
   authRedirect: {path: '/users'},
   refreshData: {enabled: false},
-  rolesVar: 'role'
+  rolesVar: 'role',
+  fetchData: {
+    url: '/auth/login',
+    method: 'POST',
+    enabled: true
+  }
 })
 
 Vue.config.productionTip = false

@@ -41,12 +41,14 @@ def auth():
     password = request.json.get('password', None)
     print username
     print password
-    if sql.get_user(username, password):
+    content = sql.get_user(username, password)
+    if content['status'] == 'passed':
         # Use create_access_token() and create_refresh_token() to create our
         # access and refresh tokens
         ret = {
             'access_token': create_access_token(identity=username),
-            'refresh_token': create_refresh_token(identity=username)
+            'refresh_token': create_refresh_token(identity=username),
+            'role': content['role']
         }
         return jsonify(ret), 200
     else:

@@ -292,7 +292,7 @@ def update_canOpen(user, doors):
 def delete_user(user):
     conn, c = get_db()
     #cascade delete in canOpen and doorUsers table (set in table initialisation)
-    #c.execute("DELETE FROM doorUsers WHERE user=?", (user,))
+    c.execute("DELETE FROM doorUsers WHERE user=?", (user,))
     c.execute("DELETE FROM userAuth WHERE username=?", (user,))
     conn.commit()
 

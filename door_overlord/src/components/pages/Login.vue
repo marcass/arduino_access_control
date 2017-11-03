@@ -75,9 +75,9 @@
         // console.log(this.token)
         // console.log(this.refresh_token)
         // var role
-        console.log('username ' + this.data.body.username)
-        var userUrl = 'auth/user/' + this.data.body.username
-        console.log('url ' + userUrl)
+        // console.log('username ' + this.data.body.username)
+        // var userUrl = 'auth/user/' + this.data.body.username
+        // console.log('url ' + userUrl)
         var redirect = this.$auth.redirect()
         this.$auth.login({
           // body: this.data.body, // Vue-resource
@@ -87,7 +87,8 @@
           fetchUser: this.data.fetchUser,
           success (res) {
             var roleIn = res.data.data.role
-            this.$auth.user({'role': roleIn})
+            this.$auth.user({'role': roleIn, 'username': this.data.body.username})
+            console.log('user = ' + this.$auth.user().username)
           },
           // success () {
           //   console.log('success ' + this.context)

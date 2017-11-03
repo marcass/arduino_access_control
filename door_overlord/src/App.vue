@@ -1,19 +1,11 @@
 <template>
   <div id="app">
-    <img src="./assets/logo.png">
+    <!-- <img src="./assets/logo.png"> -->
     <div v-if="$auth.ready()">
-      <span v-show="!$auth.check()">
+      <!-- <span v-show="!$auth.check()">
           <router-link :to="{name: 'login'}">login</router-link> &bull;
-      </span>
-
-      <!-- <span v-show="$auth.check('admin')">
-          <router-link :to="{name: 'admin'}">users</router-link> &bull;
-      </span>
-
-      <span v-show="$auth.check()">
-          <router-link :to="{name: 'account'}">account</router-link> &bull;
-          <a v-on:click="logout()" href="javascript:void(0);">logout</a>
       </span> -->
+      <h2>Lets do some door stuff</h2>
       <router-view></router-view>
     </div>
     <div v-if="!$auth.ready()">

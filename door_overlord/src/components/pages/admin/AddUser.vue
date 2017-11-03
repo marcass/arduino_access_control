@@ -84,6 +84,7 @@ export default {
   methods: {
     blah (payload) {
       postUserData(payload)
+      this.$router.push('/users')
     },
     getDoors () {
       getDoors().then((ret) => {

@@ -8,6 +8,7 @@ import Login from '@/components/pages/Login'
 import Doors from '@/components/pages/Doors'
 import Usekey from '@/components/pages/UseKey'
 import Updateuser from '@/components/pages/admin/UpdateUser'
+import Userupdate from '@/components/pages/UserUpdate'
 
 // Vue.router = Router
 Vue.use(Router)
@@ -23,8 +24,8 @@ export default new Router({
       path: '/users',
       name: 'Users',
       component: Users,
-      // meta: {auth: {roles: 'admin'}}
-      meta: {auth: true}
+      meta: {auth: {roles: 'admin'}}
+      // meta: {auth: true}
     },
     {
       path: '/auth/login',
@@ -36,13 +37,15 @@ export default new Router({
       path: '/adduser',
       name: 'adduser',
       component: Adduser,
-      meta: {auth: true}
+      meta: {auth: {roles: 'admin'}}
+      // meta: {auth: true}
     },
     {
       path: '/listallowed',
       name: 'listallowed',
       component: Listallowed,
-      meta: {auth: true}
+      meta: {auth: {roles: 'admin'}}
+      // meta: {auth: true}
     },
     {
       path: '/doors',
@@ -60,7 +63,15 @@ export default new Router({
       path: '/updateuser',
       name: 'edituser',
       component: Updateuser,
-      meta: {auth: true}
+      meta: {auth: {roles: 'admin'}}
+      // meta: {auth: true}
+    },
+    {
+      path: '/userupdate',
+      name: 'userupdate',
+      component: Userupdate,
+      meta: {auth: ['admin', 'user']}
+      // meta: {auth: true}
     }
   ]
 })

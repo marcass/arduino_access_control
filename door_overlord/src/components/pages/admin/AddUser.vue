@@ -10,19 +10,8 @@
      <li>Password:
        <input v-model="password">
      </li>
-     <li>Role:
-       <input type="radio" id="admin" value="admin" v-model="role">
-       <label for="admin">Admin</label>
-       <br>
-       <input type="radio" id="user" value="user" v-model="role">
-       <label for="user">User</label>
-       <span>Picked: {{ role }}</span>
-     </li>
      <li>Keycode:
        <input v-model="keycode">
-     </li>
-     <li>Enabled:
-       <input type="checkbox" id="checkbox" v-model="enabled">
      </li>
      <li>Valid from:
        <date-picker v-model="startDateObject" :config="config"></date-picker>
@@ -31,10 +20,29 @@
        <date-picker v-model="endDateObject" :config="config"></date-picker>
       </li>
       <li>
-        <div id='enabled-doors' v-for="x in doorlist">
+        <h4>
+          Enabled doors:
+        </h4>
+        <div class='radio' v-for="x in doorlist">
           <input type="checkbox" :id="x" :value="x" v-model="enableddoorlist">
           <label >{{ x }}</label>
         </div>
+      </li>
+      <li>
+        <div class='radio'>
+          <h4>Role:</h4>
+          <input type="radio" id="admin" value="admin" v-model="role">
+          <label for="admin">Admin</label>
+          <br>
+          <input type="radio" id="user" value="user" v-model="role">
+          <label for="user">User</label>
+        </div>
+      </li>
+      <li>
+        <h4>
+          Enabled:
+        </h4>
+        <input type="checkbox" id="checkbox" v-model="enabled">
       </li>
       <li>
         <button v-on:click="blah(JSON.stringify({'username':username, 'password':password, 'role':role, 'keycode': keycode, 'enabled': enabled, 'timeStart': startDateObject, 'timeEnd': endDateObject, 'doorlist': enableddoorlist}))">Submit</button>
@@ -76,6 +84,7 @@ export default {
   methods: {
     blah (payload) {
       postUserData(payload)
+      this.$router.push('/users')
     },
     getDoors () {
       getDoors().then((ret) => {
@@ -97,6 +106,14 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.radio {
+  text-align: left;
+}
+
+/*span {
+  vertical-align: top;
+}*/
+
 h1, h2 {
   font-weight: normal;
 }
@@ -107,6 +124,7 @@ ul {
 }
 
 li {
+  vertical-align: top;
   display: inline-block;
   margin: 0 10px;
 }

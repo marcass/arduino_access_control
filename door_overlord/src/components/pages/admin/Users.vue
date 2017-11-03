@@ -5,16 +5,21 @@
       <div v-for="item in userlist">
         <div class="col-md-5">
             <div  v-if="enabled(item.enabled)">
-                <h3>{{ item.username }}  |  {{ item.keycode }} is ENABLED</h3>
-                  <p>Valid from: {{ item.startDateObject }}</p>
-                    <div class="col-lg-4">
-                      <date-picker v-model="item.startDateObject"></date-picker> <date-picker v-model="item.endDateObject"></date-picker>
-                    </div>
-                    <!-- {{ doors }} -->
-                    Permitted doors: <p v-for="x in item.doors">
-                                        {{ x }}
-                                      </p>
-
+                <h3>
+                  {{ item.username }}  is ENABLED
+                </h3>
+                <h4>
+                  Keycode:  {{ item.keycode }}
+                </h4>
+                <h4>
+                  Valid from: {{ item.startDateReadable }}
+                </h4>
+                <h4>
+                  Expires: {{ item.endDateReadable }}
+                </h4>
+                Permitted doors: <p v-for="x in item.doors">
+                                    {{ x }}
+                                  </p>
             </div>
             <div v-else>
                 <h3>{{ item.username }}  |  {{ item.keycode }} is disabled</h3>
@@ -71,6 +76,8 @@ export default {
           var o = Object.assign({}, el)
           o.startDateObject = new Date(o.times.start)
           o.endDateObject = new Date(o.times.end)
+          o.startDateReadable = o.startDateObject.toDateString()
+          o.endDateReadable = o.endDateObject.toDateString()
           return o
         })
       })

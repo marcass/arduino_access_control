@@ -1,5 +1,6 @@
 <template>
   <div class="hello">
+    <app-nav></app-nav>
     <h1>{{ msg }}</h1>
     <h2>Essential Links</h2>
     <ul>
@@ -21,13 +22,17 @@
 </template>
 
 <script>
+import AppNav from '../AppNav'
 export default {
   name: 'hello',
   data () {
     return {
       msg: 'Wellcome to Your Vue.js App'
     }
-  }
+  },
+  components: {
+    AppNav
+  },
 }
 </script>
 

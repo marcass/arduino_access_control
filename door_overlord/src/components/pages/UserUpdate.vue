@@ -1,45 +1,45 @@
 <template>
   <div class="doors">
     <app-nav></app-nav>
-    <h1>Update keycode for {{ $auth.user().username }}</h1>
+    <h1>Update keycode for {{ this.username }}</h1>
     <div class="col-lg-7">
-         Keycode: <input v-model="keycode" :placeholder="keycode" v-on:keyup.enter="changeattr($auth.user().username, 'keycode', keycode)">
-        <button v-on:click="sendData(JSON.stringify({'username': $auth.user().username, 'keycode': item.keycode, 'enabled': item.enabled, 'timeStart': item.startDateObject, 'timeEnd': item.endDateObject, 'doorlist': item.doors}))">Submit user data</button>
+         Keycode: <input v-model="keycode" :placeholder="this.keycode" v-on:keyup.enter="changepin({'username':username, 'keycode': keycode})">
+         <h4>Status: {{ status }}</h4>
    </div>
   </div>
 </template>
 
 <script>
-import { getUsers, putUserData, putAllUserData } from '../../../utils/door-api'
-import AppNav from '../../AppNav'
+import { putUserData, getUser } from '../../../utils/door-api'
+import AppNav from '../AppNav'
 export default {
-  name: 'updateuser',
+  name: 'userupdate',
   data () {
     return {
-      user: '',
+      // user: this.auth.user().username,
       keycode: '',
+      username: '',
+      status: 'Pending'
     }
   },
   components: {
     AppNav
   },
   methods: {
-    sendData (payload) {
-      putAllUserData(payload)
-    },
-    changeattr (userin, attr, val) {
-      // var key = attr
-      // axios.put(url,{'username': this.username, 'keycode': message})
-      const payload = JSON.stringify({'username': userin, [attr]: val})
-      // const pl = {username: item.username, keycode: message}
-      putUserData(payload, attr)
-      console.log(payload)
+    changepin (payload) {
+      putUserData(JSON.stringify(payload), 'keycode')
+      this.status = 'Success'
       return 1
+    },
+    getUserKey () {
+      getUser(this.$auth.user().username).then((ret) => {
+        this.keycode = ret.keycode
+      })
     }
   },
   mounted () {
-    this.getDoors()
-    this.getUsers()
+    this.getUserKey()
+    this.username = this.$auth.user().username
   }
 }
 </script>

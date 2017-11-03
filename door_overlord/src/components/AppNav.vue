@@ -22,12 +22,13 @@
               <router-link :to="{name: 'listallowed'}">Allowed users</router-link> &bull;
               <router-link :to="{name: 'adduser'}">Add a user</router-link> &bull;
               <router-link :to="{name: 'edituser'}">Edit users</router-link> &bull;
-              <router-link :to="{name: 'doors'}">Door status</router-link>
+              <router-link :to="{name: 'doors'}">Door status</router-link> &bull;
             <!-- </span>
             <span v-else> -->
             </span>
             <span v-show="$auth.check()">
               <router-link :to="{name: 'Hello'}">Hello</router-link> &bull;
+              <router-link :to="{name: 'userupdate'}">Update keycode</router-link> &bull;
               <a v-on:click='logout()' href="javascript:void(0);">Logout</a> &bull;
             </span>
           </span>
@@ -40,7 +41,7 @@
 <script>
 // import { isLoggedIn, login, logout } from '../../utils/auth'
 //
-import role from './pages/Login'
+// import role from './pages/Login'
 export default {
   name: 'app-nav',
   methods: {
@@ -62,10 +63,10 @@ export default {
     //     return 'user'
     //   }
     // }
-  },
-  components: {
-    role
   }
+  // components: {
+  //   role
+  // }
 }
 </script>
 

@@ -8,6 +8,7 @@ import Login from '@/components/pages/Login'
 import Doors from '@/components/pages/Doors'
 import Usekey from '@/components/pages/UseKey'
 import Updateuser from '@/components/pages/admin/UpdateUser'
+import Userupdate from '@/components/pages/UserUpdate'
 
 // Vue.router = Router
 Vue.use(Router)
@@ -63,6 +64,13 @@ export default new Router({
       name: 'edituser',
       component: Updateuser,
       meta: {auth: {roles: 'admin'}}
+      // meta: {auth: true}
+    },
+    {
+      path: '/userupdate',
+      name: 'userupdate',
+      component: Userupdate,
+      meta: {auth: ['admin', 'user']}
       // meta: {auth: true}
     }
   ]

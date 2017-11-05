@@ -31,8 +31,8 @@ char hexaKeys[ROWS][COLS] = {
  * byte rowPins[ROWS] = {6, 7, 8, 9}; //connect to the row pinouts of the keypad
  * byte colPins[COLS] = {2, 3, 4, 5}; //connect to the column pinouts of the keypad
  */
-byte rowPins[ROWS] = {8,9,10,11}; //connect to the row pinouts of the keypad
-byte colPins[COLS] = {2,3,4,5}; //connect to the column pinouts of the keypad
+byte colPins[ROWS] = {8,9,10,11}; //connect to the row pinouts of the keypad
+byte rowPins[COLS] = {2,3,4,5}; //connect to the column pinouts of the keypad
 
 
 String key_str = "";

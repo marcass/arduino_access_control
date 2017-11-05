@@ -140,7 +140,7 @@ def add_user():
     else:
         content.update({'timeEnd':0})
     if not keycode_validation(content['keycode']):
-        return jsonify({'Status':'keycode failure'}), 200
+        return jsonify({'status':'keycode failure'}), 200
     #sql.write_userdata(content)
     return jsonify(sql.write_userdata(content)), 200
 
@@ -159,12 +159,12 @@ def remove_user(username):
 @jwt_required
 def get_user_role(username):
     '''
-    Receives: nothing
-    Returns {'username': max, 'role':'user'}
+    
     '''
     content = request.get_json(silent=False)
+    password = request.json.get('password', None)
     print content
-    return jsonify(sql.get_user_role(username)), 200
+    return jsonify(sql.auth_user(username, password)), 200
 
 @app.route("/user/data/<username>", methods=['GET',])
 @jwt_required
@@ -211,7 +211,7 @@ def update_user():
     else:
         content.update({'timeEnd':0})
     if not keycode_validation(content['keycode']):
-        return jsonify({'Status':'keycode failure'}), 200
+        return jsonify({'status':'keycode failure'}), 200
     return jsonify(sql.write_userdata(content)), 200
 
 @app.route("/user/keycode", methods=['PUT',])
@@ -224,7 +224,7 @@ def update_user_keycode():
     content = request.get_json(silent=False)
     print content
     if not keycode_validation(content['keycode']):
-        return jsonify({'Status':'keycode failure'}), 200
+        return jsonify({'status':'keycode failure'}), 200
     else:
         sql.update_doorUsers(content['username'], 'keycode', content['keycode'])
         resp = {}

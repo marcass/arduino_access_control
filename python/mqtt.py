@@ -54,7 +54,7 @@ def on_message(client, userdata, msg):
             # print payload
             middleman.update_door_status(door, status)
             # r = requests.put(API_URL+'door/status', json=payload)
-            print r.json()
+            #print r.json()
         except:
             print 'Status error'
 

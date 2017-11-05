@@ -7,12 +7,12 @@
 #define debug
 
 char DOOR[] = "topgarage";
-char ssid[] = "ssid";            // your network SSID (name)
-char pass[] = "pass";            // your network password
+char ssid[] = "";            // your network SSID (name)
+char pass[] = "";            // your network password
 char HOST[] = "houseslave";
 
-const char USER[] = "user";
-const char MOSQ_PASS[] = "pass";
+const char USER[] = "esp";
+const char MOSQ_PASS[] = "";
 
 const byte ROWS = 4; //four rows
 const byte COLS = 4; //four columns
@@ -37,8 +37,8 @@ char hexaKeys[ROWS][COLS] = {
  * byte rowPins[ROWS] = {6, 7, 8, 9}; //connect to the row pinouts of the keypad
  * byte colPins[COLS] = {2, 3, 4, 5}; //connect to the column pinouts of the keypad
  */
-byte rowPins[ROWS] = {8,9,10,11}; //connect to the row pinouts of the keypad
-byte colPins[COLS] = {2,3,4,5}; //connect to the column pinouts of the keypad
+byte colPins[ROWS] = {8,9,10,11}; //connect to the row pinouts of the keypad
+byte rowPins[COLS] = {2,3,4,5}; //connect to the column pinouts of the keypad
 String key_str = "";
 bool sendKey = false;
 unsigned long pin_start = 0;

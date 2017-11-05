@@ -1,14 +1,14 @@
 #include <SPI.h>
 #include "WiFiEsp.h"
 #include <Keypad.h>
-#include <MQTTClient.h>
+#include <PubSubClient.h>
 #include <Adafruit_NeoPixel.h>
 
 
 #define debug
 
 char DOOR[] = "topgarage";
-char ssid[] = "";            // your network SSID (name)
+char ssid[] = "skibo";            // your network SSID (name)
 char pass[] = "";            // your network password
 char HOST[] = "192.168.0.3";
 
@@ -92,9 +92,32 @@ SoftwareSerial Serial1(6, 7); // RX, TX
 
 int status = WL_IDLE_STATUS;     // the Wifi radio's status
 
+//callback for mosquitto message
+void callback(char* topic, byte* payload, unsigned int length) {
+  // handle message arrived
+  Serial.print("Message arrived [");
+  Serial.print(topic);
+  Serial.print("] ");
+  String in_str;
+  for (int i=0;i<length;i++) {
+    Serial.print((char)payload[i]);
+    in_str = in_str + (char)payload[i];
+  }
+  Serial.println();
+    if (in_str == "1"){
+    state = STATE_TRIGGER;
+    led_state = state;
+  }else{
+    led_state = DENIED;
+    #ifdef debug
+      Serial.println("get fucked, open it yourself");
+    #endif
+  }
+}
+
 // Initialize the Ethernet client object
 WiFiEspClient net;
-MQTTClient client;
+PubSubClient client(HOST, 1883, callback, net);
 
 unsigned long lastMillis = 0;
 
@@ -115,12 +138,26 @@ void setup() {
   // initialize ESP module
   WiFi.init(&Serial1);
 
-  // MQTT brokers usually use port 8883 for secure connections.
-  client.begin(HOST, net);
-  client.onMessage(messageReceived);
-
   connect();
   pixels.begin();
+}
+
+void printWifiStatus()
+{
+  // print the SSID of the network you're attached to
+  Serial.print("SSID: ");
+  Serial.println(WiFi.SSID());
+
+  // print your WiFi shield's IP address
+  IPAddress ip = WiFi.localIP();
+  Serial.print("IP Address: ");
+  Serial.println(ip);
+
+  // print the received signal strength
+  long rssi = WiFi.RSSI();
+  Serial.print("Signal strength (RSSI):");
+  Serial.print(rssi);
+  Serial.println(" dBm");
 }
 
 void connect(){
@@ -146,20 +183,13 @@ void connect(){
     printWifiStatus();
   #endif
 
-  Serial.print("\nconnecting...");
-  while (!client.connect(DOOR, USER, MOSQ_PASS)) {
-    Serial.print(".");
-    delay(1000);
+  if (client.connect("arduinoClient", USER, MOSQ_PASS)) {
+    client.subscribe(DOOR_SUB);
+    Serial.println("Subscribed to response topic");
+  }else{
+    Serial.println("Unable to connect to broker");
   }
-  led_state = state;
-
-  //boolean connect(const char clientId[], const char username[], const char password[]);
-  //client.connect(DOOR, USER, MOSQ_PASS);
-  //client.subscribe(DOOR_SUB, 1);
-  while (!client.subscribe("doors/response/topgarage", 1)) {
-    Serial.print("*");
-    delay(1000);
-  }
+  
   led_state = state;
 }
 
@@ -181,23 +211,17 @@ void check_state(){
       Serial.print("Publishing state change to: ");
       Serial.println(door_state);
     #endif
-    client.publish(DOOR_STATE, (String)door_state);
+    client.publish(DOOR_STATE, (char)door_state);
+    client.subscribe(DOOR_SUB);
 //    delay(1000);
     prev_door_state = door_state;
   }
 }
 
-void send_pin(String pin){
+void send_pin(char pin){
   //boolean publish(const String &topic, const String &payload, bool retained, int qos);
-  if (client.publish(DOOR_PUB, pin, false, 1)){
-    #ifdef debug
-      Serial.println("Send successful");
-    #endif
-  }else{
-    #ifdef debug
-      Serial.println("Send failed");
-    #endif
-  }
+  client.publish(DOOR_PUB, pin);
+  client.subscribe(DOOR_SUB);
 }
 
 void keypadListen(){
@@ -230,7 +254,10 @@ void keypadListen(){
     #ifdef debug
       Serial.println(key_str);
     #endif
-    send_pin(key_str);
+    int len = key_str.length();
+    char key_out[len];
+    key_str.toCharArray(key_out, len);
+    send_pin(key_out);
     key_str = "";
     sendKey = false;
   }else{
@@ -318,39 +345,23 @@ void loop() {
   //run led stuff
   if (millis() - previousMillis > INTERVAL) {
     previousMillis = millis();
-//    manage_led();
+    manage_led();
   }
 }
 
-void messageReceived(String &topic, String &payload) {
-  #ifdef debug
-    Serial.println("incoming: " + topic + " - " + payload);
-  #endif
-  if (payload == "1"){
-    state = STATE_TRIGGER;
-    led_state = state;
-  }else{
-    led_state = DENIED;
-    #ifdef debug
-      Serial.println("get fucked, open it yourself");
-    #endif
-  }
-}
+//void messageReceived(String &topic, String &payload) {
+//  #ifdef debug
+//    Serial.println("incoming: " + topic + " - " + payload);
+//  #endif
+//  if (payload == "1"){
+//    state = STATE_TRIGGER;
+//    led_state = state;
+//  }else{
+//    led_state = DENIED;
+//    #ifdef debug
+//      Serial.println("get fucked, open it yourself");
+//    #endif
+//  }
+//}
 
-void printWifiStatus()
-{
-  // print the SSID of the network you're attached to
-  Serial.print("SSID: ");
-  Serial.println(WiFi.SSID());
 
-  // print your WiFi shield's IP address
-  IPAddress ip = WiFi.localIP();
-  Serial.print("IP Address: ");
-  Serial.println(ip);
-
-  // print the received signal strength
-  long rssi = WiFi.RSSI();
-  Serial.print("Signal strength (RSSI):");
-  Serial.print(rssi);
-  Serial.println(" dBm");
-}

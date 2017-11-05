@@ -319,28 +319,6 @@ Text GLabel 3650 2050 2    60   Input ~ 0
 Text GLabel 3650 1950 2    60   Input ~ 0
 11
 $Comp
-L CONN_01X03 J1
-U 1 1 59D57AA6
-P 1450 6450
-F 0 "J1" H 1450 6650 50  0000 C CNN
-F 1 "CONN_01X03" V 1550 6450 50  0000 C CNN
-F 2 "Connectors_Phoenix:PhoenixContact_MCV-G_03x3.81mm_Vertical" H 1450 6450 50  0001 C CNN
-F 3 "" H 1450 6450 50  0001 C CNN
-	1    1450 6450
-	1    0    0    -1  
-$EndComp
-$Comp
-L CONN_01X08 J2
-U 1 1 59D57B42
-P 1850 6450
-F 0 "J2" H 1850 6900 50  0000 C CNN
-F 1 "CONN_01X08" V 1950 6450 50  0000 C CNN
-F 2 "Connectors_Phoenix:PhoenixContact_MCV-G_08x3.81mm_Vertical" H 1850 6450 50  0001 C CNN
-F 3 "" H 1850 6450 50  0001 C CNN
-	1    1850 6450
-	-1   0    0    1   
-$EndComp
-$Comp
 L CONN_01X08 J7
 U 1 1 59D57E70
 P 9900 3750
@@ -527,17 +505,6 @@ A2
 Text GLabel 2250 2400 0    60   Input ~ 0
 A2
 $Comp
-L CONN_01X01 J12
-U 1 1 59DD5EA4
-P 6600 5250
-F 0 "J12" H 6600 5350 50  0000 C CNN
-F 1 "CONN_01X01" V 6700 5250 50  0000 C CNN
-F 2 "Mounting_Holes:MountingHole_3.2mm_M3_DIN965_Pad" H 6600 5250 50  0001 C CNN
-F 3 "" H 6600 5250 50  0001 C CNN
-	1    6600 5250
-	1    0    0    -1  
-$EndComp
-$Comp
 L CONN_01X01 J9
 U 1 1 59DD5F50
 P 7150 5500
@@ -559,43 +526,10 @@ F 3 "" H 7650 5700 50  0001 C CNN
 	1    7650 5700
 	1    0    0    -1  
 $EndComp
-$Comp
-L CONN_01X01 J11
-U 1 1 59DD6013
-P 8200 5800
-F 0 "J11" H 8200 5900 50  0000 C CNN
-F 1 "CONN_01X01" V 8300 5800 50  0000 C CNN
-F 2 "Mounting_Holes:MountingHole_3.2mm_M3_DIN965_Pad" H 8200 5800 50  0001 C CNN
-F 3 "" H 8200 5800 50  0001 C CNN
-	1    8200 5800
-	1    0    0    -1  
-$EndComp
 Text Notes 3800 6350 0    60   ~ 0
 http://www.electronic-discount.be/product-details/box-g311/shop.htm?lng=en (for enclosure)
-$Comp
-L CONN_01X08 J3
-U 1 1 59DD664B
-P 2250 6450
-F 0 "J3" H 2250 6900 50  0000 C CNN
-F 1 "CONN_01X08" V 2350 6450 50  0000 C CNN
-F 2 "Pin_Headers:Pin_Header_Straight_1x08_Pitch2.54mm" H 2250 6450 50  0001 C CNN
-F 3 "" H 2250 6450 50  0001 C CNN
-	1    2250 6450
-	1    0    0    -1  
-$EndComp
 Text Notes 3900 6500 0    60   ~ 0
 http://support.seeedstudio.com/knowledgebase/articles/388503-what-are-the-pcb-panelization-rules
-$Comp
-L CONN_01X03 J13
-U 1 1 59DD964A
-P 1050 6450
-F 0 "J13" H 1050 6650 50  0000 C CNN
-F 1 "CONN_01X03" V 1150 6450 50  0000 C CNN
-F 2 "Connectors_Phoenix:PhoenixContact_MCV-G_03x3.81mm_Vertical" H 1050 6450 50  0001 C CNN
-F 3 "" H 1050 6450 50  0001 C CNN
-	1    1050 6450
-	-1   0    0    1   
-$EndComp
 $Comp
 L +5V #PWR?
 U 1 1 59DE983C

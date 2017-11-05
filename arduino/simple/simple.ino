@@ -21,13 +21,13 @@
 const char DOOR_ID[] = "topgarage";
 
 //wifi setup
-char ssid[] = "Twim";            // your network SSID (name)
-char pass[] = "12345678";        // your network password
+char ssid[] = "skibo";            // your network SSID (name)
+char pass[] = "r4bbitshurtlegs";        // your network password
 int status = WL_IDLE_STATUS;     // the Wifi radio's status
 char server[] = "houseslave";
 
 // Initialize the Ethernet client object
-//WiFiEspClient client;
+WiFiEspClient client;
 
 const byte ROWS = 4; //four rows
 const byte COLS = 4; //four columns
@@ -164,13 +164,13 @@ void check_door() {
   if (door_state != prev_state) {
     switch (door_state) {
       case DOOR_CLOSED:
-        send_data("Closed", DOOR_ID, statusUpdate, "PUT")
+        send_data("Closed", DOOR_ID, statusUpdate, "PUT");
         break;
       case DOOR_OPEN:
-        send_data("Opened", DOOR_ID, statusUpdate, "PUT")
+        send_data("Opened", DOOR_ID, statusUpdate, "PUT");
         break;
       case DOOR_UNKNOWN:
-        send_data("Unkown", DOOR_ID, statusUpdate, "PUT")
+        send_data("Unkown", DOOR_ID, statusUpdate, "PUT");
         break;
     }
     prev_state = door_state;

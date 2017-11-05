@@ -19,7 +19,7 @@
             <span v-show="$auth.check('admin')">
               <!-- <span v-if="$auth.user('admin')"> -->
                 <router-link :to="{name: 'Users'}">All Users</router-link> &bull;
-                <router-link :to="{name: 'usekey'}">Open a door</router-link> &bull;
+                <router-link :to="{name: 'usekey'}">Actuate a door</router-link> &bull;
                 <router-link :to="{name: 'listallowed'}">Allowed users</router-link> &bull;
                 <router-link :to="{name: 'adduser'}">Add a user</router-link> &bull;
                 <router-link :to="{name: 'edituser'}">Edit users</router-link> &bull;
@@ -29,7 +29,7 @@
               </span>
               <router-link :to="{name: 'Hello'}">Hello</router-link> &bull;
               <span v-show="$auth.check('user')">
-                <router-link :to="{name: 'userupdate'}">Update keycode</router-link> &bull;
+                <router-link :to="{name: 'userupdate'}">Update user details</router-link> &bull;
               </span>
               <a v-on:click='logout()' href="javascript:void(0);">Logout</a> &bull;
             </span>

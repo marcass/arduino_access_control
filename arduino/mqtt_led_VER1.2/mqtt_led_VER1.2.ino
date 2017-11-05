@@ -8,11 +8,11 @@
 #define debug
 
 char DOOR[] = "topgarage";
-char ssid[] = "";            // your network SSID (name)
+char ssid[] = "Garage";            // your network SSID (name)
 char pass[] = "";            // your network password
 char HOST[] = "192.168.0.3";
 
-const char USER[] = "esp";
+const char USER[] = "";
 const char MOSQ_PASS[] = "";
 
 const byte ROWS = 4; //four rows
@@ -38,43 +38,44 @@ char hexaKeys[ROWS][COLS] = {
  * byte rowPins[ROWS] = {6, 7, 8, 9}; //connect to the row pinouts of the keypad
  * byte colPins[COLS] = {2, 3, 4, 5}; //connect to the column pinouts of the keypad
  */
-byte colPins[ROWS] = {8,9,10,11}; //connect to the row pinouts of the keypad
-byte rowPins[COLS] = {2,3,4,5}; //connect to the column pinouts of the keypad
-String key_str = "";
-bool sendKey = false;
-unsigned long pin_start = 0;
-const unsigned long KEY_THRESH = 30000; //30sec to put pin in
-unsigned long relay_time = 0;
-const unsigned long RELAY_TRIG = 300;
-unsigned long led_time = 0;
-const unsigned long LED_TIME = 3000; //3sec
-unsigned long INTERVAL = 50;  // the time we need to wait for led update
-unsigned long previousMillis = 0;
-const byte STATE_IDLE = 1;
-const byte STATE_TRIGGER = 2;
-byte state = STATE_IDLE;
-#define RELAY 12
-#define LED 13
-#define SW_OPEN A0
-#define SW_CLOSED A1
+byte                  colPins[ROWS] = {8,9,10,11}; //connect to the row pinouts of the keypad
+byte                  rowPins[COLS] = {2,3,4,5}; //connect to the column pinouts of the keypad
+String                key_str = "";
+bool                  sendKey = false;
+unsigned long         pin_start = 0;
+const unsigned long   KEY_THRESH = 30000; //30sec to put pin in
+unsigned long         relay_time = 0;
+const unsigned long   RELAY_TRIG = 300;
+unsigned long         led_time = 0;
+const unsigned long   LED_TIME = 3000; //3sec
+unsigned long         INTERVAL = 50;  // the time we need to wait for led update
+unsigned long         previousMillis = 0;
+const byte            STATE_IDLE = 1;
+const byte            STATE_TRIGGER = 2;
+byte                  state = STATE_IDLE;
+const int             RELAY = A2;
+#define               LED 12
+#define               SW_OPEN A0
+#define               SW_CLOSED A1
 // How many NeoPixels are attached to the Arduino?
-#define NUMPIXELS      16
-char DOOR_PUB[] = "doors/request/topgarage";
-char DOOR_SUB[] = "doors/response/topgarage";
-char DOOR_STATE[] = "doors/status/topgarage";
+#define               NUMPIXELS      24
+char                  DOOR_PUB[] = "doors/request/topgarage";
+char                  DOOR_SUB[] = "doors/response/topgarage";
+char                  DOOR_STATE[] = "doors/status/topgarage";
 //door states
-const int STATE_OPEN = 0;
-const int STATE_CLOSED = 1;
-const int STATE_UNKNOWN = 2;
-int door_state = STATE_UNKNOWN;
-int prev_door_state;
+const int             STATE_OPEN = 0;
+const int             STATE_CLOSED = 1;
+const int             STATE_UNKNOWN = 2;
+int                   door_state = STATE_UNKNOWN;
+int                   prev_door_state;
 //led states
-const byte NOT_CONN = 3;
-const byte KEY_IN = 4;
-const byte DENIED = 5;
-byte led_state = NOT_CONN;
-byte disp_pix = 0;
-bool ledState = false;
+const byte            NOT_CONN = 3;
+const byte            KEY_IN = 4;
+const byte            DENIED = 5;
+byte                  led_state = NULL;
+byte                  prev_led_state;
+byte                  disp_pix = 0;
+byte                  prev_disp_pix;
 
 //initialize an instance of class NewKeypad
 Keypad customKeypad = Keypad( makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS);
@@ -108,10 +109,8 @@ void setup() {
   digitalWrite(RELAY, LOW);
   pinMode(LED, OUTPUT);
   digitalWrite(LED, LOW);
-  pinMode(SW_OPEN, INPUT);
-  pinMode(SW_CLOSED, INPUT);
-  digitalWrite(SW_OPEN, INPUT_PULLUP);
-  digitalWrite(SW_CLOSED, INPUT_PULLUP);
+  pinMode(SW_OPEN, INPUT_PULLUP);
+  pinMode(SW_CLOSED, INPUT_PULLUP);
   // initialize ESP module
   WiFi.init(&Serial1);
 
@@ -151,6 +150,7 @@ void connect(){
     Serial.print(".");
     delay(1000);
   }
+  client.setOptions(60, true, 1000);
   led_state = state;
 
   //boolean connect(const char clientId[], const char username[], const char password[]);
@@ -167,10 +167,16 @@ void check_state(){
   //if SW_OPEN is LOW (and SW_CLOSED is HIGH) door is open and vice versa. Unkown if not in either of these
   int open_reed = digitalRead(SW_OPEN);
   int closed_reed = digitalRead(SW_CLOSED);
+//  Serial.print("open reed ");
+//  Serial.print(open_reed);
+//  Serial.print(": closed reed ");
+//  Serial.println(closed_reed);
   if ((open_reed == LOW) && (closed_reed == HIGH)){
+//  if (open_reed == LOW) {
     door_state = STATE_OPEN;
   }
-  else if((open_reed == HIGH) && (closed_reed == LOW)){
+  else if ((open_reed == HIGH) && (closed_reed == LOW)){
+//  if (closed_reed == LOW){
     door_state = STATE_CLOSED;
   }
   else{
@@ -189,7 +195,7 @@ void check_state(){
 
 void send_pin(String pin){
   //boolean publish(const String &topic, const String &payload, bool retained, int qos);
-  if (client.publish(DOOR_PUB, pin, false, 1)){
+  if (client.publish(DOOR_PUB, pin, false, 2)){
     #ifdef debug
       Serial.println("Send successful");
     #endif
@@ -210,6 +216,10 @@ void keypadListen(){
   }
   char key = customKeypad.getKey();
   if (key){
+    #ifdef debug
+//      Serial.print("Currnet state for LED is "+(String)led_state);
+      Serial.println("Changing to key in LED state");
+    #endif
     led_state = KEY_IN;
     //reset timeout timer
     pin_start = millis();
@@ -248,6 +258,8 @@ void open_door(){
   if (millis() - relay_time > RELAY_TRIG){
     digitalWrite(RELAY, LOW);
     relay_time = 0;
+    state = STATE_IDLE;
+    led_state = state;
   }else{
     digitalWrite(RELAY, HIGH);
   }
@@ -261,39 +273,28 @@ void set_led(int in_pix, int red, int green, int blue){
 }
 
 void manage_led(){
-  //reset state when the flashing is done
-  if (led_time != 0){
-    if (millis() - led_time > LED_TIME){
-      led_state = state;
-      led_time = 0;
-    }
-  }
-  //flash in the appropriate way
   switch (led_state){
     case NOT_CONN:
-      ledState != ledState;
-      if (ledState){
-        set_led(NUMPIXELS, 150, 0, 0);
-      }else{
-        set_led(NUMPIXELS, 0, 0, 0);
-      }
+      set_led(NUMPIXELS, 20, 20, 20);
+      prev_led_state = led_state;
       break;
     case STATE_IDLE:
-      set_led(NUMPIXELS, 150, 0, 0);
+      set_led(2, 20, 0, 0);
+      prev_led_state = led_state;
       break;
     case KEY_IN:
-      set_led(disp_pix, 0, 80, 0);
+      set_led(NUMPIXELS, 0, 0, 0);
+      set_led(disp_pix, 0, 50, 0);
+      prev_disp_pix = disp_pix;
+      prev_led_state = led_state;
       break;
     case STATE_TRIGGER:
-      set_led(NUMPIXELS, 0, 100, 0);
+      set_led(NUMPIXELS, 0, 50, 50);
+      led_state = STATE_IDLE;
       break;
     case DENIED:
-      ledState != ledState;
-      if (ledState){
-        set_led(NUMPIXELS, 0, 0, 150);
-      }else{
-        set_led(NUMPIXELS, 0, 0, 0);
-      }
+      set_led(NUMPIXELS, 50, 0, 50);
+      prev_led_state = led_state;
       break;
   }
   pixels.show(); // This sends the updated pixel color to the hardware.
@@ -301,7 +302,7 @@ void manage_led(){
 
 void loop() {
   client.loop();
-
+  //Serial.println(state);
   if (!client.connected()) {
     led_state = NOT_CONN;
     connect();
@@ -316,10 +317,18 @@ void loop() {
       break;
   }
   //run led stuff
-  if (millis() - previousMillis > INTERVAL) {
-    previousMillis = millis();
-//    manage_led();
+  if ((disp_pix != prev_disp_pix) or (led_state != prev_led_state)){
+    manage_led();
   }
+  if (led_state == DENIED) {
+    if (led_time == 0) {
+      led_time = millis();
+    }
+    if (millis() - led_time > RELAY_TRIG) {
+      led_state = STATE_IDLE;
+    }
+  }
+  //check_state();
 }
 
 void messageReceived(String &topic, String &payload) {
@@ -332,7 +341,7 @@ void messageReceived(String &topic, String &payload) {
   }else{
     led_state = DENIED;
     #ifdef debug
-      Serial.println("get fucked, open it yourself");
+      Serial.println("no, open it yourself");
     #endif
   }
 }

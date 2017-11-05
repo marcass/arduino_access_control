@@ -12,7 +12,7 @@ char ssid[] = "Garage";            // your network SSID (name)
 char pass[] = "";            // your network password
 char HOST[] = "192.168.0.3";
 
-const char USER[] = "esp";
+const char USER[] = "";
 const char MOSQ_PASS[] = "";
 
 const byte ROWS = 4; //four rows
@@ -109,10 +109,8 @@ void setup() {
   digitalWrite(RELAY, LOW);
   pinMode(LED, OUTPUT);
   digitalWrite(LED, LOW);
-  pinMode(SW_OPEN, INPUT);
-  pinMode(SW_CLOSED, INPUT);
-  digitalWrite(SW_OPEN, INPUT_PULLUP);
-  digitalWrite(SW_CLOSED, INPUT_PULLUP);
+  pinMode(SW_OPEN, INPUT_PULLUP);
+  pinMode(SW_CLOSED, INPUT_PULLUP);
   // initialize ESP module
   WiFi.init(&Serial1);
 
@@ -152,6 +150,7 @@ void connect(){
     Serial.print(".");
     delay(1000);
   }
+  client.setOptions(60, true, 1000);
   led_state = state;
 
   //boolean connect(const char clientId[], const char username[], const char password[]);
@@ -168,10 +167,16 @@ void check_state(){
   //if SW_OPEN is LOW (and SW_CLOSED is HIGH) door is open and vice versa. Unkown if not in either of these
   int open_reed = digitalRead(SW_OPEN);
   int closed_reed = digitalRead(SW_CLOSED);
+//  Serial.print("open reed ");
+//  Serial.print(open_reed);
+//  Serial.print(": closed reed ");
+//  Serial.println(closed_reed);
   if ((open_reed == LOW) && (closed_reed == HIGH)){
+//  if (open_reed == LOW) {
     door_state = STATE_OPEN;
   }
-  else if((open_reed == HIGH) && (closed_reed == LOW)){
+  else if ((open_reed == HIGH) && (closed_reed == LOW)){
+//  if (closed_reed == LOW){
     door_state = STATE_CLOSED;
   }
   else{
@@ -274,7 +279,7 @@ void manage_led(){
       prev_led_state = led_state;
       break;
     case STATE_IDLE:
-      set_led(NUMPIXELS, 50, 0, 0);
+      set_led(2, 20, 0, 0);
       prev_led_state = led_state;
       break;
     case KEY_IN:
@@ -297,7 +302,7 @@ void manage_led(){
 
 void loop() {
   client.loop();
-
+  //Serial.println(state);
   if (!client.connected()) {
     led_state = NOT_CONN;
     connect();
@@ -323,6 +328,7 @@ void loop() {
       led_state = STATE_IDLE;
     }
   }
+  //check_state();
 }
 
 void messageReceived(String &topic, String &payload) {

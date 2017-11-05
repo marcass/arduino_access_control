@@ -10,7 +10,7 @@
      <li>Password:
        <input v-model="password">
      </li>
-     <li>Keycode:
+     <li>Keycode. Must consist of at least four of 1-9,A-D:
        <input v-model="keycode">
      </li>
      <li>Valid from:
@@ -45,7 +45,10 @@
         <input type="checkbox" id="checkbox" v-model="enabled">
       </li>
       <li>
-        <button v-on:click="blah(JSON.stringify({'username':username, 'password':password, 'role':role, 'keycode': keycode, 'enabled': enabled, 'timeStart': startDateObject, 'timeEnd': endDateObject, 'doorlist': enableddoorlist}))">Submit</button>
+        <button v-on:click="postData(JSON.stringify({'username':username, 'password':password, 'role':role, 'keycode': keycode, 'enabled': enabled, 'timeStart': startDateObject, 'timeEnd': endDateObject, 'doorlist': enableddoorlist}))">Submit</button>
+      </li>
+      <li class="response">
+        Result: {{ this.resp }}
       </li>
    </div>
   </div>
@@ -65,6 +68,7 @@ export default {
       userlist: [],
       message: '',
       keycode: '',
+      resp: '',
       enableddoorlist: [],
       config: {
         format: 'ddd, MMM Do YYYY, HH:mm'
@@ -82,9 +86,11 @@ export default {
     AppNav
   },
   methods: {
-    blah (payload) {
-      postUserData(payload)
-      this.$router.push('/users')
+    postData (payload) {
+      postUserData(payload).then((ret) => {
+        this.resp = ret.data.status
+      })
+      // this.$router.push('/users')
     },
     getDoors () {
       getDoors().then((ret) => {

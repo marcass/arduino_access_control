@@ -5,12 +5,13 @@
     <div class="col-lg-7">
          Keycode: <input v-model="keycode" :placeholder="this.keycode" v-on:keyup.enter="changepin({'username':username, 'keycode': keycode})">
          <h4>Status: {{ status }}</h4>
+         Password: <input v-model="password" v-on:keyup.enter="passwordCheck(password)">
    </div>
   </div>
 </template>
 
 <script>
-import { putUserData, getUser } from '../../../utils/door-api'
+import { putUserData, getUser, getVerifyUser } from '../../../utils/door-api'
 import AppNav from '../AppNav'
 export default {
   name: 'userupdate',
@@ -19,7 +20,8 @@ export default {
       // user: this.auth.user().username,
       keycode: '',
       username: '',
-      status: 'Pending'
+      status: 'Pending',
+      verified: ''
     }
   },
   components: {
@@ -31,10 +33,21 @@ export default {
       this.status = 'Success'
       return 1
     },
+
     getUserKey () {
       getUser(this.$auth.user().username).then((ret) => {
         this.keycode = ret.keycode
       })
+    },
+    passwordCheck (password) {
+      getVerifyUser(this.$auth.user().username, password).then((ret) => {
+        this.verfied = ret.data.status
+      })
+      if (this.verified === 'passed') {
+        return 1
+      } else {
+        return 0
+      }
     }
   },
   mounted () {

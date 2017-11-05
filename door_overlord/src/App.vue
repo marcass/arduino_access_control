@@ -5,7 +5,7 @@
       <!-- <span v-show="!$auth.check()">
           <router-link :to="{name: 'login'}">login</router-link> &bull;
       </span> -->
-      <h2>Lets do some door stuff</h2>
+      <h2>Door Overlord</h2>
       <router-view></router-view>
     </div>
     <div v-if="!$auth.ready()">
@@ -49,4 +49,5 @@ export default {
   color: #2c3e50;
   margin-top: 60px;
 }
+@import './assets/css/main.css'
 </style>

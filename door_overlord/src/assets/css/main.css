@@ -1,0 +1,8 @@
+.response {
+  border-style: solid;
+  border-color: red;
+}
+
+div.response {
+    clear: both;
+}

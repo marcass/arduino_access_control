@@ -2,7 +2,7 @@
   <div>
     <h1>Login</h1>
 
-    <b>Test users:</b> (admin / password)
+    <!-- <b>Test users:</b> (admin / password) -->
 
     <hr/>
 
@@ -42,8 +42,8 @@
         role: '',
         data: {
           body: {
-            username: 'admin',
-            password: 'password'
+            username: '',
+            password: ''
           },
           rememberMe: true,
           fetchUser: false

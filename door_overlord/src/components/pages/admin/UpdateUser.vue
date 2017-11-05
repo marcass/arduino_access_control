@@ -28,6 +28,9 @@
         </div>
       </div>
    </div>
+   <div class="response">
+     Result: {{ this.resp }}
+   </div>
   </div>
 </template>
 
@@ -45,6 +48,7 @@ export default {
       userlist: [],
       message: '',
       key: '',
+      resp: '',
       enableddoorlist: [],
       config: {
         format: 'ddd, MMM Do YYYY, HH:mm'
@@ -57,7 +61,9 @@ export default {
   },
   methods: {
     sendData (payload) {
-      putAllUserData(payload)
+      putAllUserData(payload).then((ret) => {
+        this.resp = ret.data.status
+      })
     },
     sendDelete (payload) {
       console.log(payload)

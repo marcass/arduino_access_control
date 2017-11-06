@@ -46,15 +46,9 @@ def on_message(client, userdata, msg):
             print 'failed to publish'
     if 'status' in msg.topic:
         #publish status
-        status_dict = {'0': 'Open', '1': 'Closed', '2':'Unknown'}
         try:
-            print status_dict[msg.payload]
-            status = status_dict[msg.payload]
-            # payload = {'door': door, 'status':status}
-            # print payload
-            middleman.update_door_status(door, status)
-            # r = requests.put(API_URL+'door/status', json=payload)
-            #print r.json()
+            print msg.payload
+            middleman.update_door_status(door, msg.payload)
         except:
             print 'Status error'
 

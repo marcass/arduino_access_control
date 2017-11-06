@@ -183,11 +183,13 @@ void check_state(){
     door_state = STATE_UNKNOWN;
   }
   if (door_state != prev_door_state){
+    char* doorStates[] = {"open", "closed", "unknown"};
     #ifdef debug
       Serial.print("Publishing state change to: ");
-      Serial.println(door_state);
+      Serial.println(doorStates[door_state]);
     #endif
-    client.publish(DOOR_STATE, (String)door_state);
+    client.publish(DOOR_STATE, (String)doorStates[door_state]);
+//    client.publish(DOOR_STATE, (String)door_state);
 //    delay(1000);
     prev_door_state = door_state;
   }

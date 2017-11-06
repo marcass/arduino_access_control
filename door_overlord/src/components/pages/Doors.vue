@@ -3,7 +3,7 @@
     <app-nav></app-nav>
     <h1>Door Table</h1>
    <div class="col-md-5" v-for="item in doorstatus">
-     <li>{{ item.door }} was {{ item.status }} at {{ item.time }}</li>
+     <li>{{ item.door }} was {{ item.status }} at {{ item.timeReadable }}</li>
 
    </div>
   </div>
@@ -24,10 +24,23 @@ export default {
     AppNav
   },
   methods: {
+    // getDoorStatus () {
+    //   getDoorStatus().then((ret) => {
+    //     this.doorstatus = ret
+    //   })
+    // },
     getDoorStatus () {
       getDoorStatus().then((ret) => {
-        this.doorstatus = ret
+        this.doorstatus = ret.map(function (el) {
+          var o = Object.assign({}, el)
+          o.timeObject = new Date(o.time)
+          o.timeReadable = o.timeObject.toString()
+          return o
+        })
       })
+    },
+    convertDate (obj) {
+      return obj.toDateString()
     }
   },
   mounted () {

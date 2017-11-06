@@ -302,11 +302,9 @@ def update_doorstatus(status, door):
     c.execute("INSERT INTO doorStates VALUES (?,?,?)", (utcnow,door,status) )
     conn.commit()
 
-def insert_actionLog(access_type, door, pin=None, username='Someone'):
+def insert_actionLog(access_type, door, pin, username='Someone'):
     if username is not 'Someone':
         pin = '****'
-    if pin is None:
-        pin = 'mqtt'
     message = '{} attempted access at {} with {}'.format(username, door, pin)
     conn, c = get_db()
     c.execute("INSERT INTO actionLog VALUES (?,?,?)",\

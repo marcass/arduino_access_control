@@ -10,7 +10,7 @@
     </p>
     <keyboard layouts="123A|456B|789C|*0{#:enter}D" v-model="keycode" @enter="postkey"></keyboard>
     <p> Keycode = {{ keycode }}</p>
-    <div class="statusgood" v-if="resp.pin_correct === true">
+    <div class="statusgood" v-if="resp.pin_correct === 1">
      <p>Status</p>
     </div>
     <!-- <div class="statusbad" v-if="resp.pin_correct === false"> -->

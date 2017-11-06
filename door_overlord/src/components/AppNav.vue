@@ -24,6 +24,7 @@
                 <router-link :to="{name: 'adduser'}">Add a user</router-link> &bull;
                 <router-link :to="{name: 'edituser'}">Edit users</router-link> &bull;
                 <router-link :to="{name: 'doors'}">Door status</router-link> &bull;
+                <router-link :to="{name: 'statuslog'}">Door status log</router-link> &bull;
               <!-- </span>
               <span v-else> -->
               </span>

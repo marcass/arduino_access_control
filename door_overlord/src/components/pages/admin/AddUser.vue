@@ -71,7 +71,7 @@ export default {
       resp: '',
       enableddoorlist: [],
       config: {
-        format: 'ddd, MMM Do YYYY, HH:mm'
+        format: 'ddd, MMM DD YYYY, HH:mm'
       },
       username: '',
       password: '',
@@ -87,6 +87,7 @@ export default {
   },
   methods: {
     postData (payload) {
+      console.log(payload)
       postUserData(payload).then((ret) => {
         this.resp = ret.data.status
       })

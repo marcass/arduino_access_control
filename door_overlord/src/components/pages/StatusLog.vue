@@ -10,18 +10,26 @@
       </p>
     </div>
     <span>Picked: {{ door }}</span>
-    <div>
-      <li>Start:
-        <date-picker v-model="startDateObject" :config="config"></date-picker>
-      </li>
-      <li>End:
+    <div style="position:relative">
+      <li>Log Start (default is 7d ago):
         <date-picker v-model="endDateObject" :config="config"></date-picker>
+      </li>
+      <li>Log end time (default is now):
+        <date-picker v-model="startDateObject" :config="config"></date-picker>
+
        </li>
        <li>
         <button v-on:click="postData(door, JSON.stringify({'timeStart': startDateObject, 'timeEnd': endDateObject}))">Submit</button>
       </li>
       <li class="response">
-        Result: {{ this.resp }}
+        Actions:
+        <div v-for="item in this.resp.actions">
+          {{ item }}
+        </div>
+        Door states:
+        <div v-for="item in this.resp.states">
+          {{ item }}
+        </div>
       </li>
     </div>
   </div>
@@ -42,7 +50,7 @@ export default {
       resp: '',
       door: '',
       config: {
-        format: 'ddd, MMM Do YYYY, HH:mm'
+        format: 'ddd, MMM DD YYYY, HH:mm'
       },
       endDateObject: '',
       startDateObject: ''
@@ -64,6 +72,7 @@ export default {
       })
     },
     postData (door, payload) {
+      console.log(payload)
       getLog(door, payload).then((ret) => {
         this.resp = ret
       })

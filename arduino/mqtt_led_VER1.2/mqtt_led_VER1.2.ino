@@ -167,16 +167,10 @@ void check_state(){
   //if SW_OPEN is LOW (and SW_CLOSED is HIGH) door is open and vice versa. Unkown if not in either of these
   int open_reed = digitalRead(SW_OPEN);
   int closed_reed = digitalRead(SW_CLOSED);
-//  Serial.print("open reed ");
-//  Serial.print(open_reed);
-//  Serial.print(": closed reed ");
-//  Serial.println(closed_reed);
   if ((open_reed == LOW) && (closed_reed == HIGH)){
-//  if (open_reed == LOW) {
     door_state = STATE_OPEN;
   }
   else if ((open_reed == HIGH) && (closed_reed == LOW)){
-//  if (closed_reed == LOW){
     door_state = STATE_CLOSED;
   }
   else{
@@ -188,10 +182,9 @@ void check_state(){
       Serial.print("Publishing state change to: ");
       Serial.println(doorStates[door_state]);
     #endif
-    client.publish(DOOR_STATE, (String)doorStates[door_state]);
-//    client.publish(DOOR_STATE, (String)door_state);
-//    delay(1000);
+    client.publish(DOOR_STATE, (String)doorStates[door_state], true, 1);
     prev_door_state = door_state;
+    manage_led();
   }
 }
 

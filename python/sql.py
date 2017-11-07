@@ -176,9 +176,10 @@ def get_doorstatus():
                 status_list.append(status_dict)
     return status_list
 
-def get_doorlog(resp):
+def get_doorlog(door, resp):
     conn, c = get_db()
     conn1, c1 = get_db()
+    print resp
     if len(resp['timeStart']) > 0:
         timeStart = utc_from_string(resp['timeStart'])
     else:
@@ -197,7 +198,7 @@ def get_doorlog(resp):
     for a in ret:
         dump = dump+[a[0],a[1],a[2]]
     #c1.execute("SELECT * FROM doorStates WHERE timestamp BETWEEN datetime('now', '-%i days') AND datetime('now','localtime')" % (days))
-    c1.execute("SELECT * FROM doorStates WHERE timestamp BETWEEN datetime(?) AND datetime(?)",  (timeStart, timeEnd))
+    c1.execute("SELECT * FROM doorStates WHERE door=? AND WHERE timestamp BETWEEN datetime(?) AND datetime(?)",  (door, timeStart, timeEnd))
     got = c1.fetchall()
     timestamp_open = [localtime_from_response(i[0]) for i in got]
     state = [i[2] for i in got]

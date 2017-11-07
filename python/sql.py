@@ -19,8 +19,9 @@ def localtime_from_response(resp):
 
 def utc_from_string(payload):
     local = pytz.timezone(tz)
-    print payload
-    naive = datetime.datetime.strptime (payload, "%Y-%m-%dT%H:%M:%S.%fZ")
+    # print payload
+    # naive = datetime.datetime.strptime (payload, "%Y-%m-%dT%H:%M:%S.%fZ")
+    naive = datetime.datetime.strptime (payload, "%a, %b %d %Y, %H:%M")
     local_dt = local.localize(naive, is_dst=None)
     utc_dt = local_dt.astimezone(pytz.utc)
     return utc_dt
@@ -78,12 +79,12 @@ def setup_admin_user(user, passw):
 def auth_user(thisuser, passw):
     conn, c = get_db()
     try:
-        print thisuser
-        print passw
+        # print thisuser
+        # print passw
         c.execute("SELECT * FROM userAuth WHERE username=?", (thisuser,))
         ret = c.fetchall()
-        print 'following is the fetch'
-        print ret
+        # print 'following is the fetch'
+        # print ret
         pw_hash = ret[0][1]
         role = ret[0][2]
         # print type(pw_hash)
@@ -134,7 +135,7 @@ def get_doorUser_col(column):
     conn, c = get_db()
     c.execute("SELECT %s FROM doorUsers" %(column))
     ret = [i[0] for i in c.fetchall()]
-    print ret
+    # print ret
     return ret
 
 def get_all_doors():
@@ -157,7 +158,7 @@ def get_all_users():
     ret = []
     for user_in in get_doorUser_col('user'):
         ret.append(fetch_user_data(user_in))
-        print ret
+        # print ret
     return ret
 
 def get_doorstatus():
@@ -183,6 +184,7 @@ def get_doorlog(door, resp):
     conn1, c1 = get_db()
     print resp
     if len(resp['timeStart']) > 0:
+        print resp['timeStart']
         timeStart = utc_from_string(resp['timeStart'])
     else:
         timeStart = datetime.datetime.utcnow()
@@ -190,23 +192,30 @@ def get_doorlog(door, resp):
         timeEnd = utc_from_string(resp['timeEnd'])
     else:
         timeEnd = datetime.datetime.utcnow() - timedelta(days=7)
+    # print 'times are'
+    # print timeStart
+    # print timeEnd
     # c.execute("SELECT * FROM actionLog WHERE timestamp BETWEEN datetime('now', '-%i days') AND datetime('now','localtime')" % (days))
-    c.execute("SELECT * FROM actionLog WHERE timestamp BETWEEN datetime(?) AND datetime(?)", (timeStart, timeEnd))
+    c.execute("SELECT * FROM actionLog WHERE timestamp BETWEEN datetime(?) AND datetime(?)", (timeEnd, timeStart))
     ret = c.fetchall()
+    # print 'actionlog ret'
+    # print ret
     timestamp_action = [localtime_from_response(i[0]) for i in ret]
     message = [i[1] for i in ret]
     actionType = [i[2] for i in ret]
     dump = []
     for a in ret:
-        dump = dump+[a[0],a[1],a[2]]
+        dump = dump+[localtime_from_response(a[0]),a[1],a[2]]
     #c1.execute("SELECT * FROM doorStates WHERE timestamp BETWEEN datetime('now', '-%i days') AND datetime('now','localtime')" % (days))
-    c1.execute("SELECT * FROM doorStates WHERE door=? AND timestamp BETWEEN datetime(?) AND datetime(?)",  (door, timeStart, timeEnd))
+    c1.execute("SELECT * FROM doorStates WHERE door=? AND timestamp BETWEEN datetime(?) AND datetime(?)",  (door, timeEnd, timeStart))
     got = c1.fetchall()
+    # print 'door state'
+    # print got
     timestamp_open = [localtime_from_response(i[0]) for i in got]
     state = [i[2] for i in got]
     dump1 = []
     for x in got:
-        dump1 = dump1 + [x[1], x[2], x[0]]
+        dump1 = dump1 + [x[1], x[2], localtime_from_response(x[0])]
     ret_dict = {"actions":dump, "states":dump1}
     return ret_dict
 
@@ -231,7 +240,7 @@ def update_doorUsers(user, column, value):
         print value
         #parse timestting
         value = utc_from_string(value)
-    print value
+    # print value
     c.execute("UPDATE doorUsers SET %s=? WHERE user=?" %(column), (value, user))
     conn.commit()
 
@@ -247,27 +256,29 @@ def write_userdata(resp):
     utcnow = datetime.datetime.utcnow()
     conn, c = get_db()
     #ret = {}
-    print resp['timeStart']
+    # print resp['timeStart']
     try:
         timeStart = utc_from_string(resp['timeStart'])
+        # print 'time start converted'
     except:
+        # print 'exception'
         timeStart = utcnow
-        print timeStart
+        # print timeStart
     try:
         timeEnd = utc_from_string(resp['timeEnd'])
     except:
         from dateutil.relativedelta import relativedelta
         timeEnd = utcnow + relativedelta(years=+20)
-    print resp['username']
+    # print resp['username']
     users_in = get_doorUser_col('user')
-    print users_in
+    # print users_in
     if resp['username'] not in users_in:
         try:
-            print 'Username and pw detail for setup follows'
-            print 'Username = '+resp['username']
-            print 'PW = '+resp['password']
+            # print 'Username and pw detail for setup follows'
+            # print 'Username = '+resp['username']
+            # print 'PW = '+resp['password']
             if (setup_user(resp['username'], resp['password'], resp['role'])):
-                print 'adding user '+resp['username']
+                # print 'adding user '+resp['username']
                 c.execute("INSERT INTO doorUsers VALUES (?,?,?,?,?)",(resp['username'], resp['keycode'], resp['enabled'], timeStart, timeEnd))
                 #c.execute("UPDATE doorUsers SET keycode=?, enabled=?, timeStart=?, timeEnd=? WHERE user=?", (resp['keycode'], resp['enabled'], timeStart, timeEnd, resp['username']))
                 conn.commit()
@@ -330,7 +341,7 @@ def build_user_dict_query():
     username = [i[0] for i in ret]
     keycode = [i[1] for i in ret]
     ret_dict = {'username':username, 'keycode':keycode}
-    print ret_dict
+    # print ret_dict
     return ret_dict
 
 def validate_key(key, door):
@@ -341,14 +352,14 @@ def validate_key(key, door):
         ret = c.fetchall()
         print ret
         try:
-            print key
-            print door
+            # print key
+            # print door
             in_user = ret[0][0]
-            print in_user
+            # print in_user
             c.execute("SELECT userallowed FROM canOpen WHERE door=? AND userallowed=?", (door, in_user))
             #c.execute("SELECT * FROM canOpen")
             user = c.fetchall()[0][0]
-            print user
+            # print user
             #user = ret["userallowed"]
             return user
         except:

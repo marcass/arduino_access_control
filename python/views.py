@@ -103,7 +103,7 @@ def list_allowed_keys():
 def usekey():
     try:
         content = request.get_json(silent=False)
-        print content
+        # print content
     except:
         print 'failed to get data'
     door = content['door']
@@ -134,7 +134,7 @@ def add_user():
         timeStart = content['timeStart'] # parse this to datetime in sql script
     else:
         content.update({'timeStart':0})
-        print 'making timeStart content = '+str(content)
+        # print 'making timeStart content = '+str(content)
     if content.has_key('timeEnd'):
         timeEnd = content['timeEnd'] # parse this to datetime in sql scrip
     else:
@@ -163,7 +163,7 @@ def get_user_role(username):
     '''
     content = request.get_json(silent=False)
     password = request.json.get('password', None)
-    print content
+    # print content
     return jsonify(sql.auth_user(username, password)), 200
 
 @app.route("/user/data/<username>", methods=['GET',])
@@ -174,7 +174,7 @@ def get_user_data(username):
     Returns {'username': max, 'role':'user'}
     '''
     content = request.get_json(silent=False)
-    print content
+    # print content
     return jsonify(sql.fetch_user_data(username)), 200
 
 @app.route("/user", methods=['GET',])
@@ -197,7 +197,7 @@ def update_user():
     curl -X PUT -H "Content-Type: application/json" -d '{"username":"max","keycode":"234A","enabled":"0","doorlist":["frontdoor", "bottomgarage"], "timeStart":"2017-09-11T03:03:27.860Z", "timeEnd":"2037-09-11T03:03:27.860Z"}' http://127.0.0.1:5000/user
     '''
     content = request.get_json(silent=False)
-    print content
+    # print content
     timeStart = None
     timeEnd = None
     doorlist = None
@@ -222,7 +222,7 @@ def update_user_keycode():
     {"username":pell", "keycode":"00003"}
     '''
     content = request.get_json(silent=False)
-    print content
+    # print content
     if not keycode_validation(content['keycode']):
         return jsonify({'status':'keycode failure'}), 200
     else:
@@ -303,7 +303,7 @@ def getStatus():
 @jwt_required
 def getLog(door):
     content = request.get_json(silent=False)
-    print content
+    # print content
     return jsonify(sql.get_doorlog(door, content)), 200
 
 @app.route("/door/status", methods=['PUT',])

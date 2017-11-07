@@ -18,7 +18,7 @@
         <date-picker v-model="endDateObject" :config="config"></date-picker>
        </li>
        <li>
-        <button v-on:click="postData(JSON.stringify({'username':username, 'password':password, 'role':role, 'keycode': keycode, 'enabled': enabled, 'timeStart': startDateObject, 'timeEnd': endDateObject, 'doorlist': enableddoorlist}))">Submit</button>
+        <button v-on:click="postData(door, JSON.stringify({'timeStart': startDateObject, 'timeEnd': endDateObject}))">Submit</button>
       </li>
       <li class="response">
         Result: {{ this.resp }}
@@ -28,7 +28,7 @@
 </template>
 
 <script>
-import { getDoorStatus, getDoors } from '../../../utils/door-api'
+import { getDoorStatus, getDoors, getLog } from '../../../utils/door-api'
 import 'bootstrap/dist/css/bootstrap.css'
 import datePicker from 'vue-bootstrap-datetimepicker'
 import AppNav from '../AppNav'
@@ -61,6 +61,11 @@ export default {
     getDoors () {
       getDoors().then((ret) => {
         this.doors = ret
+      })
+    },
+    postData (door, payload) {
+      getLog(door, payload).then((ret) => {
+        this.resp = ret
       })
     }
   },

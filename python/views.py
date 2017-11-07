@@ -159,7 +159,7 @@ def remove_user(username):
 @jwt_required
 def get_user_role(username):
     '''
-    
+
     '''
     content = request.get_json(silent=False)
     password = request.json.get('password', None)
@@ -298,6 +298,12 @@ def get_doors():
 def getStatus():
     content = request.get_json(silent=False)
     return jsonify(sql.get_doorstatus()), 200
+
+@app.route("/door/status/<door>", methods=['GET',])
+@jwt_required
+def getStatus():
+    content = request.get_json(silent=False)
+    return jsonify(sql.get_doorlog(content)), 200
 
 @app.route("/door/status", methods=['PUT',])
 @jwt_required

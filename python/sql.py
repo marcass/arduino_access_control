@@ -1,11 +1,11 @@
 import pytz
 import sys
 import time
-import datetime
 import sqlite3
 import door_setup
 from dateutil import parser
 from passlib.hash import pbkdf2_sha256
+from datetime import datetime, timedelta
 
 users_db = '/home/marcus/git/arduino_access_control/python/door_database.db'
 tz = 'Pacific/Auckland'
@@ -176,12 +176,19 @@ def get_doorstatus():
                 status_list.append(status_dict)
     return status_list
 
-def get_doorlog(days):
+def get_doorlog(resp):
     conn, c = get_db()
     conn1, c1 = get_db()
-    days = int(days)
-    print days
-    c.execute("SELECT * FROM actionLog WHERE timestamp BETWEEN datetime('now', '-%i days') AND datetime('now','localtime')" % (days))
+    if len(resp['timeStart']) > 0:
+        timeStart = utc_from_string(resp['timeStart'])
+    else:
+        timeStart = datetime.datetime.utcnow()
+    if len(resp['timeEnd']) > 0:
+        timeEnd = utc_from_string(resp['timeEnd'])
+    else:
+        timeEnd = datetime.datetime.utcnow() - timedelta(days=7)
+    # c.execute("SELECT * FROM actionLog WHERE timestamp BETWEEN datetime('now', '-%i days') AND datetime('now','localtime')" % (days))
+    c.execute("SELECT * FROM actionLog WHERE timestamp BETWEEN datetime(?) AND datetime(?)", (timeStart, timeEnd))
     ret = c.fetchall()
     timestamp_action = [localtime_from_response(i[0]) for i in ret]
     message = [i[1] for i in ret]
@@ -189,7 +196,8 @@ def get_doorlog(days):
     dump = []
     for a in ret:
         dump = dump+[a[0],a[1],a[2]]
-    c1.execute("SELECT * FROM doorStates WHERE timestamp BETWEEN datetime('now', '-%i days') AND datetime('now','localtime')" % (days))
+    #c1.execute("SELECT * FROM doorStates WHERE timestamp BETWEEN datetime('now', '-%i days') AND datetime('now','localtime')" % (days))
+    c1.execute("SELECT * FROM doorStates WHERE timestamp BETWEEN datetime(?) AND datetime(?)",  (timeStart, timeEnd))
     got = c1.fetchall()
     timestamp_open = [localtime_from_response(i[0]) for i in got]
     state = [i[2] for i in got]

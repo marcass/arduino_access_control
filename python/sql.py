@@ -8,11 +8,11 @@ from passlib.hash import pbkdf2_sha256
 import datetime
 from datetime import timedelta
 
-
 users_db = '/home/marcus/git/arduino_access_control/python/door_database.db'
 tz = 'Pacific/Auckland'
 
 def localtime_from_response(resp):
+    print resp
     ts = datetime.datetime.strptime(resp, "%Y-%m-%d %H:%M:%S.%f")
     # ts = datetime.datetime.strptime(resp, "%a, %b %d %Y, %H:%M")
     ts = ts.replace(tzinfo=pytz.UTC)
@@ -20,9 +20,22 @@ def localtime_from_response(resp):
 
 def utc_from_string(payload):
     local = pytz.timezone(tz)
-    # print payload
-    # naive = datetime.datetime.strptime (payload, "%Y-%m-%dT%H:%M:%S.%fZ")
-    naive = datetime.datetime.strptime (payload, "%a, %b %d %Y, %H:%M")
+    #print 'time to convert is'
+    #print type(payload)
+    #print payload
+    #2017-11-07 22:31:51.456184
+    try:
+        naive = datetime.datetime.strptime(payload, "%Y-%m-%dT%H:%M:%S.%fZ")
+    except:
+        print 'not first format'    
+    try:
+        naive = datetime.datetime.strptime(payload, "%a, %b %d %Y, %H:%M")
+    except:
+        print 'problem with time string format'
+    try:
+        naive = datetime.datetime.strptime(payload, "%Y-%m-%d %H:%M:%S.%f")
+    except:
+        return 'failed'
     local_dt = local.localize(naive, is_dst=None)
     utc_dt = local_dt.astimezone(pytz.utc)
     return utc_dt
@@ -166,11 +179,18 @@ def get_doorstatus():
     conn, c = get_db()
     c.execute("SELECT * FROM doorStates GROUP BY door")
     ret = c.fetchall()
+    print ret
     doors = [i[1] for i in ret]
-    time_altered = [utc_from_string(i[0]) for i in ret]
+    print doors
+    time_altered = [i[0] for i in ret]
+    print time_altered
     status = [i[2] for i in ret]
+    print status
     door_list = get_all_doors()
-    ret_dict = {'doors':doors, 'time':localtime_from_response(time_altered), 'status':status}
+    print door_list
+    print time_altered[0]
+    ret_dict = {'doors':doors, 'time':localtime_from_response(time_altered[0]).timetuple(), 'status':status}
+    print ret_dict
     status_list = []
     for i in door_list:
         for c, value in enumerate(ret_dict['doors']):

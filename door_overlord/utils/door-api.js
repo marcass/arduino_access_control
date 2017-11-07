@@ -37,8 +37,8 @@ function getUser(user) {
 }
 
 function getVerifyUser(user, pass) {
-  const url = BASE_URL+'/auth/user/'+user
-  return axios.get(user, pass)
+  const url = BASE_URL+'/auth/user/'
+  return axios.get(url+user, pass)
   .then(function (response) {
       return response.data
   });
@@ -55,8 +55,11 @@ function getDoorStatus() {
 }
 
 function getLog(door, payload) {
-  const url = BASE_URL+'/door/status/'+door
-  return simple_get(url)
+  const url = BASE_URL+'/door/log/'
+  return axios.post(url+door, payload)
+  .then(function (response) {
+      return response.data
+  });
 }
 
 function getAllowedUsers() {

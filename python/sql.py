@@ -5,7 +5,9 @@ import sqlite3
 import door_setup
 from dateutil import parser
 from passlib.hash import pbkdf2_sha256
-from datetime import datetime, timedelta
+import datetime
+from datetime import timedelta
+
 
 users_db = '/home/marcus/git/arduino_access_control/python/door_database.db'
 tz = 'Pacific/Auckland'
@@ -198,7 +200,7 @@ def get_doorlog(door, resp):
     for a in ret:
         dump = dump+[a[0],a[1],a[2]]
     #c1.execute("SELECT * FROM doorStates WHERE timestamp BETWEEN datetime('now', '-%i days') AND datetime('now','localtime')" % (days))
-    c1.execute("SELECT * FROM doorStates WHERE door=? AND WHERE timestamp BETWEEN datetime(?) AND datetime(?)",  (door, timeStart, timeEnd))
+    c1.execute("SELECT * FROM doorStates WHERE door=? AND timestamp BETWEEN datetime(?) AND datetime(?)",  (door, timeStart, timeEnd))
     got = c1.fetchall()
     timestamp_open = [localtime_from_response(i[0]) for i in got]
     state = [i[2] for i in got]

@@ -14,6 +14,7 @@ tz = 'Pacific/Auckland'
 
 def localtime_from_response(resp):
     ts = datetime.datetime.strptime(resp, "%Y-%m-%d %H:%M:%S.%f")
+    # ts = datetime.datetime.strptime(resp, "%a, %b %d %Y, %H:%M")
     ts = ts.replace(tzinfo=pytz.UTC)
     return ts.astimezone(pytz.timezone(tz))
 
@@ -166,10 +167,10 @@ def get_doorstatus():
     c.execute("SELECT * FROM doorStates GROUP BY door")
     ret = c.fetchall()
     doors = [i[1] for i in ret]
-    time_altered = [i[0] for i in ret]
+    time_altered = [utc_from_string(i[0]) for i in ret]
     status = [i[2] for i in ret]
     door_list = get_all_doors()
-    ret_dict = {'doors':doors, 'time':time_altered, 'status':status}
+    ret_dict = {'doors':doors, 'time':localtime_from_response(time_altered), 'status':status}
     status_list = []
     for i in door_list:
         for c, value in enumerate(ret_dict['doors']):

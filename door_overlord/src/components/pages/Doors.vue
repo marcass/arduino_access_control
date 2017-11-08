@@ -3,7 +3,7 @@
     <app-nav></app-nav>
     <h1>Door Table</h1>
    <div class="col-md-5" v-for="item in doorstatus">
-     <li>{{ item.door }} was {{ item.status }} at {{ item.timeReadable }}</li>
+     <li>{{ item.door }} was {{ item.status }} at {{ item.time }}</li>
 
    </div>
   </div>

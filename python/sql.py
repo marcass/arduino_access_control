@@ -20,22 +20,23 @@ def localtime_from_response(resp):
 
 def utc_from_string(payload):
     local = pytz.timezone(tz)
-    #print 'time to convert is'
-    #print type(payload)
-    #print payload
+    print 'time to convert is'
+    print type(payload)
+    print payload
     #2017-11-07 22:31:51.456184
+    #Wed, Nov 08 2017, 11:45
     try:
         naive = datetime.datetime.strptime(payload, "%Y-%m-%dT%H:%M:%S.%fZ")
     except:
         print 'not first format'
-    try:
-        naive = datetime.datetime.strptime(payload, "%a, %b %d %Y, %H:%M")
-    except:
-        print 'problem with time string format'
-    try:
-        naive = datetime.datetime.strptime(payload, "%Y-%m-%d %H:%M:%S.%f")
-    except:
-        return 'failed'
+        try:
+            naive = datetime.datetime.strptime(payload, "%a, %b %d %Y, %H:%M")
+        except:
+            print 'problem with time string format'
+            try:
+                naive = datetime.datetime.strptime(payload, "%Y-%m-%d %H:%M:%S.%f")
+            except:
+                return 'failed'
     local_dt = local.localize(naive, is_dst=None)
     utc_dt = local_dt.astimezone(pytz.utc)
     return utc_dt
@@ -179,68 +180,78 @@ def get_doorstatus():
     conn, c = get_db()
     c.execute("SELECT * FROM doorStates GROUP BY door")
     ret = c.fetchall()
-    print ret
+    #print ret
     doors = [i[1] for i in ret]
-    print doors
-    time_altered = [i[0] for i in ret]
-    print time_altered
+    #print doors
+    time_altered = [localtime_from_response(i[0]) for i in ret]
+    #print time_altered
     status = [i[2] for i in ret]
-    print status
+    #print status
     door_list = get_all_doors()
-    print door_list
-    print time_altered[0]
+    #print door_list
+    #print time_altered[0]
     #ret_dict = {'doors':doors, 'time':time.strftime('%Y-%m-%d, %H:%M',localtime_from_response(time_altered[0]).timetuple()), 'status':status}
     #ret_dict = {'doors':doors, 'time':time.strftime('%a %d %b %Y, %H:%M', localtime_from_response(time_altered[0])), 'status': status}
-    ret_dict = {'doors':doors, 'time':localtime_from_response(time_altered[0]).strftime("%Y-%m-%d %H:%M:%S"), 'status': status}
-    print ret_dict
+    ret_dict = {'doors':doors[0], 'time':time_altered[0], 'status': status[0]}
+    #print ret_dict
     status_list = []
-    for i in door_list:
-        for c, value in enumerate(ret_dict['doors']):
-            if value == i:
-                status_dict = {'door':i, 'status':ret_dict['status'][c], 'time':ret_dict['time'][c]}
-                # status_dict = {'status':ret_dict['status'][c], 'time':ret_dict['time'][c]}
-                status_list.append(status_dict)
-    return status_list
+    #for i in door_list:
+    #    for c, value in enumerate(ret_dict['doors']):
+    #        if value == i:
+    #            status_dict = {'door':i, 'status':ret_dict['status'][c], 'time':ret_dict['time'][c]}
+    #            # status_dict = {'status':ret_dict['status'][c], 'time':ret_dict['time'][c]}
+    #            status_list.append(status_dict)
+    #return status_list
+    #print ret_dict
+    return ret_dict
 
 def get_doorlog(door, resp):
     conn, c = get_db()
     conn1, c1 = get_db()
-    print resp
-    if len(resp['timeStart']) > 0:
-        # print resp['timeStart']
-        timeStart = utc_from_string(resp['timeStart'])
+    #print resp
+    start = resp['timeStart']
+    end = resp['timeEnd']
+    if (start is not None) and (len(start) > 0):
+        print start
+        timeStart = utc_from_string(start)
     else:
-        timeStart = datetime.datetime.utcnow()
-    if len(resp['timeEnd']) > 0:
-        timeEnd = utc_from_string(resp['timeEnd'])
+        timeStart = datetime.datetime.utcnow() - timedelta(days=7)
+    if (end is not None) and (len(end) > 0):
+        print end
+        timeEnd = utc_from_string(end)
     else:
-        timeEnd = datetime.datetime.utcnow() - timedelta(days=7)
-    # print 'times are'
-    # print timeStart
-    # print timeEnd
+        timeEnd = datetime.datetime.utcnow()
+    print 'times are'
+    print timeStart
+    #print localtime_from_response(timeStart)
+    print timeEnd
+    #print localtime_from_response(timeEnd)
     # c.execute("SELECT * FROM actionLog WHERE timestamp BETWEEN datetime('now', '-%i days') AND datetime('now','localtime')" % (days))
-    c.execute("SELECT * FROM actionLog WHERE timestamp BETWEEN datetime(?) AND datetime(?)", (timeEnd, timeStart))
+    c.execute("SELECT * FROM actionLog WHERE timestamp BETWEEN datetime(?) AND datetime(?)", (timeStart, timeEnd))
     ret = c.fetchall()
     # print 'actionlog ret'
     # print ret
-    timestamp_action = [localtime_from_response(i[0]) for i in ret]
-    print timestamp_action
+    #timestamp_action = [localtime_from_response(i[0]) for i in ret]
+    #timestamp_action = [i[0] for i in ret]
+    #print timestamp_action
     message = [i[1] for i in ret]
     actionType = [i[2] for i in ret]
     dump = []
     for a in ret:
         dump = dump+[localtime_from_response(a[0]),a[1],a[2]]
     #c1.execute("SELECT * FROM doorStates WHERE timestamp BETWEEN datetime('now', '-%i days') AND datetime('now','localtime')" % (days))
-    c1.execute("SELECT * FROM doorStates WHERE door=? AND timestamp BETWEEN datetime(?) AND datetime(?)",  (door, timeEnd, timeStart))
+    #print dump
+    c1.execute("SELECT * FROM doorStates WHERE door=? AND timestamp BETWEEN datetime(?) AND datetime(?)",  (door, timeStart, timeEnd))
     got = c1.fetchall()
     # print 'door state'
     # print got
-    timestamp_open = [localtime_from_response(i[0]) for i in got]
+    #timestamp_open = [localtime_from_response(i[0]) for i in got]
     state = [i[2] for i in got]
     dump1 = []
     for x in got:
         dump1 = dump1 + [x[1], x[2], localtime_from_response(x[0])]
     ret_dict = {"actions":dump, "states":dump1}
+    #print ret_dict
     return ret_dict
 
 ############  Write data ########################

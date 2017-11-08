@@ -189,7 +189,9 @@ def get_doorstatus():
     door_list = get_all_doors()
     print door_list
     print time_altered[0]
-    ret_dict = {'doors':doors, 'time':localtime_from_response(time_altered[0]).timetuple(), 'status':status}
+    #ret_dict = {'doors':doors, 'time':time.strftime('%Y-%m-%d, %H:%M',localtime_from_response(time_altered[0]).timetuple()), 'status':status}
+    #ret_dict = {'doors':doors, 'time':time.strftime('%a %d %b %Y, %H:%M', localtime_from_response(time_altered[0])), 'status': status}
+    ret_dict = {'doors':doors, 'time':localtime_from_response(time_altered[0]), 'status': status}
     print ret_dict
     status_list = []
     for i in door_list:

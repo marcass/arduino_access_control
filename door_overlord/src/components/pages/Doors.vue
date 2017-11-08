@@ -2,9 +2,10 @@
   <div class="doors">
     <app-nav></app-nav>
     <h1>Door Table</h1>
-   <div class="col-md-5" v-for="item in doorstatus">
-     <li>{{ item.door }} was {{ item.status }} at {{ item.time }}</li>
-
+   <!-- <div class="col-md-5" v-for="item in doorstatus">
+     <li>{{ item.doors }} was {{ item.status }} at {{ item.time }}</li> -->
+      <p> {{ doorstatus.doors }} was {{ doorstatus.status }} at {{ doorstatus.time }}
+      </p>
    </div>
   </div>
 </template>
@@ -31,17 +32,22 @@ export default {
     // },
     getDoorStatus () {
       getDoorStatus().then((ret) => {
-        this.doorstatus = ret.map(function (el) {
-          var o = Object.assign({}, el)
-          o.timeObject = new Date(o.time)
-          o.timeReadable = o.timeObject.toString()
-          return o
-        })
+        this.doorstatus = ret
       })
-    },
-    convertDate (obj) {
-      return obj.toDateString()
     }
+    // getDoorStatus () {
+    //   getDoorStatus().then((ret) => {
+    //     this.doorstatus = ret.map(function (el) {
+    //       var o = Object.assign({}, el)
+    //       o.timeObject = new Date(o.time)
+    //       o.timeReadable = o.timeObject.toString()
+    //       return o
+    //     })
+    //   })
+    // }
+    // convertDate (obj) {
+    //   return obj.toDateString()
+    // }
   },
   mounted () {
     this.getDoorStatus()

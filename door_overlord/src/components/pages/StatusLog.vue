@@ -12,10 +12,10 @@
     <span>Picked: {{ door }}</span>
     <div style="position:relative">
       <li>Log Start (default is 7d ago):
-        <date-picker v-model="endDateObject" :config="config"></date-picker>
+        <date-picker v-model="startDateObject" :config="config"></date-picker>
       </li>
       <li>Log end time (default is now):
-        <date-picker v-model="startDateObject" :config="config"></date-picker>
+        <date-picker v-model="endDateObject" :config="config"></date-picker>
 
        </li>
        <li>

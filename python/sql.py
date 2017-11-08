@@ -12,7 +12,7 @@ users_db = '/home/marcus/git/arduino_access_control/python/door_database.db'
 tz = 'Pacific/Auckland'
 
 def localtime_from_response(resp):
-    print resp
+    # print resp
     ts = datetime.datetime.strptime(resp, "%Y-%m-%d %H:%M:%S.%f")
     # ts = datetime.datetime.strptime(resp, "%a, %b %d %Y, %H:%M")
     ts = ts.replace(tzinfo=pytz.UTC)
@@ -27,7 +27,7 @@ def utc_from_string(payload):
     try:
         naive = datetime.datetime.strptime(payload, "%Y-%m-%dT%H:%M:%S.%fZ")
     except:
-        print 'not first format'    
+        print 'not first format'
     try:
         naive = datetime.datetime.strptime(payload, "%a, %b %d %Y, %H:%M")
     except:
@@ -191,7 +191,7 @@ def get_doorstatus():
     print time_altered[0]
     #ret_dict = {'doors':doors, 'time':time.strftime('%Y-%m-%d, %H:%M',localtime_from_response(time_altered[0]).timetuple()), 'status':status}
     #ret_dict = {'doors':doors, 'time':time.strftime('%a %d %b %Y, %H:%M', localtime_from_response(time_altered[0])), 'status': status}
-    ret_dict = {'doors':doors, 'time':localtime_from_response(time_altered[0]), 'status': status}
+    ret_dict = {'doors':doors, 'time':localtime_from_response(time_altered[0]).strftime("%Y-%m-%d %H:%M:%S"), 'status': status}
     print ret_dict
     status_list = []
     for i in door_list:
@@ -207,7 +207,7 @@ def get_doorlog(door, resp):
     conn1, c1 = get_db()
     print resp
     if len(resp['timeStart']) > 0:
-        print resp['timeStart']
+        # print resp['timeStart']
         timeStart = utc_from_string(resp['timeStart'])
     else:
         timeStart = datetime.datetime.utcnow()
@@ -224,6 +224,7 @@ def get_doorlog(door, resp):
     # print 'actionlog ret'
     # print ret
     timestamp_action = [localtime_from_response(i[0]) for i in ret]
+    print timestamp_action
     message = [i[1] for i in ret]
     actionType = [i[2] for i in ret]
     dump = []

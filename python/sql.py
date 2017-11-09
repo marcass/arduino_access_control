@@ -31,6 +31,7 @@ def utc_from_string(payload):
         print 'not first format'
         try:
             naive = datetime.datetime.strptime(payload, "%a, %b %d %Y, %H:%M")
+            print 'successful convertion'
         except:
             print 'problem with time string format'
             try:
@@ -39,6 +40,8 @@ def utc_from_string(payload):
                 return 'failed'
     local_dt = local.localize(naive, is_dst=None)
     utc_dt = local_dt.astimezone(pytz.utc)
+    print 'converted supplied time is'
+    print utc_dt
     return utc_dt
 
 
@@ -113,7 +116,7 @@ def auth_user(thisuser, passw):
         ret_dict = {'status': status, 'role': role}
     except:
         ret_dict = {'status': 'exception', 'role': 'undefined'}
-    print ret_dict
+    #print ret_dict
     return ret_dict
 
 def get_user_role(thisuser):
@@ -173,7 +176,7 @@ def get_all_users():
     ret = []
     for user_in in get_doorUser_col('user'):
         ret.append(fetch_user_data(user_in))
-        # print ret
+        print ret
     return ret
 
 def get_doorstatus():
@@ -291,17 +294,24 @@ def write_userdata(resp):
     utcnow = datetime.datetime.utcnow()
     conn, c = get_db()
     #ret = {}
+    print resp
     # print resp['timeStart']
-    try:
-        timeStart = utc_from_string(resp['timeStart'])
-        # print 'time start converted'
-    except:
-        # print 'exception'
+    start = resp['timeStart']
+    print 'Start time is'
+    print start
+    end = resp['timeEnd']
+    print 'end is'
+    print end
+    if (start == '') or (start == None):
         timeStart = utcnow
-        # print timeStart
-    try:
-        timeEnd = utc_from_string(resp['timeEnd'])
-    except:
+    else:
+        timeStart = utc_from_string(start).strftime('%Y-%m-%dT%H:%M:%S.%fZ')
+    #2017-11-05T23:17:22.303Z
+    print 'time start converted'
+    print timeStart
+    if (end == '') or (end == None):
+        timeEnd = utc_from_string(end).strftime('%Y-%m-%dT%H:%M:%S.%fZ')
+    else:
         from dateutil.relativedelta import relativedelta
         timeEnd = utcnow + relativedelta(years=+20)
     # print resp['username']

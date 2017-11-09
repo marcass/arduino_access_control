@@ -51,7 +51,7 @@ export default {
       resp: '',
       enableddoorlist: [],
       config: {
-        format: 'ddd, MMM Do YYYY, HH:mm'
+        format: 'ddd, MMM DD YYYY, HH:mm'
       }
     }
   },

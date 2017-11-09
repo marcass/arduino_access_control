@@ -12,36 +12,29 @@ users_db = '/home/marcus/git/arduino_access_control/python/door_database.db'
 tz = 'Pacific/Auckland'
 
 def localtime_from_response(resp):
-    # print resp
     ts = datetime.datetime.strptime(resp, "%Y-%m-%d %H:%M:%S.%f")
-    # ts = datetime.datetime.strptime(resp, "%a, %b %d %Y, %H:%M")
     ts = ts.replace(tzinfo=pytz.UTC)
     return ts.astimezone(pytz.timezone(tz))
 
 def utc_from_string(payload):
     local = pytz.timezone(tz)
-    # print 'time to convert is'
-    # print type(payload)
-    # print payload
-    #2017-11-07 22:31:51.456184
-    #Wed, Nov 08 2017, 11:45
     try:
         naive = datetime.datetime.strptime(payload, "%Y-%m-%dT%H:%M:%S.%fZ")
     except:
-        print 'not first format'
+        # print 'not first format'
+        pass
         try:
             naive = datetime.datetime.strptime(payload, "%a, %b %d %Y, %H:%M")
-            print 'successful convertion'
+            # print 'successful convertion'
         except:
-            print 'problem with time string format'
+            # print 'problem with time string format'
+            pass
             try:
                 naive = datetime.datetime.strptime(payload, "%Y-%m-%d %H:%M:%S.%f")
             except:
                 return 'failed'
     local_dt = local.localize(naive, is_dst=None)
     utc_dt = local_dt.astimezone(pytz.utc)
-    print 'converted supplied time is'
-    print utc_dt
     return utc_dt
 
 
@@ -85,10 +78,7 @@ def setup_admin_user(user, passw):
     if len(c.fetchall()) > 0:
         return
     else:
-        # print user
-        # print passw
         pw_hash = pbkdf2_sha256.hash(passw)
-        # print pw_hash
         c.execute("INSERT INTO userAuth VALUES (?,?,?)", (user, pw_hash, 'admin'))
         conn.commit()
 
@@ -97,26 +87,17 @@ def setup_admin_user(user, passw):
 def auth_user(thisuser, passw):
     conn, c = get_db()
     try:
-        # print thisuser
-        # print passw
         c.execute("SELECT * FROM userAuth WHERE username=?", (thisuser,))
         ret = c.fetchall()
-        # print 'following is the fetch'
-        # print ret
         pw_hash = ret[0][1]
         role = ret[0][2]
-        # print type(pw_hash)
-        # print str(pw_hash)
         if (pbkdf2_sha256.verify(passw, pw_hash)):
-            # print 'hash OK'
             status = 'passed'
         else:
-            print 'Hash not OK'
             status = 'failed'
         ret_dict = {'status': status, 'role': role}
     except:
         ret_dict = {'status': 'exception', 'role': 'undefined'}
-    #print ret_dict
     return ret_dict
 
 def get_user_role(thisuser):
@@ -124,9 +105,9 @@ def get_user_role(thisuser):
     try:
         c.execute("SELECT role FROM userAuth WHERE username=?", (thisuser,))
         ret = c.fetchall()
-        print ret
     except:
-        print 'Problem getting role'
+        pass
+        # print 'Problem getting role'
     return {'username':thisuser, 'role':role}
 
 def get_allowed():
@@ -153,7 +134,6 @@ def get_doorUser_col(column):
     conn, c = get_db()
     c.execute("SELECT %s FROM doorUsers" %(column))
     ret = [i[0] for i in c.fetchall()]
-    # print ret
     return ret
 
 def get_all_doors():
@@ -176,7 +156,6 @@ def get_all_users():
     ret = []
     for user_in in get_doorUser_col('user'):
         ret.append(fetch_user_data(user_in))
-        print ret
     return ret
 
 def get_doorstatus():
@@ -205,12 +184,10 @@ def get_doorlog(door, resp):
     start = resp['timeStart']
     end = resp['timeEnd']
     if (start is not None) and (len(start) > 0):
-        print start
         timeStart = utc_from_string(start)
     else:
         timeStart = datetime.datetime.utcnow() - timedelta(days=7)
     if (end is not None) and (len(end) > 0):
-        print end
         timeEnd = utc_from_string(end)
     else:
         timeEnd = datetime.datetime.utcnow()
@@ -228,7 +205,6 @@ def get_doorlog(door, resp):
     for x in got:
         dump1 = dump1 + [x[1], x[2], localtime_from_response(x[0])]
     ret_dict = {"actions":dump, "states":dump1}
-    #print ret_dict
     return ret_dict
 
 ############  Write data ########################
@@ -249,10 +225,8 @@ def setup_user(user_in, passw, role=0):
 def update_doorUsers(user, column, value):
     conn, c = get_db()
     if 'time' in column:
-        print value
         #parse timestting
-        value = utc_from_string(value)
-    # print value
+        value = utc_from_string(value).strftime('%Y-%m-%dT%H:%M:%S.%fZ')
     c.execute("UPDATE doorUsers SET %s=? WHERE user=?" %(column), (value, user))
     conn.commit()
 
@@ -267,39 +241,23 @@ def remove_disable_key(username):
 def write_userdata(resp):
     utcnow = datetime.datetime.utcnow()
     conn, c = get_db()
-    #ret = {}
-    print resp
-    # print resp['timeStart']
     start = resp['timeStart']
-    print 'Start time is'
-    print start
     end = resp['timeEnd']
-    print 'end is'
-    print end
     if (start == '') or (start == None):
         timeStart = utcnow
     else:
         timeStart = utc_from_string(start).strftime('%Y-%m-%dT%H:%M:%S.%fZ')
     #2017-11-05T23:17:22.303Z
-    print 'time start converted'
-    print timeStart
     if (end == '') or (end == None):
-        timeEnd = utc_from_string(end).strftime('%Y-%m-%dT%H:%M:%S.%fZ')
-    else:
         from dateutil.relativedelta import relativedelta
         timeEnd = utcnow + relativedelta(years=+20)
-    # print resp['username']
+    else:
+        timeEnd = utc_from_string(end).strftime('%Y-%m-%dT%H:%M:%S.%fZ')
     users_in = get_doorUser_col('user')
-    # print users_in
     if resp['username'] not in users_in:
         try:
-            # print 'Username and pw detail for setup follows'
-            # print 'Username = '+resp['username']
-            # print 'PW = '+resp['password']
             if (setup_user(resp['username'], resp['password'], resp['role'])):
-                # print 'adding user '+resp['username']
                 c.execute("INSERT INTO doorUsers VALUES (?,?,?,?,?)",(resp['username'], resp['keycode'], resp['enabled'], timeStart, timeEnd))
-                #c.execute("UPDATE doorUsers SET keycode=?, enabled=?, timeStart=?, timeEnd=? WHERE user=?", (resp['keycode'], resp['enabled'], timeStart, timeEnd, resp['username']))
                 conn.commit()
             else:
                 return {'status':'Failed to setup user'}
@@ -315,12 +273,10 @@ def update_canOpen(user, doors):
     conn, c = get_db()
     try:
         c.execute("DELETE FROM canOpen WHERE userallowed=?", (user,))
-        print 'deleting new user from any existing door access'
+        # print 'deleting new user from any existing door access'
     except:
-        print 'this user is not in canOpen so passing'
-    # if len(c.fetchall()) > 0:
-    #     #flush detail from canOpen then rewrite it
-    #     c.execute("DELETE FROM canOpen WHERE userallowed=?", (user,))
+        # print 'this user is not in canOpen so passing'
+        pass
     if len(doors) > 0:
         for i in doors:
             c.execute("INSERT INTO canOpen VALUES (?,?)", (i, user))
@@ -360,7 +316,6 @@ def build_user_dict_query():
     username = [i[0] for i in ret]
     keycode = [i[1] for i in ret]
     ret_dict = {'username':username, 'keycode':keycode}
-    # print ret_dict
     return ret_dict
 
 def validate_key(key, door):
@@ -369,17 +324,10 @@ def validate_key(key, door):
     if key != 0:
         c.execute("SELECT user FROM doorUsers WHERE enabled=? AND keycode=? AND ? BETWEEN timeStart AND timeEnd", (1, key, utcnow,))
         ret = c.fetchall()
-        print ret
         try:
-            # print key
-            # print door
             in_user = ret[0][0]
-            # print in_user
             c.execute("SELECT userallowed FROM canOpen WHERE door=? AND userallowed=?", (door, in_user))
-            #c.execute("SELECT * FROM canOpen")
             user = c.fetchall()[0][0]
-            # print user
-            #user = ret["userallowed"]
             return user
         except:
             return None

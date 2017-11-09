@@ -79,7 +79,7 @@ def keycode_validation(keycode):
     # keycodes = sql.get_doorUser_col('keycode')
     # if keycode in keycodes:
     #     return False
-    if (len(keycode) > 3) and (len(keycode) < 11) and (re.match("^[A-D1-9]+$", keycode)):
+    if (len(keycode) > 3) and (len(keycode) < 11) and (re.match("^[A-D0-9]+$", keycode)):
         return True
     else:
         return False

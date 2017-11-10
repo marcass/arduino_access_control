@@ -2,10 +2,14 @@
   <div class="keypad">
     <app-nav></app-nav>
     <h2>Input your keycode, then press #</h2>
+    <!-- <h4>Door's status</h4>
+    <div id='doors' v-for="item in doorsstatus">
+       <p> {{ item.doors }} is currently {{ item.status }} at {{ item.time }}</p>
+    </div> -->
     <p>
-      <div id='doors' v-for="x in doorstatus">
-        <input type="radio" :id="x.door" :value="x.door" v-model="doorselected">
-      <label for="x.door">{{ x.door }} currently {{ x.status }}</label>
+      <div id='doors' v-for="x in doorlist">
+        <input type="radio" :id="x" :value="x" v-model="doorselected">
+      <label for="x">{{ x }}</label>
      </div>
     </p>
     <keyboard layouts="123A|456B|789C|*0{#:enter}D" v-model="keycode" @enter="postkey"></keyboard>
@@ -24,7 +28,7 @@
 </template>
 
 <script>
-import { postKeycode, getDoors, getDoorStatus } from '../../../utils/door-api'
+import { postKeycode, getDoors, getADoorStatus, getDoorStatus } from '../../../utils/door-api'
 import keyboard from 'vue-keyboard'
 import AppNav from '../AppNav'
 export default {
@@ -35,6 +39,7 @@ export default {
       keycode: '',
       doorselected: '',
       doorstatus: [],
+      doorsstatus: [],
       resp: []
     }
   },
@@ -54,9 +59,16 @@ export default {
         this.doorlist = ret
       })
     },
+    getADoorStatus (door) {
+      getADoorStatus(door).then((ret) => {
+        this.doorstatus = ret
+      })
+      return this.doorstatus.status
+    },
     getDoorStatus () {
       getDoorStatus().then((ret) => {
-        this.doorstatus = ret
+        this.doorsstatus = ret
+        console.log(ret)
       })
     }
   },

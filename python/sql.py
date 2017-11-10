@@ -178,6 +178,25 @@ def get_doorstatus():
     #print ret_dict
     return ret_dict
 
+def get_adoorstatus(door):
+    conn, c = get_db()
+    c.execute("SELECT * FROM doorStates WHERE door=?", (door,))
+    ret = c.fetchall()
+    # doors = [i[1] for i in ret]
+    try:
+        # print ret[-1]
+        time_altered = localtime_from_response(ret[-1][0])
+        status = ret[-1][2]
+        door = ret[-1][1]
+    except:
+        time_altered = None
+        status = None
+        door = None
+    ret_dict = {'door':door, 'time':time_altered, 'status': status}
+    # print ret_dict
+    # status_list = []
+    return ret_dict
+
 def get_doorlog(door, resp):
     conn, c = get_db()
     conn1, c1 = get_db()

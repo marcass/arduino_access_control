@@ -299,6 +299,12 @@ def getStatus():
     content = request.get_json(silent=False)
     return jsonify(sql.get_doorstatus()), 200
 
+@app.route("/door/status/<door>", methods=['GET',])
+@jwt_required
+def getADoorStatus(door):
+    content = request.get_json(silent=False)
+    return jsonify(sql.get_adoorstatus(door)), 200
+
 @app.route("/door/log/<door>", methods=['POST',])
 @jwt_required
 def getLog(door):

@@ -2,12 +2,13 @@
   <div class="keypad">
     <app-nav></app-nav>
     <h2>Input your keycode, then press #</h2>
-    <!-- <h4>Door's status</h4>
-    <div id='doors' v-for="item in doorsstatus">
+    <h4>Door's status</h4>
+    <li class="radio" id='doors' v-for="item in doorsstatus">
        <p> {{ item.doors }} is currently {{ item.status }} at {{ item.time }}</p>
-    </div> -->
+     <br>
+    </li>
     <p>
-      <div id='doors' v-for="x in doorlist">
+      <div class="radio" id='doors' v-for="x in doorlist">
         <input type="radio" :id="x" :value="x" v-model="doorselected">
       <label for="x">{{ x }}</label>
      </div>
@@ -57,6 +58,7 @@ export default {
     getDoors () {
       getDoors().then((ret) => {
         this.doorlist = ret
+        console.log(this.doorlist)
       })
     },
     getADoorStatus (door) {
@@ -65,10 +67,18 @@ export default {
       })
       return this.doorstatus.status
     },
+    // getDoorStatus () {
+    //   getDoorStatus().then((ret) => {
+    //     this.doorsstatus = ret
+    //     console.log(ret)
+    //   })
+    // }
     getDoorStatus () {
       getDoorStatus().then((ret) => {
-        this.doorsstatus = ret
         console.log(ret)
+        this.doorsstatus = ret
+        console.log(this.doorsstatus)
+        return this.doorsstatus
       })
     }
   },
@@ -81,6 +91,9 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+/*.radio {
+  text-align: left;
+}*/
 div.statusgood {
     background-color: green;
     width: 50px;

@@ -3,10 +3,12 @@
     <app-nav></app-nav>
     <h2>Input your keycode, then press #</h2>
     <h4>Door's status</h4>
-    <li class="radio" id='doors' v-for="item in doorsstatus">
-       <p> {{ item.doors }} is currently {{ item.status }} at {{ item.time }}</p>
-     <br>
-    </li>
+    <ul v-for="item in doorsstatus" >
+      <li>
+         <p> {{ item.door }} is currently {{ item.status }} at {{ item.time }}</p>
+       <br>
+      </li>
+    </ul>
     <p>
       <div class="radio" id='doors' v-for="x in doorlist">
         <input type="radio" :id="x" :value="x" v-model="doorselected">
@@ -58,7 +60,6 @@ export default {
     getDoors () {
       getDoors().then((ret) => {
         this.doorlist = ret
-        console.log(this.doorlist)
       })
     },
     getADoorStatus (door) {
@@ -75,9 +76,7 @@ export default {
     // }
     getDoorStatus () {
       getDoorStatus().then((ret) => {
-        console.log(ret)
         this.doorsstatus = ret
-        console.log(this.doorsstatus)
         return this.doorsstatus
       })
     }

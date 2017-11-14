@@ -166,17 +166,18 @@ def get_doorstatus():
     time_altered = [localtime_from_response(i[0]) for i in ret]
     status = [i[2] for i in ret]
     door_list = get_all_doors()
-    ret_dict = {'doors':doors[0], 'time':time_altered[0], 'status': status[0]}
+    ret_dict = {'doors':doors, 'time':time_altered, 'status': status}
     status_list = []
-    #for i in door_list:
-    #    for c, value in enumerate(ret_dict['doors']):
-    #        if value == i:
-    #            status_dict = {'door':i, 'status':ret_dict['status'][c], 'time':ret_dict['time'][c]}
-    #            # status_dict = {'status':ret_dict['status'][c], 'time':ret_dict['time'][c]}
-    #            status_list.append(status_dict)
-    #return status_list
+    for i in door_list:
+        for c, value in enumerate(ret_dict['doors']):
+            if value == i:
+                status_dict = {'door':i, 'status':ret_dict['status'][c], 'time':ret_dict['time'][c]}
+                # status_dict = {'status':ret_dict['status'][c], 'time':ret_dict['time'][c]}
+                status_list.append(status_dict)
+    #print status_list
+    return status_list
     #print ret_dict
-    return ret_dict
+    #return ret_dict
 
 def get_adoorstatus(door):
     conn, c = get_db()

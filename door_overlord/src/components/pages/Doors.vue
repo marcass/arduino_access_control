@@ -2,10 +2,12 @@
   <div class="doors">
     <app-nav></app-nav>
     <h1>Door Table</h1>
-   <!-- <div class="col-md-5" v-for="item in doorstatus">
-     <li>{{ item.doors }} was {{ item.status }} at {{ item.time }}</li> -->
-      <p> {{ doorstatus.doors }} was {{ doorstatus.status }} at {{ doorstatus.time }}
-      </p>
+   <div class="col-md-5" v-for="item in doorstatus">
+     <ul>
+       <li>{{ item.door }} was {{ item.status }} at {{ item.time }}</li>
+     </ul>
+      <!-- <p> {{ doorstatus.doors }} was {{ doorstatus.status }} at {{ doorstatus.time }}
+      </p> -->
    </div>
   </div>
 </template>

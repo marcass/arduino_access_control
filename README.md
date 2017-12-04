@@ -19,9 +19,9 @@ Users added, modified and deleted via webpage in webserver (https://<servername/
 ## Maintenace
 ### Initial setup
 * Update doorsetup.py to reflect doors you want to control
-* run `python views.py <admin username> <admin password`
-* Stop script then run via systemd (or whaterever prcess manager you use)
-* Populate db via web interface (login usng credentials above)
+* run `python views.py <admin username> <admin password>` You get to choose what they are!
+* Stop script then run via systemd (or whaterever process manager you use)
+* Populate db via web interface (login usng credentials supplied above above)
 
 ### ssl certs
 Letsencrypt cert needs to be renewed periodically:

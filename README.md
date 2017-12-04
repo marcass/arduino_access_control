@@ -5,11 +5,12 @@ Use arduino to control access to electrically actuated devices
 * Electronically actuated device (garage door/door/or anything you want to access)
 * WiFi in range
 * Arduino as node/client (communicates to network using ESP8266 and [WIFIESP](https://github.com/bportaluri/WiFiEsp) arduino lib)
+* Arduino runs this [MQTT lib](https://github.com/256dpi/arduino-mqtt)
 * A master/server that runs mosquitto and a webserver
 
 ## How it works
-1. Code gets sent to topic for door requests (either by pinpad, mqttclient, web interface, rfid device etc)
-2. Code checked against database of allowed users
+1. Pincode gets sent to topic for door requests (either by pinpad, mqttclient, web interface, rfid device etc)
+2. Pincode checked against database of allowed users
 3. Response is sent to the node (allow or deny)
 4. Relay is actuated and DB is updated
 

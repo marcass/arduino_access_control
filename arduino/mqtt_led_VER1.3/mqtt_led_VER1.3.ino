@@ -107,6 +107,10 @@ void setup() {
   // initialize serial for debugging
   Serial.begin(115200);
   // initialize serial for ESP module
+  // Set ESP8266 baud rate to 9600. You only need to do this once per device
+  //send "AT+UART_DEF=9600,8,1,0,0";
+  // toset software serial baud to 9600;
+  // From now on, communicate with your device at 9600 baud.
   Serial1.begin(9600);
   //setup digital pins
   pinMode(RELAY, OUTPUT);

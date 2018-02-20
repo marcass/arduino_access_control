@@ -1,0 +1,10 @@
+[Unit]
+Description=Garage door controller
+
+[Service]
+Type=simple
+User=<username>
+ExecStart=/usr/bin/python /home/<user_home_dir>/git/arduino_access_control/python/views.py
+
+[Install]
+WantedBy=multi-user.target

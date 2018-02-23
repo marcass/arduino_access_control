@@ -8,8 +8,8 @@
 
 #define debug
 
-char DOOR[] = "topgarage";
-char ssid[] = "Garage";            // your network SSID (name)
+char DOOR[] = "bottomgarage";
+char ssid[] = "";            // your network SSID (name)
 char pass[] = "";            // your network password
 char HOST[] = "192.168.0.3";
 
@@ -62,9 +62,9 @@ const int             RELAY = A2;
 #define               SW_CLOSED A1
 // How many NeoPixels are attached to the Arduino?
 #define               NUMPIXELS      24
-char                  DOOR_PUB[] = "doors/request/topgarage";
-char                  DOOR_SUB[] = "doors/response/topgarage";
-char                  DOOR_STATE[] = "doors/status/topgarage";
+char                  DOOR_PUB[] = "doors/request/bottomgarage";
+char                  DOOR_SUB[] = "doors/response/bottomgarage";
+char                  DOOR_STATE[] = "doors/status/bottomgarage";
 //door states
 const int             STATE_OPEN = 0;
 const int             STATE_CLOSED = 1;
@@ -90,6 +90,9 @@ Keypad customKeypad = Keypad( makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS
 Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, LED, NEO_GRB + NEO_KHZ800);
 
 // Emulate Serial1 on pins 6/7 if not present
+// Set ESP8266 baud rate to 9600. You only need to do this once per device
+//send "AT+UART_DEF=9600,8,1,0,0";
+//set software serial baud to 9600;
 #ifndef HAVE_HWSERIAL1
 #include "SoftwareSerial.h"
 SoftwareSerial Serial1(6, 7); // RX, TX
@@ -159,7 +162,7 @@ void connect(){
   //boolean connect(const char clientId[], const char username[], const char password[]);
   //client.connect(DOOR, USER, MOSQ_PASS);
   //client.subscribe(DOOR_SUB, 1);
-  while (!client.subscribe("doors/response/topgarage", 1)) {
+  while (!client.subscribe("doors/response/bottomgarage", 1)) {
     Serial.print("*");
     delay(1000);
   }
@@ -347,6 +350,8 @@ void loop() {
 }
 
 void messageReceived(String &topic, String &payload) {
+  Serial.println("Receiving the payload");
+  Serial.println(payload);
   #ifdef debug
     Serial.println("incoming: " + topic + " - " + payload);
   #endif

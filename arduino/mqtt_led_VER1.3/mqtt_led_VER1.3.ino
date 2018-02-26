@@ -92,6 +92,7 @@ Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, LED, NEO_GRB + NEO_KHZ80
 // Emulate Serial1 on pins 6/7 if not present
 // Set ESP8266 baud rate to 9600. You only need to do this once per device
 //send "AT+UART_DEF=9600,8,1,0,0";
+//set hardware serial to 115200, 
 //set software serial baud to 9600;
 #ifndef HAVE_HWSERIAL1
 #include "SoftwareSerial.h"

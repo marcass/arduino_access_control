@@ -312,6 +312,7 @@ void loop() {
 //  Serial.print("Led_state is ");
 //  Serial.println(led_state);
   client.loop();
+  //delay(100);
   //Serial.println(state);
   if (!client.connected()) {
     led_state = NOT_CONN;
@@ -355,11 +356,12 @@ void loop() {
 }
 
 void messageReceived(String &topic, String &payload) {
-  Serial.println("Receiving the payload");
-  Serial.println(payload);
-  #ifdef debug
-    Serial.println("incoming: " + topic + " - " + payload);
-  #endif
+//  Won't work with following serial prints: 
+//  Serial.println("Receiving the payload");
+//  Serial.println(payload);
+//  #ifdef debug
+//    Serial.println("incoming: " + topic + " - " + payload);
+//  #endif
   if (payload == "1"){
     state = STATE_TRIGGER;
     led_state = state;

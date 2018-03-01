@@ -1,6 +1,7 @@
 <template>
-  <nav class="navbar navbar-default">
+  <!-- <nav class="navbar navbar-default"> -->
     <div class="navbar-header">
+
       <!-- <router-link to="/" class="navbar-brand"> fuck you by mw</router-link>
     </div>
     <ul class="nav navbar-nav navbar-right">
@@ -9,36 +10,57 @@
         <button class="auth button" v-show="!isLoggedIn()" @click="handleLogin()">Log In</button>
       </li>
     </ul> -->
-      <ul>
-        <li>
+      <ul class="menu">
+      <!-- <ul> -->
+        <!-- <li> -->
           <!-- <a v-link="'login'">Login</a> -->
           <span v-show="!$auth.check()">
-            <router-link :to="{name: 'login'}">login</router-link>
+            <li class="menu">
+              <router-link :to="{name: 'login'}">login</router-link>
+            </li>
           </span>
           <span v-show="$auth.check()">
             <span v-show="$auth.check('admin')">
               <!-- <span v-if="$auth.user('admin')"> -->
-                <router-link :to="{name: 'Users'}">All Users</router-link> &bull;
-                <router-link :to="{name: 'usekey'}">Actuate a door</router-link> &bull;
-                <router-link :to="{name: 'listallowed'}">Allowed users</router-link> &bull;
-                <router-link :to="{name: 'adduser'}">Add a user</router-link> &bull;
-                <router-link :to="{name: 'edituser'}">Edit users</router-link> &bull;
-                <router-link :to="{name: 'doors'}">Door status</router-link> &bull;
-                <router-link :to="{name: 'statuslog'}">Door status log</router-link> &bull;
-              <!-- </span>
-              <span v-else> -->
-              </span>
-              <router-link :to="{name: 'Hello'}">Hello</router-link> &bull;
-              <span v-show="$auth.check('user')">
-                <router-link :to="{name: 'userupdate'}">Update user details</router-link> &bull;
-              </span>
-              <a v-on:click='logout()' href="javascript:void(0);">Logout</a> &bull;
+              <li class="menu">
+                <router-link :to="{name: 'Users'}">All Users</router-link>
+              </li>
+              <li class="menu">
+                <router-link :to="{name: 'usekey'}">Actuate a door</router-link>
+              </li>
+              <li class="menu">
+                <router-link :to="{name: 'listallowed'}">Allowed users</router-link>
+              </li>
+              <li class="menu">
+                <router-link :to="{name: 'adduser'}">Add a user</router-link>
+              </li>
+              <li class="menu">
+                <router-link :to="{name: 'edituser'}">Edit users</router-link>
+              </li>
+              <li class="menu">
+                <router-link :to="{name: 'doors'}">Door status</router-link>
+              </li>
+              <li class="menu">
+                <router-link :to="{name: 'statuslog'}">Door status log</router-link>
+              </li>
             </span>
+            <li class="menu">
+              <router-link :to="{name: 'Hello'}">Hello</router-link>
+            </li>
+          <span v-show="$auth.check('user')">
+            <li class="menu">
+              <router-link :to="{name: 'userupdate'}">Update user details</router-link>
+            </li>
           </span>
-        </li>
+            <li class="menu">
+              <a v-on:click='logout()' href="javascript:void(0);">Logout</a>
+            </li>
+          </span>
+          <!-- </span> -->
+        <!-- </li> -->
       </ul>
     </div>
-  </nav>
+  <!-- </nav> -->
 </template>
 
 <script>

@@ -1,9 +1,9 @@
 <template>
   <div class="users">
     <app-nav></app-nav>
-     <h1>Currently Allowed Users</h1>
-     <div class="col-md-5" v-for="item in allowedusers">
-       <li>{{ item.door }} has the following user enabled:
+     <h2>Currently Allowed Users</h2>
+     <div class="col-5" v-for="item in allowedusers">
+       <li>{{ item.door }} has the following user(s) enabled:
          <div v-for="x in item.users">
             {{ x }}
          </div>

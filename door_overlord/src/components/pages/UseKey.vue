@@ -1,28 +1,47 @@
 <template>
   <div class="keypad">
     <app-nav></app-nav>
-    <h2>Input your keycode, then press #</h2>
-    <h4>Door's status</h4>
-    <ul v-for="item in doorsstatus" >
+    <div class="col-3">
+      <h3>Door's status</h3>
+      <ul v-for="item in doorsstatus" >
+        <li>
+          <div class="open" v-if="item.status === 'open'">
+            {{ item.door }} is currently {{ item.status }} at {{ item.time }}
+         <!-- <br> -->
+          </div>
+          <div class="closed" v-if="item.status === 'closed'">
+            {{ item.door }} is currently {{ item.status }} at {{ item.time }}
+         <!-- <br> -->
+          </div>
+        </li>
+      </ul>
+    </div>
+    <!-- <div class="statusbad" v-if="item.status === "closed"">
       <li>
          <p> {{ item.door }} is currently {{ item.status }} at {{ item.time }}</p>
        <br>
       </li>
-    </ul>
-    <p>
+    </div>
+  </ul>
+</div> -->
+    <div class="col-2">
+      <h3>Choose your door</h3>
       <div class="radio" id='doors' v-for="x in doorlist">
         <input type="radio" :id="x" :value="x" v-model="doorselected">
-      <label for="x">{{ x }}</label>
-     </div>
-    </p>
-    <keyboard layouts="123A|456B|789C|*0{#:enter}D" v-model="keycode" @enter="postkey"></keyboard>
-    <p> Keycode = {{ keycode }}</p>
-    <div class="statusgood" v-if="resp.pin_correct === 1">
-     <p>Status</p>
+        <label for="x">{{ x }}</label>
+      </div>
     </div>
-    <!-- <div class="statusbad" v-if="resp.pin_correct === false"> -->
-    <div class="statusbad" v-else>
-     <p>Status</p>
+    <div class="col-3">
+      <h3>Input your keycode, then press #</h3>
+      <keyboard layouts="123A|456B|789C|*0{#:enter}D" v-model="keycode" @enter="postkey"></keyboard>
+      <p> Keycode = {{ keycode }}</p>
+      <div class="statusgood" v-if="resp.pin_correct === 1">
+       <p>Status</p>
+      </div>
+      <!-- <div class="statusbad" v-if="resp.pin_correct === false"> -->
+      <div class="statusbad" v-else>
+       <p>Status</p>
+      </div>
     </div>
      <!-- <div v-else>
       <p>Status</p>
@@ -90,9 +109,10 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-/*.radio {
+.radio {
   text-align: left;
-}*/
+  padding-left:20px;
+}
 div.statusgood {
     background-color: green;
     width: 50px;
@@ -102,6 +122,12 @@ div.statusbad {
     background-color: red;
     margin:0 auto;
     width: 50px;
+}
+.closed {
+    background-color: green;
+}
+.open {
+      background-color: red;
 }
 h1, h2 {
   font-weight: normal;

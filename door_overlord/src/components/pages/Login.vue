@@ -83,7 +83,7 @@
           // body: this.data.body, // Vue-resource
           data: this.data.body, // Axios
           rememberMe: this.data.rememberMe,
-          redirect: {name: redirect ? redirect.from.name : 'Hello'},
+          redirect: {name: redirect ? redirect.from.name : 'usekey'},
           fetchUser: this.data.fetchUser,
           success (res) {
             var roleIn = res.data.data.role

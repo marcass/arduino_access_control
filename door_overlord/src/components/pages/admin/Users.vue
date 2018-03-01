@@ -1,9 +1,9 @@
 <template>
   <div class="users">
     <app-nav></app-nav>
-    <h1>User Table</h1>
+    <h2>All users</h2>
       <div v-for="item in userlist">
-        <div class="col-md-5">
+        <div class="col-5">
             <div  v-if="enabled(item.enabled)">
                 <h3>
                   {{ item.username }}  is ENABLED

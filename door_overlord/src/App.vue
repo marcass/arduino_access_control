@@ -5,7 +5,7 @@
       <!-- <span v-show="!$auth.check()">
           <router-link :to="{name: 'login'}">login</router-link> &bull;
       </span> -->
-      <h2>Door Overlord</h2>
+      <h1>Door Overlord</h1>
       <router-view></router-view>
     </div>
     <div v-if="!$auth.ready()">

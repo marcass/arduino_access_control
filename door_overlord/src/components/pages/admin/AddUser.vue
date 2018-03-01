@@ -1,36 +1,42 @@
 <template>
   <div class="doors">
     <app-nav></app-nav>
-    <h1>Existing users</h1>
-    <p v-for="item in userlist"> {{ item.username }} </p>
-   <div class="col-md-5">
-     <li>Username:
+    <h2>Add a user</h2>
+    <div class="col-2">
+      <h3>Existing users</h3>
+      <p v-for="item in userlist"> {{ item.username }} </p>
+    </div>
+    <div class="col-2">
+     <li><h3>Username</h3>
        <input v-model="username">
      </li>
-     <li>Password:
+   </div>
+   <div class="col-2">
+     <li><h3>Password</h3>
        <input v-model="password">
      </li>
-     <li>Keycode. Must consist of at least four of 1-9,A-D:
+   </div>
+   <div class="col-2">
+     <li><h3>Keycode</h3>
+        Must consist of at least four of 1-9,A-D:
        <input v-model="keycode">
      </li>
-     <li>Valid from:
-       <date-picker v-model="startDateObject" :config="config"></date-picker>
-     </li>
-     <li>Expires:
-       <date-picker v-model="endDateObject" :config="config"></date-picker>
-      </li>
+   </div>
+   <div class="col-2">
       <li>
-        <h4>
-          Enabled doors:
-        </h4>
+        <h3>
+          Enabled doors
+        </h3>
         <div class='radio' v-for="x in doorlist">
           <input type="checkbox" :id="x" :value="x" v-model="enableddoorlist">
           <label >{{ x }}</label>
         </div>
       </li>
+    </div>
+    <div class="col-2">
       <li>
         <div class='radio'>
-          <h4>Role:</h4>
+          <h3>Role</h3>
           <input type="radio" id="admin" value="admin" v-model="role">
           <label for="admin">Admin</label>
           <br>
@@ -38,18 +44,35 @@
           <label for="user">User</label>
         </div>
       </li>
+    </div>
+    <div class="col-2">
       <li>
-        <h4>
-          Enabled:
-        </h4>
+        <h3>
+          Tick to mark enabled
+        </h3>
         <input type="checkbox" id="checkbox" v-model="enabled">
       </li>
+    </div>
+    <div class="col-5 hack">
+      <li><h3>Valid from</h3>
+        <date-picker v-model="startDateObject" :config="config"></date-picker>
+      </li>
+    </div>
+    <div class="col-5 hack">
+      <li><h3>Expires</h3>
+        <date-picker v-model="endDateObject" :config="config"></date-picker>
+       </li>
+    </div>
+    <div class="col-12">
       <li>
         <button v-on:click="postData(JSON.stringify({'username':username, 'password':password, 'role':role, 'keycode': keycode, 'enabled': enabled, 'timeStart': startDateObject, 'timeEnd': endDateObject, 'doorlist': enableddoorlist}))">Submit</button>
       </li>
+    </div>
+    <div class="col-12">
       <li class="response">
         Result: {{ this.resp }}
       </li>
+    </div>
    </div>
   </div>
 </template>
@@ -117,6 +140,11 @@ export default {
   text-align: left;
 }
 
+.hack {
+  position: relative;
+  left: auto !important;
+  right: 0px;
+}
 /*span {
   vertical-align: top;
 }*/

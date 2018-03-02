@@ -30,7 +30,7 @@ This makes sure that the padding and border are included in the total width and 
 [class*="col-"] {
     float: left;
     padding: 15px;
-    border: 1px solid red;
+    /*border: 1px solid red;*/
 }
 /*Clear after div (using row class)*/
 .row::after {
@@ -70,4 +70,15 @@ html {
 
 div.response {
     clear: both;
+}
+
+/*Hack for datetime picker to keep calendar near field*/
+.hack {
+  position: relative;
+  left: auto !important;
+  right: 0px;
+}
+
+.user {
+  border: 1px solid red;
 }

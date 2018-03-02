@@ -140,11 +140,6 @@ export default {
   text-align: left;
 }
 
-.hack {
-  position: relative;
-  left: auto !important;
-  right: 0px;
-}
 /*span {
   vertical-align: top;
 }*/

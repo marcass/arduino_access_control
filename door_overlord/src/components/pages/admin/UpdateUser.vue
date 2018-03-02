@@ -1,31 +1,27 @@
 <template>
   <div class="doors">
     <app-nav></app-nav>
-    <h1>Door Users for updating</h1>
+    <h2>Door Users for updating</h2>
    <!-- <div class="col-md-5" v-for="(item, key, index) in userlist" :key="item.name"> -->
-   <div class="col-lg-7" v-for="(item, key, index) in userlist" :key="item.name">
-      <div class="col-lg-3">
-       <div class="col-sm-3"><h4>Username: {{ item.username }} </h4>
-         Keycode: <input v-model="item.keycode" :placeholder="item.keycode" v-on:keyup.enter="changeattr(item.username, 'keycode', item.keycode)">
-       </div>
-       <div class="col-sm-3" ><h4>Valid from:</h4> <date-picker v-model="item.startDateObject" :config="config" :placeholder="String(item.startDateObject)"></date-picker>
-         <br>
+   <div class="col-5 user" v-for="(item, key, index) in userlist" :key="item.name">
+     <div class="col-3"><h3>Username: {{ item.username }} </h3>
+       Keycode: <input v-model="item.keycode" :placeholder="item.keycode" v-on:keyup.enter="changeattr(item.username, 'keycode', item.keycode)">
+     </div>
+     <div class="col-3 hack" ><h4>Valid from:</h4> <date-picker v-model="item.startDateObject" :config="config" :placeholder="String(item.startDateObject)"></date-picker>
+       <br>
        <h4>Expires: </h4><date-picker v-model="item.endDateObject" :config="config" :placeholder="String(item.endDateObject)"></date-picker>
-      </div>
-      </div>
-       <div class="col-lg-3">
-        <div class="col-sm-3">
-          <div id='enabled-doors' v-for="x in doorlist">
-            <input type="checkbox" :id="x" :value="x" v-model="item.doors">
-            <label >{{ x }}</label>
-          </div>
+     </div>
+      <div class="col-2">
+        <div class="radio" id='enabled-doors' v-for="x in doorlist">
+          <input type="checkbox" :id="x" :value="x" v-model="item.doors">
+          <label >{{ x }}</label>
         </div>
-        <div class="col-sm-3">
-          <h4>Enabled: <input type="checkbox" id="checkbox" v-model="item.enabled"></h4>
-          <button v-on:click="sendData(JSON.stringify({'username': item.username, 'keycode': item.keycode, 'enabled': item.enabled, 'timeStart': item.startDateObject, 'timeEnd': item.endDateObject, 'doorlist': item.doors}))">Submit user data</button>
-          <button v-on:click="sendDelete(item.username)">Delete all user data</button>
-          <!-- <button v-on:click="deleteUser(JSON.stringify({'username': item.username}))">Delete all user data</button> -->
-        </div>
+      </div>
+      <div class="col-2 radio">
+        <h4>Enabled: <input type="checkbox" id="checkbox" v-model="item.enabled"></h4>
+        <button v-on:click="sendData(JSON.stringify({'username': item.username, 'keycode': item.keycode, 'enabled': item.enabled, 'timeStart': item.startDateObject, 'timeEnd': item.endDateObject, 'doorlist': item.doors}))">Submit user data</button>
+        <button v-on:click="sendDelete(item.username)">Delete all user data</button>
+        <!-- <button v-on:click="deleteUser(JSON.stringify({'username': item.username}))">Delete all user data</button> -->
       </div>
    </div>
    <div class="response">
@@ -151,5 +147,9 @@ li {
 
 a {
   color: #42b283;
+}
+
+.radio {
+  text-align: left;
 }
 </style>

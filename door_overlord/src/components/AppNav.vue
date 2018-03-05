@@ -1,13 +1,15 @@
 <template>
   <!-- <nav class="navbar navbar-default"> -->
     <div class="navbar-header">
-      <expand-ball class="ball-pos">
+      <!-- <expand-ball class="ball-pos">
         <span slot="menu" @click="clicked('M1')">M1</span>
+        <span slot="menu"><router-link :to="{name: 'Hello'}">Hi</router-link></span>
         <span slot="menu" @click="clicked('M2')">M2</span>
-      </expand-ball>
-      <!-- <span v-show="!$auth.check()">
+      </expand-ball> -->
+
+      <span v-show="!$auth.check()">
         <quick-menu :menu-count=nonauthcount :icon-class=nonauthicons :menu-url-list=nonauthlist></quick-menu>
-      </span> -->
+      </span>
       <ul class="menu">
         <span v-show="!$auth.check()">
           <li class="menu">
@@ -16,7 +18,7 @@
         </span>
         <span v-show="$auth.check()">
           <span v-show="$auth.check('admin')">
-            <quick-menu :menu-count=authcount :icon-class=authicons :menu-url-list=authlist></quick-menu>
+            <!-- <quick-menu :menu-count=authcount :icon-class=authicons :menu-url-list=authlist></quick-menu> -->
             <!-- <span v-if="$auth.user('admin')"> -->
             <li class="menu">
               <router-link :to="{name: 'Users'}">All Users</router-link>
@@ -55,15 +57,22 @@
       </ul>
     </div>
   <!-- </nav> -->
+  <!-- // <script type="text/javascript" src="https://unpkg.com/vue/dist/vue.js"></script>
+  // <script type="text/javascript" src="node_modules/vue-expand-ball/dist/vue-expand-ball.js"></script>
+  // <script type="text/javascript">
+  //     var VueExpandBall = window.VueExpandBall;
+  // </script> -->
 </template>
 
 <script>
 // import VueExpandBall from 'vue-expand-ball'
-// import quickMenu from 'vue-quick-menu'
+// import Vue from 'vue'
+// Vue.use(VueExpandBall)
+import quickMenu from 'vue-quick-menu'
 // import log-in from 'vue-icon';
 // import log-out from 'vue-icon';
 // import user-check from 'vue-icon';
-// import feather from 'vue-icon'
+import feather from 'vue-icon'
 // import user-plus from 'vue-icon';
 // import zap from 'vue-icon'
 //
@@ -84,37 +93,52 @@ export default {
     },
     clicked (str) {
       alert(str + ' is just clicked!!')
+    },
+    created () {
+      let getball = document.createElement('script'); getball.setAttribute('src', 'node_modules/vue-expand-ball/dist/vue-expand-ball.min.js')
+      // var VueExpandBall = window.VueExpandBall
+      document.head.appendChild(getball)
     }
   },
   components: {
-    // quickMenu
+    quickMenu
     // VueExpandBall
     // 'icons': require('vue-icons')
-  }
+  },
   // data () {
   //   return {
-  //     authcount: 4,
-  //     nonauthcount: 2,
-  //     authicons: ['icon-feather', 'icon-feather', 'icon', feather],
-  //     // authicons: ['../assets/003-logout.png', '002-unlocked.png', '004-people.png', '005-profile.png'],
-  //     authlist: ['userupdate', 'doors', 'adduser', 'listallowed'],
-  //     // authlist:["<a v-on:click='logout()' href="javascript:void(0);">Logout</a>","<router-link :to="{name: 'usekey'}">Actuate a door</router-link>","<router-link :to="{name: 'edituser'}">Edit users</router-link>","<router-link :to="{name: 'adduser'}">Add a user</router-link>"],
-  //     nonauthicons: ['001-login.png', '002-unlocked.png'],
-  //     nonauthlist: ['https://google.com', 'https://google.com'],
-  //     // nonauthlist:["<router-link :to="{name: 'login'}">login</router-link>","<router-link :to="{name: 'Hello'}">Hello</router-link>"],
-  //     backgroundColor: '#17c4c5',
-  //     color: '#ffffff',
-  //     position: 'top-left'
+  //     opts: {
+  //       ballSize: 40,
+  //       menuSize: 30,
+  //       menuColor: 'red'
+  //     }
   //   }
   // }
+  data () {
+    return {
+      authcount: 4,
+      nonauthcount: 2,
+      authicons: ['icon-feather', 'icon-feather', 'icon', feather],
+      // authicons: ['../assets/003-logout.png', '002-unlocked.png', '004-people.png', '005-profile.png'],
+      authlist: ['userupdate', 'doors', 'adduser', 'listallowed'],
+      // authlist:["<a v-on:click='logout()' href="javascript:void(0);">Logout</a>","<router-link :to="{name: 'usekey'}">Actuate a door</router-link>","<router-link :to="{name: 'edituser'}">Edit users</router-link>","<router-link :to="{name: 'adduser'}">Add a user</router-link>"],
+      nonauthicons: ['001-login.png', '002-unlocked.png'],
+      nonauthlist: ['https://google.com', 'https://google.com'],
+      // nonauthlist:["<router-link :to="{name: 'login'}">login</router-link>","<router-link :to="{name: 'Hello'}">Hello</router-link>"],
+      backgroundColor: '#17c4c5',
+      color: '#ffffff',
+      position: 'top-left'
+    }
+  }
 }
+// var VueExpandBall = window.VueExpandBall
 </script>
 
-<script type="text/javascript" src="node_modules/vue/dist/vue.min.js"></script>
+<!-- <script type="text/javascript" src="node_modules/vue/dist/vue.min.js"></script>
 
 <script type="text/javascript" src="node_modules/vue-expand-ball/dist/vue-expand-ball.min.js"></script>
 
-<script type="text/javascript">var VueExpandBall = window.VueExpandBall</script>
+<script type="text/javascript">var VueExpandBall = window.VueExpandBall</script> -->
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>

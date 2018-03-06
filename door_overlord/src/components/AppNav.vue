@@ -1,13 +1,47 @@
 <template>
-    <div class="navbar-header">
-      <ul class="menu">
+    <div class="navbar-header menu">
+      <span v-show="!$auth.check()">
+        <tree
+          :data="nonauthtreeData"
+          @node:selected="onNodeSelected"
+        />
+      </span>
+      <span v-show="$auth.check()">
+        <span v-show="$auth.check('admin')">
+          <tree
+            :data="authtreeData"
+            class="tree--small"
+            @node:selected="onNodeSelected"
+          />
+        </span>
+        <span v-show="$auth.check('user')">
+          <tree
+            :data="usertreeData"
+            @node:selected="onNodeSelected"
+          />
+        </span>
+      </span>
+
+
+
+
+      <!-- <ul class="menu">
           <span v-show="!$auth.check()">
+            <tree
+              :data="nonauthtreeData"
+              @node:selected="onNodeSelected"
+            />
             <li class="menu">
               <router-link :to="{name: 'login'}">login</router-link>
             </li>
           </span>
           <span v-show="$auth.check()">
             <span v-show="$auth.check('admin')">
+              <tree
+                :data="authtreeData"
+                class="tree--small"
+                @node:selected="onNodeSelected"
+              />
               <li class="menu">
                 <router-link :to="{name: 'Users'}">All Users</router-link>
               </li>
@@ -34,6 +68,10 @@
                 <router-link :to="{name: 'Hello'}">Hello</router-link>
               </li>
               <span v-show="$auth.check('user')">
+                <tree
+                  :data="usertreeData"
+                  @node:selected="onNodeSelected"
+                />
                 <li class="menu">
                   <router-link :to="{name: 'userupdate'}">Update user details</router-link>
                 </li>
@@ -44,11 +82,15 @@
             </span>
           </span>
         </li>
-      </ul>
+      </ul> -->
     </div>
 </template>
 
 <script>
+import Vue from 'vue'
+import LiquorTree from 'liquor-tree'
+// global registration
+Vue.use(LiquorTree)
 export default {
   name: 'app-nav',
   methods: {
@@ -62,8 +104,62 @@ export default {
           console.log('error ' + this.context)
         }
       })
+    },
+    onNodeSelected (node) {
+      // var data = this.data
+      console.log('data ' + node.text)
+      if (node.text === 'Logout') {
+        this.$auth.logout({
+          makeRequest: false,
+          success () {
+            console.log('success ' + this.context)
+          },
+          error () {
+            console.log('error ' + this.context)
+          }
+        })
+      } else {
+        this.$router.push({name: node.text})
+      }
     }
-  }
+  },
+  components: {
+    // [tree-nav.name]: LiquorTree
+  },
+  data: () => ({
+    authtreeData: [
+      {text: 'Menu',
+        children: [
+          {text: 'Logout'},
+          {text: 'Users',
+            children: [
+              {text: 'edituser'},
+              {text: 'listallowed'},
+              {text: 'adduser'}
+            ]
+          },
+          {text: 'Doors',
+            children: [
+              {text: 'statuslog'},
+              {text: 'usekey'},
+              {text: 'doors'}
+            ]
+          }
+        ]
+      }
+    ],
+    usertreeData: [
+      {text: 'Menu',
+        children: [
+          {text: 'UpdateUser'},
+          {text: 'Logout'}
+        ]
+      }
+    ],
+    nonauthtreeData: [
+      {text: 'login'}
+    ]
+  })
 }
 </script>
 

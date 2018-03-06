@@ -13,6 +13,7 @@
   "dependencies": {
     "@websanova/vue-auth": "^2.18.3-beta",
     "axios": "^0.17.1",
+    "liquor-tree": "^0.2.11",
     "save": "^2.3.2",
     "vue": "^2.5.13",
     "vue-axios": "^2.0.2",

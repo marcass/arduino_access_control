@@ -17,30 +17,31 @@
           </li>
         </span>
         <span v-show="$auth.check()">
-          <span v-show="$auth.check('admin')">
-            <!-- <quick-menu :menu-count=authcount :icon-class=authicons :menu-url-list=authlist></quick-menu> -->
-            <!-- <span v-if="$auth.user('admin')"> -->
-            <li class="menu">
-              <router-link :to="{name: 'Users'}">All Users</router-link>
-            </li>
-            <li class="menu">
-              <router-link :to="{name: 'usekey'}">Actuate a door</router-link>
-            </li>
-            <li class="menu">
-              <router-link :to="{name: 'listallowed'}">Allowed users</router-link>
-            </li>
-            <li class="menu">
-              <router-link :to="{name: 'adduser'}">Add a user</router-link>
-            </li>
-            <li class="menu">
-              <router-link :to="{name: 'edituser'}">Edit users</router-link>
-            </li>
-            <li class="menu">
-              <router-link :to="{name: 'doors'}">Door status</router-link>
-            </li>
-            <li class="menu">
-              <router-link :to="{name: 'statuslog'}">Door status log</router-link>
-            </li>
+          <!-- <span v-show="$auth.check('admin')"> -->
+            <quick-menu :menu-count=authcount :icon-class=authicons :menu-url-list=authlist></quick-menu>
+            <span v-if="$auth.user('admin')">
+              <li class="menu">
+                <router-link :to="{name: 'Users'}">All Users</router-link>
+              </li>
+              <li class="menu">
+                <router-link :to="{name: 'usekey'}">Actuate a door</router-link>
+              </li>
+              <li class="menu">
+                <router-link :to="{name: 'listallowed'}">Allowed users</router-link>
+              </li>
+              <li class="menu">
+                <router-link :to="{name: 'adduser'}">Add a user</router-link>
+              </li>
+              <li class="menu">
+                <router-link :to="{name: 'edituser'}">Edit users</router-link>
+              </li>
+              <li class="menu">
+                <router-link :to="{name: 'doors'}">Door status</router-link>
+              </li>
+              <li class="menu">
+                <router-link :to="{name: 'statuslog'}">Door status log</router-link>
+              </li>
+            <!-- </span> -->
           </span>
           <li class="menu">
             <router-link :to="{name: 'Hello'}">Hello</router-link>
@@ -90,15 +91,15 @@ export default {
           console.log('error ' + this.context)
         }
       })
-    },
-    clicked (str) {
-      alert(str + ' is just clicked!!')
-    },
-    created () {
-      let getball = document.createElement('script'); getball.setAttribute('src', 'node_modules/vue-expand-ball/dist/vue-expand-ball.min.js')
-      // var VueExpandBall = window.VueExpandBall
-      document.head.appendChild(getball)
     }
+    // clicked (str) {
+    //   alert(str + ' is just clicked!!')
+    // },
+    // created () {
+    //   let getball = document.createElement('script'); getball.setAttribute('src', 'node_modules/vue-expand-ball/dist/vue-expand-ball.min.js')
+    //   // var VueExpandBall = window.VueExpandBall
+    //   document.head.appendChild(getball)
+    // }
   },
   components: {
     quickMenu
@@ -123,7 +124,7 @@ export default {
       authlist: ['userupdate', 'doors', 'adduser', 'listallowed'],
       // authlist:["<a v-on:click='logout()' href="javascript:void(0);">Logout</a>","<router-link :to="{name: 'usekey'}">Actuate a door</router-link>","<router-link :to="{name: 'edituser'}">Edit users</router-link>","<router-link :to="{name: 'adduser'}">Add a user</router-link>"],
       nonauthicons: ['001-login.png', '002-unlocked.png'],
-      nonauthlist: ['https://google.com', 'https://google.com'],
+      nonauthlist: ['login', 'https://google.com'],
       // nonauthlist:["<router-link :to="{name: 'login'}">login</router-link>","<router-link :to="{name: 'Hello'}">Hello</router-link>"],
       backgroundColor: '#17c4c5',
       color: '#ffffff',

@@ -5,9 +5,6 @@ import App from './App'
 import AppNav from './components/AppNav'
 import router from './router'
 import VueAuth from '@websanova/vue-auth'
-// import VueExpandBall from 'vue-expand-ball'
-// import Vue from 'vue'
-// Vue.use(VueExpandBall)
 
 Vue.router = router
 
@@ -28,8 +25,6 @@ Vue.use(VueAuth, {
   //   return data.data
   // }
 })
-// VueExpandBall
-// )
 
 Vue.config.productionTip = false
 

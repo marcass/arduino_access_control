@@ -1,6 +1,7 @@
 <template>
     <div class="navbar-header menu">
-      <span v-show="!$auth.check()">
+      <!-- <span v-show="!$auth.check()"> -->
+      <!-- <span>
         <tree
           :data="nonauthtreeData"
           @node:selected="onNodeSelected"
@@ -20,20 +21,20 @@
             @node:selected="onNodeSelected"
           />
         </span>
-      </span>
+      </span> -->
 
 
 
 
-      <!-- <ul class="menu">
+      <ul class="menu">
           <span v-show="!$auth.check()">
             <tree
               :data="nonauthtreeData"
               @node:selected="onNodeSelected"
             />
-            <li class="menu">
+            <!-- <li class="menu">
               <router-link :to="{name: 'login'}">login</router-link>
-            </li>
+            </li> -->
           </span>
           <span v-show="$auth.check()">
             <span v-show="$auth.check('admin')">
@@ -42,7 +43,7 @@
                 class="tree--small"
                 @node:selected="onNodeSelected"
               />
-              <li class="menu">
+              <!-- <li class="menu">
                 <router-link :to="{name: 'Users'}">All Users</router-link>
               </li>
               <li class="menu">
@@ -62,27 +63,27 @@
               </li>
               <li class="menu">
                 <router-link :to="{name: 'statuslog'}">Door status log</router-link>
-              </li>
+              </li> -->
             </span>
-              <li class="menu">
+              <!-- <li class="menu">
                 <router-link :to="{name: 'Hello'}">Hello</router-link>
-              </li>
+              </li> -->
               <span v-show="$auth.check('user')">
                 <tree
                   :data="usertreeData"
                   @node:selected="onNodeSelected"
                 />
-                <li class="menu">
+                <!-- <li class="menu">
                   <router-link :to="{name: 'userupdate'}">Update user details</router-link>
-                </li>
+                </li> -->
               </span>
-              <li class="menu">
+              <!-- <li class="menu">
                 <a v-on:click='logout()' href="javascript:void(0);">Logout</a>
-              </li>
+              </li> -->
             </span>
           </span>
         </li>
-      </ul> -->
+      </ul>
     </div>
 </template>
 
@@ -120,6 +121,8 @@ export default {
         })
       } else {
         this.$router.push({name: node.text})
+        // this.$router.push('/auth/login')
+        // router.push({name: node.text})
       }
     }
   },

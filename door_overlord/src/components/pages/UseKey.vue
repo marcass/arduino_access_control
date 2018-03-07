@@ -124,10 +124,12 @@ div.statusbad {
     width: 50px;
 }
 .closed {
-    background-color: green;
+    border-radius: 25px;
+    background-color: #9fdf9f;
 }
 .open {
-      background-color: red;
+    border-radius: 25px;
+    background-color: #ff8080;
 }
 h1, h2 {
   font-weight: normal;

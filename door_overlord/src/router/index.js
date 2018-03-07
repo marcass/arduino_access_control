@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import HelloWorld from '@/components/HelloWorld'
+import Hello from '@/components/pages/Hello'
 import Users from '@/components/pages/admin/Users'
 import Adduser from '@/components/pages/admin/AddUser'
 import Listallowed from '@/components/pages/admin/ListAllowed'
@@ -20,7 +20,7 @@ export default new Router({
     {
       path: '/',
       name: 'Hello',
-      component: HelloWorld
+      component: Hello
     },
     {
       path: '/users',

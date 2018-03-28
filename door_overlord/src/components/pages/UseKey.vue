@@ -13,6 +13,10 @@
             {{ item.door }} is currently {{ item.status }} at {{ item.time }}
          <!-- <br> -->
           </div>
+          <div class="unknown" v-if="item.status === 'unknown'">
+            {{ item.door }} is currently {{ item.status }} at {{ item.time }}
+         <!-- <br> -->
+          </div>
         </li>
       </ul>
     </div>
@@ -130,6 +134,10 @@ div.statusbad {
 .open {
     border-radius: 25px;
     background-color: #ff8080;
+}
+.unknown {
+    border-radius: 25px;
+    background-color: #d1e0e0;
 }
 h1, h2 {
   font-weight: normal;

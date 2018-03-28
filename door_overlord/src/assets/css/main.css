@@ -10,6 +10,12 @@ This makes sure that the padding and border are included in the total width and 
 [class*="col-"] {
     width: 100%;
 }
+
+/*stop horzontal scrolling on mobile*/
+body{
+    overflow-x:hidden;
+}
+
 @media only screen and (min-width: 768px) {
     /* For desktop: */
   /*Set columns*/

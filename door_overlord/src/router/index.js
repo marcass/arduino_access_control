@@ -36,6 +36,12 @@ export default new Router({
       meta: {auth: false}
     },
     {
+      path: '/DoorOverlord',
+      name: 'login',
+      component: Login,
+      meta: {auth: false}
+    },
+    {
       path: '/adduser',
       name: 'adduser',
       component: Adduser,

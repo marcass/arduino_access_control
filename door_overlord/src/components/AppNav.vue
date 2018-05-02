@@ -1,7 +1,7 @@
 <template>
     <!-- <div class="navbar-header menu"> -->
     <div class="menu">
-      <span v-show="!$auth.check()">
+      <!-- <span v-show="!$auth.check()">
         <tree
           :data="nonauthtreeData"
           @node:selected="onNodeSelected"
@@ -21,6 +21,14 @@
             @node:selected="onNodeSelected"
           />
         </span>
+      </span> -->
+
+      <span>
+        <tree
+          :data="datatree"
+          class="tree--small"
+          @node:selected="onNodeSelected"
+        />
       </span>
       <!-- <div> -->
         <!-- <h2>Door Overlord</h2> -->
@@ -130,8 +138,9 @@ export default {
     // [tree-nav.name]: LiquorTree
   },
   data: () => ({
+    datatree: '',
     authtreeData: [
-      {text: '<h2>Door Overlord</h2>',
+      {text: '<h2>DoorOverlord</h2>',
         children: [
           {text: 'Logout'},
           {text: 'Users',
@@ -167,6 +176,22 @@ export default {
       }
     ]
   })
+},
+mounted() {
+  if ($auth.check()) {
+    if ($auth.check('admin')) {
+      datatree == authtreeData
+    }
+    if ($auth.check('user')) {
+      datatree == usertreeData
+    }
+    else {
+      logout()
+    }
+  }
+  else {
+    datatree == nonauthtreeData
+  }
 }
 </script>
 

@@ -175,22 +175,22 @@ export default {
         ]
       }
     ]
-  })
-},
-mounted() {
-  if ($auth.check()) {
-    if ($auth.check('admin')) {
-      datatree == authtreeData
-    }
-    if ($auth.check('user')) {
-      datatree == usertreeData
+  }),
+  mounted () {
+    if (this.$auth.check()) {
+      if (this.$auth.check('admin')) {
+        this.datatree === authtreeData
+      }
+      if (this.$auth.check('user')) {
+        this.datatree === usertreeData
+      }
+      else {
+        this.logout()
+      }
     }
     else {
-      logout()
+      this.datatree === nonauthtreeData
     }
-  }
-  else {
-    datatree == nonauthtreeData
   }
 }
 </script>

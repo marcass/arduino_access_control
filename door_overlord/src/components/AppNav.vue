@@ -25,7 +25,7 @@
 
       <span>
         <tree
-          :data="datatree"
+          :data="this.datatree"
           class="tree--small"
           @node:selected="onNodeSelected"
         />
@@ -169,27 +169,21 @@ export default {
       }
     ],
     nonauthtreeData: [
-      {text: 'Door Overlord',
-        children: [
-          {text: 'login'}
-        ]
-      }
+      {text: 'login'}
     ]
   }),
-  mounted () {
+  created: function () {
     if (this.$auth.check()) {
       if (this.$auth.check('admin')) {
-        this.datatree === authtreeData
+        this.datatree = this.authtreeData
       }
       if (this.$auth.check('user')) {
-        this.datatree === usertreeData
-      }
-      else {
+        this.datatree = this.usertreeData
+      } else {
         this.logout()
       }
-    }
-    else {
-      this.datatree === nonauthtreeData
+    } else {
+      this.datatree = this.nonauthtreeData
     }
   }
 }

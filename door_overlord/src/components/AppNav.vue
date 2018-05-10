@@ -1,6 +1,40 @@
 <template>
     <!-- <div class="navbar-header menu"> -->
     <div class="menu">
+
+      <!-- Using v-if: -->
+
+      <span v-if="$auth.check()">
+        <span v-if="$auth.check('admin')">
+          <tree
+            :data="authtreeData"
+            class="tree--small"
+            @node:selected="onNodeSelected"
+          />
+        </span>
+        <span v-if="$auth.check('user')">
+          <tree
+            :data="usertreeData"
+            @node:selected="onNodeSelected"
+          />
+        </span>
+        <!-- <span v-else>
+          <button @click="logout">Logout</button>
+        </span> -->
+      </span>
+      <span v-if="!$auth.check()">
+        <tree
+          :data="nonauthtreeData"
+          @node:selected="onNodeSelected"
+        />
+      </span>
+      <!-- <span v-else>
+          <button @click="logout">Logout</button>
+      </span> -->
+
+
+      <!-- Using v-show: -->
+
       <!-- <span v-show="!$auth.check()">
         <tree
           :data="nonauthtreeData"
@@ -23,13 +57,20 @@
         </span>
       </span> -->
 
-      <span>
+
+      <!-- Using mounted method: -->
+
+      <!-- <span>
         <tree
           :data="this.datatree"
           class="tree--small"
           @node:selected="onNodeSelected"
         />
-      </span>
+      </span> -->
+
+
+      <!-- Using text menu: -->
+
       <!-- <div> -->
         <!-- <h2>Door Overlord</h2> -->
       <!-- </div> -->
@@ -107,12 +148,13 @@ export default {
       this.$auth.logout({
         makeRequest: false,
         success () {
-          console.log('success ' + this.context)
+          console.log('logout success ' + this.context)
         },
         error () {
-          console.log('error ' + this.context)
+          console.log('logout error ' + this.context)
         }
       })
+      // this.$router.push({name: 'login'})
     },
     onNodeSelected (node) {
       // var data = this.data
@@ -121,13 +163,14 @@ export default {
         this.$auth.logout({
           makeRequest: false,
           success () {
-            console.log('success ' + this.context)
+            console.log('node selected success ' + this.context)
           },
           error () {
-            console.log('error ' + this.context)
+            console.log(' node selected error ' + this.context)
           }
         })
       } else {
+        console.log('push route = ' + node.text)
         this.$router.push({name: node.text})
         // this.$router.push('/auth/login')
         // router.push({name: node.text})
@@ -140,7 +183,7 @@ export default {
   data: () => ({
     datatree: '',
     authtreeData: [
-      {text: '<h2>DoorOverlord</h2>',
+      {text: 'dooroverlord',
         children: [
           {text: 'Logout'},
           {text: 'Users',
@@ -150,18 +193,16 @@ export default {
               {text: 'adduser'}
             ]
           },
-          {text: 'Doors',
+          {text: 'doors',
             children: [
-              {text: 'statuslog'},
-              {text: 'usekey'},
-              {text: 'doors'}
+              {text: 'statuslog'}
             ]
           }
         ]
       }
     ],
     usertreeData: [
-      {text: 'Door Overlord',
+      {text: 'dooroverlord',
         children: [
           {text: 'UpdateUser'},
           {text: 'Logout'}
@@ -172,20 +213,33 @@ export default {
       {text: 'login'}
     ]
   }),
-  created: function () {
+  mounted: function () {
+    console.log('nav user = ' + this.$auth.user().username)
     if (this.$auth.check()) {
-      if (this.$auth.check('admin')) {
-        this.datatree = this.authtreeData
-      }
-      if (this.$auth.check('user')) {
-        this.datatree = this.usertreeData
+      if (this.$auth.check('admin') || this.$auth.check('user')) {
+        console.log('nav user OK')
       } else {
+        console.log('logging out')
+        console.log('logout user = ' + this.$auth.user().username)
         this.logout()
       }
-    } else {
-      this.datatree = this.nonauthtreeData
     }
   }
+  // created: function () {
+  //   console.log('nav user = ' + this.$auth.user().username)
+  //   if (this.$auth.check()) {
+  //     if (this.$auth.check('admin')) {
+  //       this.datatree = this.authtreeData
+  //     }
+  //     if (this.$auth.check('user')) {
+  //       this.datatree = this.usertreeData
+  //     } else {
+  //       this.logout()
+  //     }
+  //   } else {
+  //     this.datatree = this.nonauthtreeData
+  //   }
+  // }
 }
 </script>
 
@@ -196,4 +250,7 @@ export default {
 .log {
   margin: 5px 10px 0 0;
 }*/
+.menu {
+  font-size: 200%;
+}
 </style>

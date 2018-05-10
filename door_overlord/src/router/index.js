@@ -35,12 +35,10 @@ export default new Router({
       component: Login,
       meta: {auth: false}
     },
-    {
-      path: '/DoorOverlord',
-      name: 'login',
-      component: Login,
-      meta: {auth: false}
-    },
+    // {
+    //   path: '/dooroverlord',
+    //   redirect: {name: 'usekey'}
+    // },
     {
       path: '/adduser',
       name: 'adduser',
@@ -63,7 +61,7 @@ export default new Router({
     },
     {
       path: '/usekey',
-      name: 'usekey',
+      name: 'dooroverlord',
       component: Usekey,
       meta: {auth: true}
     },

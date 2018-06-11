@@ -10,6 +10,8 @@ import Usekey from '@/components/pages/UseKey'
 import Updateuser from '@/components/pages/admin/UpdateUser'
 import Userupdate from '@/components/pages/UserUpdate'
 import StatusLog from '@/components/pages/StatusLog'
+import Three from '@/components/pages/403'
+import Four from '@/components/pages/404'
 
 // Vue.router = Router
 Vue.use(Router)
@@ -85,6 +87,16 @@ export default new Router({
       component: StatusLog,
       meta: {auth: ['admin']}
       // meta: {auth: true}
+    },
+    {
+      path: '/403',
+      name: '403',
+      component: Three
+    },
+    {
+      path: '/404',
+      name: '404',
+      component: Four
     }
   ]
 })

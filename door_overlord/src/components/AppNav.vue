@@ -1,23 +1,9 @@
 <template>
     <div class="menu">
-      <span v-if="$auth.check()">
-        <span v-if="$auth.check('admin')">
-          <tree
-            :data="authtreeData"
-            class="tree--small"
-            @node:selected="onNodeSelected"
-          />
-        </span>
-        <span v-if="$auth.check('user')">
-          <tree
-            :data="usertreeData"
-            @node:selected="onNodeSelected"
-          />
-        </span>
-      </span>
-      <span v-if="!$auth.check()">
+      <span>
         <tree
-          :data="nonauthtreeData"
+          :data="authtreeData"
+          class="tree--small"
           @node:selected="onNodeSelected"
         />
       </span>
@@ -32,18 +18,6 @@ Vue.use(LiquorTree)
 export default {
   name: 'app-nav',
   methods: {
-    logout () {
-      this.$auth.logout({
-        makeRequest: false,
-        success () {
-          console.log('logout success ' + this.context)
-        },
-        error () {
-          console.log('logout error ' + this.context)
-        }
-      })
-      // this.$router.push({name: 'login'})
-    },
     onNodeSelected (node) {
       // var data = this.data
       console.log('data ' + node.text)
@@ -51,17 +25,17 @@ export default {
         this.$auth.logout({
           makeRequest: false,
           success () {
-            console.log('node selected success ' + this.context)
+            console.log('success ' + this.context)
           },
           error () {
-            console.log(' node selected error ' + this.context)
+            console.log('error ' + this.context)
           }
         })
+        console.log('logout pressed')
+        console.log('user = ' + this.$auth.user().username + ' role = ' + this.$auth.user().role)
+        this.$router.push({name: 'Login'})
       } else {
-        console.log('push route = ' + node.text)
         this.$router.push({name: node.text})
-        // this.$router.push('/auth/login')
-        // router.push({name: node.text})
       }
     }
   },
@@ -88,46 +62,8 @@ export default {
           }
         ]
       }
-    ],
-    usertreeData: [
-      {text: 'dooroverlord',
-        children: [
-          {text: 'UpdateUser'},
-          {text: 'Logout'}
-        ]
-      }
-    ],
-    nonauthtreeData: [
-      {text: 'login'}
     ]
-  }),
-  mounted: function () {
-    console.log('nav user = ' + this.$auth.user().username)
-    if (this.$auth.check()) {
-      if (this.$auth.check('admin') || this.$auth.check('user')) {
-        console.log('nav user OK')
-      } else {
-        console.log('logging out')
-        console.log('logout user = ' + this.$auth.user().username)
-        this.logout()
-      }
-    }
-  }
-  // created: function () {
-  //   console.log('nav user = ' + this.$auth.user().username)
-  //   if (this.$auth.check()) {
-  //     if (this.$auth.check('admin')) {
-  //       this.datatree = this.authtreeData
-  //     }
-  //     if (this.$auth.check('user')) {
-  //       this.datatree = this.usertreeData
-  //     } else {
-  //       this.logout()
-  //     }
-  //   } else {
-  //     this.datatree = this.nonauthtreeData
-  //   }
-  // }
+  })
 }
 </script>
 

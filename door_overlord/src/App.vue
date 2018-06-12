@@ -1,11 +1,6 @@
 <template>
   <div id="app">
-    <!-- <img src="./assets/logo.png"> -->
     <div v-if="$auth.ready()">
-      <!-- <span v-show="!$auth.check()">
-          <router-link :to="{name: 'login'}">login</router-link> &bull;
-      </span> -->
-      <!-- <h1>Door Overlord</h1> -->
       <router-view></router-view>
     </div>
     <div v-if="!$auth.ready()">

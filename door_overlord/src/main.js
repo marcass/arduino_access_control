@@ -5,6 +5,7 @@ import App from './App'
 import AppNav from './components/AppNav'
 import router from './router'
 import VueAuth from '@websanova/vue-auth'
+const BASE_URL = 'https://skibo.duckdns.org/api'
 
 Vue.router = router
 
@@ -12,14 +13,16 @@ Vue.use(VueAuth, {
   auth: require('@websanova/vue-auth/drivers/auth/bearer.js'),
   http: require('@websanova/vue-auth/drivers/http/axios.1.x.js'),
   router: require('@websanova/vue-auth/drivers/router/vue-router.2.x.js'),
-  authRedirect: {path: '/users'},
+  loginData: {url: BASE_URL + '/auth/login', method: 'POST', redirect: {name: 'Usekey'}},
+  authRedirect: {path: '/'},
+  fetchData: {url: BASE_URL + '/auth/login', method: 'POST', enabled: false},
   refreshData: {enabled: false},
-  rolesVar: 'role',
-  fetchData: {
-    // url: '/auth/user/blah',
-    // method: 'GET',
-    enabled: false
-  }
+  rolesVar: 'role'
+  // fetchData: {
+  //   // url: '/auth/user/blah',
+  //   // method: 'GET',
+  //   enabled: false
+  // }
   // _parseUserData: function (data) {
   //   console.log(data.data)
   //   return data.data

@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Hello from '@/components/pages/Hello'
+// import Hello from '@/components/pages/Hello'
 import Users from '@/components/pages/admin/Users'
 import Adduser from '@/components/pages/admin/AddUser'
 import Listallowed from '@/components/pages/admin/ListAllowed'
@@ -19,11 +19,11 @@ Vue.use(Router)
 export default new Router({
   // mode: 'history',
   routes: [
-    {
-      path: '/',
-      name: 'Hello',
-      component: Hello
-    },
+    // {
+    //   path: '/',
+    //   name: 'Hello',
+    //   component: Hello
+    // },
     {
       path: '/users',
       name: 'Users',
@@ -32,10 +32,10 @@ export default new Router({
       // meta: {auth: true}
     },
     {
-      path: '/auth/login',
-      name: 'login',
-      component: Login,
-      meta: {auth: false}
+      path: '/',
+      name: 'Login',
+      component: Login
+      // meta: {auth: false}
     },
     // {
     //   path: '/dooroverlord',

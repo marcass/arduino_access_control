@@ -64,40 +64,23 @@
 
     methods: {
       login () {
-        // console.log(JSON.stringify(this.data.body))
-        // postCreds(JSON.stringify(this.data.body)).then((res) => {
-        //   console.log('RES', res)
-        //   console.log('access token', res.data.access_token)
-        //   console.log('refresh token', res.data.refresh_token)
-        //   this.token = res.data.access_token
-        //   this.refresh_token = res.data.refresh_token
-        // })
-        // console.log(this.token)
-        // console.log(this.refresh_token)
-        // var role
-        // console.log('username ' + this.data.body.username)
-        // var userUrl = 'auth/user/' + this.data.body.username
-        // console.log('url ' + userUrl)
         var redirect = this.$auth.redirect()
         this.$auth.login({
-          // body: this.data.body, // Vue-resource
+          // url: 'https://skibo.duckdns.org/tanktestapi/auth/login',
           data: this.data.body, // Axios
           rememberMe: this.data.rememberMe,
-          redirect: {name: redirect ? redirect.from.name : 'dooroverlord'},
+          redirect: {name: redirect ? redirect.from.name : 'Usekey'},
           fetchUser: this.data.fetchUser,
           success (res) {
+            console.log(res)
             var roleIn = res.data.data.role
+            // this.$auth.refresh({ data: this.data })
             this.$auth.user({'role': roleIn, 'username': this.data.body.username})
-            console.log('user = ' + this.$auth.user().username)
+            // console.log(res)
+            // console.log('user = ' + this.$auth.user().username + ' role = ' + this.$auth.user().role)
           },
-          // success () {
-          //   console.log('success ' + this.context)
-          //   // console.log('role' + this.data.data.role)
-          // },
           error (res) {
-            console.log('error ' + this.context)
-
-            this.error = res.data
+            this.message = {'Status': 'Error', 'Message': 'Incorrect username or password'}
           }
         })
       }

@@ -1,10 +1,14 @@
 [Unit]
-Description=Garage door controller
+Description=Garage door controller api
 
 [Service]
-Type=simple
-User=<username>
-ExecStart=/usr/bin/python /home/<user_home_dir>/git/arduino_access_control/python/views.py
+User=marcus
+ExecStart=/usr/bin/uwsgi --ini /home/amrcus/git/arduino_access_control/python/uwsgi.ini
+Restart=always
+KillSignal=SIGQUIT
+Type=notify
+StandardError=syslog
+NotifyAccess=all
 
 [Install]
 WantedBy=multi-user.target

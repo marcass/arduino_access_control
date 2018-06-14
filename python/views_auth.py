@@ -40,10 +40,10 @@ def auth():
     try:
         username = request.json.get('username', None)
         password = request.json.get('password', None)
-        print username
-        print password
+        # print username
+        # print password
         content = sql.auth_user(username, password)
-        print content
+        # print content
         if content['status'] == 'passed':
             # Use create_access_token() and create_refresh_token() to create our
             # access and refresh tokens
@@ -55,7 +55,7 @@ def auth():
             print ret
             return jsonify(ret), 200
         else:
-            print 'fucked up with a bad username'
+            # print 'fucked up with a bad username'
 	    return jsonify({"msg": "Bad username or password"}), 401
     except:
         print 'empty request'

@@ -37,24 +37,29 @@ app.config['JWT_HEADER_TYPE'] = 'Bearer'
 
 @app.route('/auth/login', methods=['POST'])
 def auth():
-    username = request.json.get('username', None)
-    password = request.json.get('password', None)
-    print username
-    print password
-    content = sql.auth_user(username, password)
-    print content
-    if content['status'] == 'passed':
-        # Use create_access_token() and create_refresh_token() to create our
-        # access and refresh tokens
-        ret = {
-            'access_token': create_access_token(identity=username),
-            'refresh_token': create_refresh_token(identity=username), 'data':{
-            'role': content['role']}
-        }
-        print ret
-        return jsonify(ret), 200
-    else:
-        return jsonify({"msg": "Bad username or password"}), 401
+    try:
+        username = request.json.get('username', None)
+        password = request.json.get('password', None)
+        print username
+        print password
+        content = sql.auth_user(username, password)
+        print content
+        if content['status'] == 'passed':
+            # Use create_access_token() and create_refresh_token() to create our
+            # access and refresh tokens
+            ret = {
+                'access_token': create_access_token(identity=username),
+                'refresh_token': create_refresh_token(identity=username), 'data':{
+                'role': content['role']}
+            }
+            print ret
+            return jsonify(ret), 200
+        else:
+            print 'fucked up with a bad username'
+	    return jsonify({"msg": "Bad username or password"}), 401
+    except:
+        print 'empty request'
+	return jsonify({'Status':'Error', 'Message':'Empty request'})
 
 # The jwt_refresh_token_required decorator insures a valid refresh
 # token is present in the request before calling this endpoint. We

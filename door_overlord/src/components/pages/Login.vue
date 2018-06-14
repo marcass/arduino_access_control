@@ -66,7 +66,7 @@
           // url: 'https://skibo.duckdns.org/tanktestapi/auth/login',
           data: this.data.body, // Axios
           rememberMe: this.data.rememberMe,
-          redirect: {name: redirect ? redirect.from.name : 'dooroverlord'},
+          redirect: {name: redirect ? redirect.from.name : 'DoorOverlord'},
           fetchUser: this.data.fetchUser,
           success (res) {
             console.log(res)

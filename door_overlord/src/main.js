@@ -13,7 +13,7 @@ Vue.use(VueAuth, {
   auth: require('@websanova/vue-auth/drivers/auth/bearer.js'),
   http: require('@websanova/vue-auth/drivers/http/axios.1.x.js'),
   router: require('@websanova/vue-auth/drivers/router/vue-router.2.x.js'),
-  loginData: {url: BASE_URL + '/auth/login', method: 'POST', redirect: {name: 'Usekey'}},
+  loginData: {url: BASE_URL + '/auth/login', method: 'POST', redirect: {name: 'dooroverlord'}},
   authRedirect: {path: '/'},
   fetchData: {url: BASE_URL + '/auth/login', method: 'POST', enabled: false},
   refreshData: {enabled: false},

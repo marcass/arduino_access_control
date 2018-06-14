@@ -1,11 +1,7 @@
 <template>
   <div>
     <h1>Login</h1>
-
-    <!-- <b>Test users:</b> (admin / password) -->
-
     <hr/>
-
     <form v-on:submit.prevent="login()">
       <table><tr>
         <td>Username:</td>
@@ -69,14 +65,13 @@
           // url: 'https://skibo.duckdns.org/tanktestapi/auth/login',
           data: this.data.body, // Axios
           rememberMe: this.data.rememberMe,
-          redirect: {name: redirect ? redirect.from.name : 'Usekey'},
+          redirect: {name: redirect ? redirect.from.name : 'dooroverlord'},
           fetchUser: this.data.fetchUser,
           success (res) {
             console.log(res)
             var roleIn = res.data.data.role
             // this.$auth.refresh({ data: this.data })
             this.$auth.user({'role': roleIn, 'username': this.data.body.username})
-            this.router.push({name: 'Usekey'})
             // console.log(res)
             // console.log('user = ' + this.$auth.user().username + ' role = ' + this.$auth.user().role)
           },

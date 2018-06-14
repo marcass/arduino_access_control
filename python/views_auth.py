@@ -39,9 +39,10 @@ app.config['JWT_HEADER_TYPE'] = 'Bearer'
 def auth():
     username = request.json.get('username', None)
     password = request.json.get('password', None)
-    # print username
-    # print password
+    print username
+    print password
     content = sql.auth_user(username, password)
+    print content
     if content['status'] == 'passed':
         # Use create_access_token() and create_refresh_token() to create our
         # access and refresh tokens
@@ -50,6 +51,7 @@ def auth():
             'refresh_token': create_refresh_token(identity=username), 'data':{
             'role': content['role']}
         }
+        print ret
         return jsonify(ret), 200
     else:
         return jsonify({"msg": "Bad username or password"}), 401

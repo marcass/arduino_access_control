@@ -114,8 +114,11 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .radio {
+  margin-left: auto;
+  margin-right: auto;
   text-align: left;
   padding-left:20px;
+  width: 8em;
 }
 div.statusgood {
     background-color: green;

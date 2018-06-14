@@ -45,19 +45,19 @@ export default {
   data: () => ({
     datatree: '',
     authtreeData: [
-      {text: 'dooroverlord',
+      {text: 'DoorOverlord',
         children: [
           {text: 'Logout'},
           {text: 'Users',
             children: [
-              {text: 'edituser'},
-              {text: 'listallowed'},
+              {text: 'EditUser'},
+              {text: 'ListAllowed'},
               {text: 'adduser'}
             ]
           },
-          {text: 'doors',
+          {text: 'Doors',
             children: [
-              {text: 'statuslog'}
+              {text: 'StatusLog'}
             ]
           }
         ]

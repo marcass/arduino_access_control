@@ -8,7 +8,7 @@ from passlib.hash import pbkdf2_sha256
 import datetime
 from datetime import timedelta
 
-users_db = '/home/marcus/git/arduino_access_control/python/door_database.db'
+users_db = '/home/mw/git/arduino_access_control/python/door_database.db'
 tz = 'Pacific/Auckland'
 
 def localtime_from_response(resp):

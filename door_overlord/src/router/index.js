@@ -43,47 +43,47 @@ export default new Router({
     // },
     {
       path: '/adduser',
-      name: 'adduser',
+      name: 'AddUser',
       component: Adduser,
       meta: {auth: {roles: 'admin'}}
       // meta: {auth: true}
     },
     {
       path: '/listallowed',
-      name: 'listallowed',
+      name: 'ListAllowed',
       component: Listallowed,
       meta: {auth: {roles: 'admin'}}
       // meta: {auth: true}
     },
     {
       path: '/doors',
-      name: 'doors',
+      name: 'Doors',
       component: Doors,
       meta: {auth: true}
     },
     {
       path: '/usekey',
-      name: 'dooroverlord',
+      name: 'DoorOverlord',
       component: Usekey,
       meta: {auth: true}
     },
     {
       path: '/updateuser',
-      name: 'edituser',
+      name: 'EditUser',
       component: Updateuser,
       meta: {auth: {roles: 'admin'}}
       // meta: {auth: true}
     },
     {
       path: '/userupdate',
-      name: 'userupdate',
+      name: 'UserUpdate',
       component: Userupdate,
       meta: {auth: ['admin', 'user']}
       // meta: {auth: true}
     },
     {
       path: '/statuslog',
-      name: 'statuslog',
+      name: 'StatusLog',
       component: StatusLog,
       meta: {auth: ['admin']}
       // meta: {auth: true}

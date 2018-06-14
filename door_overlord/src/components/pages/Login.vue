@@ -17,7 +17,8 @@
         <!-- <td><label><input v-model="data.fetchUser" type="checkbox" /> Fetch User (test)</label></td> -->
       </tr><tr>
         <td></td>
-        <td><button type="submit">Login</button></td>
+        <td><button v-on:click="login()">Login</button></td>
+        <!-- <td><button type="submit">Login</button></td> -->
       </tr></table>
 
       <hr/>

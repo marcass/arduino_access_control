@@ -69,7 +69,7 @@
           redirect: {name: redirect ? redirect.from.name : 'DoorOverlord'},
           fetchUser: this.data.fetchUser,
           success (res) {
-            console.log(res)
+            // console.log(res)
             var roleIn = res.data.data.role
             // this.$auth.refresh({ data: this.data })
             this.$auth.user({'role': roleIn, 'username': this.data.body.username})

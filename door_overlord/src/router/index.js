@@ -6,7 +6,7 @@ import Adduser from '@/components/pages/admin/AddUser'
 import Listallowed from '@/components/pages/admin/ListAllowed'
 import Login from '@/components/pages/Login'
 import Doors from '@/components/pages/Doors'
-import Usekey from '@/components/pages/UseKey'
+import DoorOverlord from '@/components/pages/UseKey'
 import Updateuser from '@/components/pages/admin/UpdateUser'
 import Userupdate from '@/components/pages/UserUpdate'
 import StatusLog from '@/components/pages/StatusLog'
@@ -64,7 +64,7 @@ export default new Router({
     {
       path: '/usekey',
       name: 'DoorOverlord',
-      component: Usekey,
+      component: DoorOverlord,
       meta: {auth: true}
     },
     {

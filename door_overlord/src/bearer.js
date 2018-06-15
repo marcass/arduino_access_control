@@ -1,19 +1,11 @@
 module.exports = {
-    
-    request: function (req, token) {
-        this.options.http._setHeaders.call(this, req, {Authorization: 'Bearer ' + token});
-    },
-    
-    response: function (res) {
-//         var headers = this.options.http._getHeaders.call(this, res),
-//             token = headers.Authorization || headers.authorization;
-//         if (token) {
-//             token = token.split(/Bearer\:?\s?/i);
-//             
-//             return token[token.length > 1 ? 1 : 0].trim();
-//         }
-           var token = res.data.access_token;
-//            console.log(token);
-           return token;
-    }
-};
+  request: function (req, token) {
+    this.options.http._setHeaders.call(this, req, {Authorization: 'Bearer ' + token})
+  },
+  response: function (res) {
+    // var refresh_token = res.data.refresh_token
+    // how the fuck do I return a refresh token and place in local storage as well???
+    var token = res.data.access_token
+    return token
+  }
+}

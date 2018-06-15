@@ -105,6 +105,7 @@ export default {
     }
   },
   mounted () {
+    // console.log('user = ' + this.$auth.user().username + ' role = ' + this.$auth.user().role)
     this.getDoors()
     this.getDoorStatus()
   }

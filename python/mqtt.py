@@ -10,7 +10,7 @@ import middleman
 broker = creds.mosq_auth['broker']
 auth = creds.mosq_auth
 #API_URL = 'https://skibo.duckdns.org/api/usekey'
-API_URL = 'http://localhost:5000/'
+API_URL = 'http://localhost/api'
 auth = {'username':creds.mosq_auth['username'], 'password':creds.mosq_auth['password']}
 broker = creds.mosq_auth['broker']
 

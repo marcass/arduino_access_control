@@ -65,7 +65,7 @@ import json
 import mqtt
 import middleman
 import views_auth
-from init import app, jwt
+from __init__ import app, jwt
 from flask_jwt_extended import jwt_required, \
     create_access_token, jwt_refresh_token_required, \
     create_refresh_token, get_jwt_identity

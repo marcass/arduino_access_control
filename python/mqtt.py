@@ -30,6 +30,7 @@ def on_connect(client, userdata, flags, rc):
 
 # The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
+    print 'Message received from somewhere'
     print(msg.topic+' '+msg.payload)
     door = msg.topic.split('/')[-1]
     print 'Door is '+door

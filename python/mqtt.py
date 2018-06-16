@@ -30,12 +30,11 @@ def on_connect(client, userdata, flags, rc):
 
 # The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
-    print 'Message received from somewhere'
-    print(msg.topic+' '+msg.payload)
+    # print(msg.topic+' '+msg.payload)
     door = msg.topic.split('/')[-1]
-    print 'Door is '+door
+    # print 'Door is '+door
     if 'request' in msg.topic:
-        print 'Checking door key'
+        # print 'Checking door key'
         topic = 'doors/response/'+door
         if (middleman.use_key(msg.payload, door)):
             resp = "1"
@@ -48,7 +47,7 @@ def on_message(client, userdata, msg):
     if 'status' in msg.topic:
         #publish status
         try:
-            print msg.payload
+            # print msg.payload
             middleman.update_door_status(door, msg.payload)
         except:
             print 'Status error'

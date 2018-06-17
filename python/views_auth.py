@@ -8,8 +8,9 @@ from flask_jwt_extended import jwt_required, \
     create_refresh_token, get_jwt_identity
 
 from init import app, jwt
+import creds
 
-app.secret_key = 'ksajdkhsadulaulkj1092830983no1y24'  # Change this!
+app.secret_key = creds.jwt_secret  # Change this!
 app.config['JWT_HEADER_TYPE'] = 'Bearer'
 #jwt = JWTManager(app)
 

@@ -25,6 +25,7 @@ def parseData(data, method, route):
     print 'Auth header is: '+str(headers)
     # catch all for furst use
     if (jwt == ''):
+        print 'Getting token'
         getToken()
     r = requests.method(URL+route, json = data, headers = headers)
     print 'First response is: ' +str(r)

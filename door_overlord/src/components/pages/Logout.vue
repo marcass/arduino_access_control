@@ -12,17 +12,18 @@ export default {
     AppNav
   },
   methods: {
-    mounted () {
-      this.$auth.logout({
-        makeRequest: false,
-        success () {
-          console.log('success ' + this.context)
-        },
-        error () {
-          console.log('error ' + this.context)
-        }
-      })
-    }
+  },
+  mounted () {
+    this.$auth.logout({
+      makeRequest: false,
+      success () {
+        // console.log('success ' + this.context)
+        this.$router.push({name: 'Login'})
+      },
+      error () {
+        // console.log('error ' + this.context)
+      }
+    })
   }
 }
 </script>

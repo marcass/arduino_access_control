@@ -19,24 +19,7 @@ export default {
   name: 'app-nav',
   methods: {
     onNodeSelected (node) {
-      // var data = this.data
-      console.log('data ' + node.text)
-      if (node.text === 'Logout') {
-        this.$auth.logout({
-          makeRequest: false,
-          success () {
-            console.log('success ' + this.context)
-          },
-          error () {
-            console.log('error ' + this.context)
-          }
-        })
-        console.log('logout pressed')
-        console.log('user = ' + this.$auth.user().username + ' role = ' + this.$auth.user().role)
-        this.$router.push({name: 'Login'})
-      } else {
-        this.$router.push({name: node.text})
-      }
+      this.$router.push({name: node.text})
     }
   },
   components: {

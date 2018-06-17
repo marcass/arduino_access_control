@@ -20,6 +20,9 @@ def getToken():
         print 'oops, no token for you'
 
 def parseData(data, method, route):
+    global jwt
+    global jwt_refresh
+    print 'Auth header is: '+str(headers)
     # catch all for furst use
     if (jwt == ''):
         getToken()

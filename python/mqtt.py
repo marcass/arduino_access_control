@@ -1,18 +1,12 @@
 import paho.mqtt.client as mqtt
 import paho.mqtt.publish as publish
-import requests
 import creds
-import time
-import json
-import ast
 import middleman
 
-broker = creds.mosq_auth['broker']
+broker = creds.broker
 auth = creds.mosq_auth
-#API_URL = 'https://skibo.duckdns.org/api/usekey'
-API_URL = 'http://localhost/api'
-auth = {'username':creds.mosq_auth['username'], 'password':creds.mosq_auth['password']}
-broker = creds.mosq_auth['broker']
+# = 'https://skibo.duckdns.org/api/usekey'
+# auth = {'username':creds.mosq_auth['username'], 'password':creds.mosq_auth['password']}
 
 def notify_door(resp, door):
     topic = 'doors/response/'+door
@@ -25,8 +19,6 @@ def on_connect(client, userdata, flags, rc):
     # Subscribing in on_connect() means that if we lose the connection and
     # reconnect then subscriptions will be renewed.
     client.subscribe([("doors/request/#", 2), ("doors/status/#", 2)])
-
-    #client.subscribe("doors/requests/#")
 
 # The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
@@ -55,7 +47,7 @@ def on_message(client, userdata, msg):
 
 #subscribe to broker and test for messages below alert values
 client = mqtt.Client("Python_doors")
-client.username_pw_set(username=creds.mosq_auth['username'], password=creds.mosq_auth['password'])
+client.username_pw_set(username=auth['username'], password=auth['password'])
 client.on_connect = on_connect
 client.on_message = on_message
 client.connect(broker, 1883, 60)

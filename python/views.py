@@ -107,14 +107,22 @@ def usekey():
     except:
         print 'failed to get data'
     door = content['door']
-    pin = content['pincode']
+    key = content['pincode']
     #use_key(pin, door)
-    if middleman.use_key(pin, door):
+    d = sql.validate_key(key, door)
+    if d is None:
+        x = sql.insert_actionLog('Pinpad', door, key)
+        print x
+        resp = {'pin_correct':0}
+        mqtt.notify_door(0, door)
+    else:
+        if d == 'burner':
+            print 'user tested true for burner'
+            sql.remove_disable_key(d)
+        print 'username = '+str(d)+' for '+door
+        y = sql.insert_actionLog('Pinpad', door, key, d)
         mqtt.notify_door(1, door)
         resp = {'pin_correct':1}
-    else:
-        mqtt.notify_door(0, door)
-        resp = {'pin_correct':0}
     return jsonify(resp), 200
 
 @app.route("/user", methods=['POST',])

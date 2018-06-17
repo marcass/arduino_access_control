@@ -36,7 +36,7 @@ def on_message(client, userdata, msg):
     if 'request' in msg.topic:
         # print 'Checking door key'
         topic = 'doors/response/'+door
-        if (middleman.use_key(msg.payload, door)):
+        if (middleman.use_key_api(msg.payload, door)):
             resp = "1"
         else:
             resp = "0"
@@ -48,7 +48,7 @@ def on_message(client, userdata, msg):
         #publish status
         try:
             # print msg.payload
-            middleman.update_door_status(door, msg.payload)
+            middleman.update_door_status_api(door, msg.payload)
         except:
             print 'Status error'
 

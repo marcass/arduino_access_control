@@ -12,6 +12,7 @@ import Userupdate from '@/components/pages/UserUpdate'
 import StatusLog from '@/components/pages/StatusLog'
 import Three from '@/components/pages/403'
 import Four from '@/components/pages/404'
+import Logout from '@/components/pages/Logout'
 
 // Vue.router = Router
 Vue.use(Router)
@@ -19,11 +20,11 @@ Vue.use(Router)
 export default new Router({
   // mode: 'history',
   routes: [
-    // {
-    //   path: '/',
-    //   name: 'Hello',
-    //   component: Hello
-    // },
+    {
+      path: '/auth/logout',
+      name: 'Logout',
+      component: Logout
+    },
     {
       path: '/users',
       name: 'Users',

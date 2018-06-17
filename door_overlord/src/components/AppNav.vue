@@ -35,7 +35,7 @@ export default {
             children: [
               {text: 'EditUser'},
               {text: 'ListAllowed'},
-              {text: 'adduser'}
+              {text: 'AddUser'}
             ]
           },
           {text: 'Doors',

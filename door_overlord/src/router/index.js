@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 // import Hello from '@/components/pages/Hello'
 import Users from '@/components/pages/admin/Users'
-import Adduser from '@/components/pages/admin/AddUser'
+import AddUser from '@/components/pages/admin/AddUser'
 import Listallowed from '@/components/pages/admin/ListAllowed'
 import Login from '@/components/pages/Login'
 import Doors from '@/components/pages/Doors'
@@ -45,7 +45,7 @@ export default new Router({
     {
       path: '/adduser',
       name: 'AddUser',
-      component: Adduser,
+      component: AddUser,
       meta: {auth: {roles: 'admin'}}
       // meta: {auth: true}
     },

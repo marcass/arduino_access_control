@@ -1,5 +1,7 @@
 import sql
 import requests
+import creds
+import json
 
 URL = 'http://localhost/api'
 
@@ -11,11 +13,12 @@ refresh_headers = {"Authorization": "Bearer %s" %jwt_refresh}
 def getToken():
     global jwt
     global jwt_refresh
-    r = requests.post(URL+'/auth/login', data = {'username': creds.user, 'password': creds.password})
-    print 'token data is: ' +str(r)
+    r = requests.post(URL+'/auth/login', json = {'username': creds.user, 'password': creds.password})
+    tokens = json.loads(r.content)
+    print 'token data is: ' +str(tokens)
     try:
-        jwt = r['access_token']
-        jwt_refresh = r['refresh_token']
+        jwt = tokens['access_token']
+        jwt_refresh = tokens['refresh_token']
     except:
         print 'oops, no token for you'
 

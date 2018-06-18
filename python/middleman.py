@@ -5,6 +5,7 @@ import json
 
 URL = 'http://localhost/api'
 
+headers = ''
 jwt = ''
 jwt_refresh = ''
 refresh_headers = {"Authorization": "Bearer %s" %jwt_refresh}
@@ -15,7 +16,7 @@ def getToken():
     global headers
     r = requests.post(URL+'/auth/login', json = {'username': creds.user, 'password': creds.password})
     tokens = r.json()
-    print 'token data is: ' +str(tokens)
+    #print 'token data is: ' +str(tokens)
     try:
         jwt = tokens['access_token']
         jwt_refresh = tokens['refresh_token']
@@ -29,13 +30,13 @@ def post(data, route):
 
 def put(data, route):
     global headers
-    return requests.post(URL+route, json = data, headers = headers)
+    return requests.put(URL+route, json = data, headers = headers)
 
 def parseData(data, method, route):
     global jwt
     global jwt_refresh
     global headers
-    print 'Auth header is: '+str(headers)
+    #print 'Auth header is: '+str(headers)
     # catch all for furst use
     if (jwt == ''):
         print 'Getting token'
@@ -44,7 +45,7 @@ def parseData(data, method, route):
         r = post(data, route)
     if (method == 'PUT'):
         r = put(data, route)
-    print 'First response is: ' +str(r)
+    #print 'First response is: ' +str(r)
     if '200' not in str(r):
         print 'Oops, not matchin'
     # if (r.json()['status'] != '200'):

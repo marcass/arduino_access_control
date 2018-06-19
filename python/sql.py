@@ -238,6 +238,7 @@ def get_doorlog(door, resp):
     #     dump1 = dump1 + [x[1], x[2], localtime_from_response(x[0])]
     # ret_dict = {"actions":dump, "states":dump1}
     ret_dict = {"actions":{'mesage':message, 'action':actionType, 'time':actionTime}, "states":{'state':state, 'time':stateTime}}
+    print ret_dict
     return ret_dict
 
 ############  Write data ########################

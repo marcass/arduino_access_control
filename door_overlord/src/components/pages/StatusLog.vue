@@ -40,12 +40,9 @@
               States
             </th>
           </tr>
-          <tr v-for="item in this.resp.states">
-            <td v-for="obj in item.state">
-              {{ obj }}
-            </td>
-            <td v-for="thing in item.time">
-              {{ thing }}
+          <tr v-for="(item, index) in this.resp.states.state">
+            <td>
+              {{ item }} at {{resp.states.time[index]}}
             </td>
           </tr>
         </table>
@@ -55,12 +52,9 @@
               Actions
             </th>
           </tr>
-          <tr v-for="item in this.resp.actions">
-            <td v-for="obj in item.action">
-              {{ obj }}
-            </td>
-            <td v-for="thing in item.time">
-              {{ thing }}
+          <tr v-for="(item, index) in this.resp.actions.action">
+            <td>
+              {{ resp.actions.mesage[index] }} {{ item }} on {{ resp.actions.time[index] }}
             </td>
           </tr>
         </table>
@@ -109,7 +103,8 @@ export default {
       // console.log(payload)
       // console.log(door)
       getLog(door, payload).then((ret) => {
-        console.log(ret)
+        // console.log(ret)
+        // console.log(ret.actions)
         this.resp = ret
       })
     }

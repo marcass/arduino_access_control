@@ -32,7 +32,7 @@
            <input v-model="newdoor">
          </td>
          <td>
-           <button v-on:click="postDoor(newdoor)">Submit</button>
+           <button v-on:click="addDoor(newdoor)">Submit</button>
          </td>
        </tr>
      </table>
@@ -62,8 +62,10 @@ export default {
       })
     },
     addDoor (door) {
+      console.log('newdoor is ' + this.newdoor)
       postDoor().then((ret) => {
         this.resp = ret
+        this.getDoors()
       })
     }
   },

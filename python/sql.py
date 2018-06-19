@@ -63,6 +63,7 @@ def setup_db():
 
 
 def setup_door(door):
+    print 'door in setup is '+door
     conn, c = get_db()
     c.execute("SELECT * FROM doorID")
     print c.fetchall()

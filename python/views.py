@@ -309,6 +309,7 @@ def setup_a_door(door):
     Receives: {'door': 'topgarage'}
     Returns: {'Status': 'Success'/'Error'. 'Message': message}
     '''
+    print 'door is '+door
     return jsonify(sql.setup_door(door))
 
 @app.route("/door/status", methods=['GET',])

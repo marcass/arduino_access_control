@@ -73,7 +73,9 @@ export default {
     },
     postData (door, payload) {
       console.log(payload)
+      console.log(door)
       getLog(door, payload).then((ret) => {
+        console.log(ret)
         this.resp = ret
       })
     }

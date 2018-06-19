@@ -52,7 +52,7 @@ def setup_db():
     c.execute('''CREATE TABLE IF NOT EXISTS doorID
                     (door_id TEXT)''')
     c.execute('''CREATE TABLE IF NOT EXISTS actionLog
-                    (timestamp TIMESTAMP, message TEXT, type TEXT)''')
+                    (timestamp TIMESTAMP, message TEXT, type TEXT, door TEXT, FOREIGN KEY(door) REFERENCES doorID(door_id)''')
     c.execute('''CREATE TABLE IF NOT EXISTS doorUsers
                     (user TEXT, keycode TEXT UNIQUE, enabled INTEGER, timeStart TIMESTAMP, timeEnd TIMESTAMP, FOREIGN KEY(user) REFERENCES userAuth(username) ON DELETE CASCADE)''' )
     c.execute('''CREATE TABLE IF NOT EXISTS doorStates
@@ -62,15 +62,24 @@ def setup_db():
     conn.commit() # Save (commit) the changes
 
 
-def setup_doors():
+def setup_door(door):
     conn, c = get_db()
     c.execute("SELECT * FROM doorID")
-    if len(c.fetchall()) > 0:
-        return
+    if door in c.fetchall():
+        message = 'Door already exists'
+        status = 'Error'
     else:
-        for i in door_setup.doors:
-            c.execute("INSERT INTO doorID VALUES (?)", (i,) )
+        c.execute("INSERT INTO doorID VALUES (?)", (door,) )
         conn.commit()
+        message = door + ' added'
+        status = 'Success'
+    # if len(c.fetchall()) > 0:
+    #     return
+    # else:
+    #     for i in door_setup.doors:
+    #         c.execute("INSERT INTO doorID VALUES (?)", (i,) )
+    #     conn.commit()
+    return {'Status': status. 'Message': message}
 
 def setup_admin_user(user, passw):
     conn, c = get_db()
@@ -200,7 +209,7 @@ def get_adoorstatus(door):
 
 def get_doorlog(door, resp):
     conn, c = get_db()
-    conn1, c1 = get_db()
+    # conn1, c1 = get_db()
     start = resp['timeStart']
     end = resp['timeEnd']
     if (start is not None) and (len(start) > 0):
@@ -211,20 +220,24 @@ def get_doorlog(door, resp):
         timeEnd = utc_from_string(end)
     else:
         timeEnd = datetime.datetime.utcnow()
-    c.execute("SELECT * FROM actionLog WHERE timestamp BETWEEN datetime(?) AND datetime(?)", (timeStart, timeEnd))
+    c.execute("SELECT * FROM actionLog WHERE door=? AND timestamp BETWEEN datetime(?) AND datetime(?)", (door, timeStart, timeEnd))
     ret = c.fetchall()
     message = [i[1] for i in ret]
     actionType = [i[2] for i in ret]
+    # door = [i[3] for i in ret]
     dump = []
     for a in ret:
         dump = dump+[localtime_from_response(a[0]),a[1],a[2]]
-    c1.execute("SELECT * FROM doorStates WHERE door=? AND timestamp BETWEEN datetime(?) AND datetime(?)",  (door, timeStart, timeEnd))
-    got = c1.fetchall()
+    c.execute("SELECT * FROM doorStates WHERE door=? AND timestamp BETWEEN datetime(?) AND datetime(?)",  (door, timeStart, timeEnd))
+    print dump
+    got = c.fetchall()
     state = [i[2] for i in got]
     dump1 = []
+    print 'making states dump'
     for x in got:
         dump1 = dump1 + [x[1], x[2], localtime_from_response(x[0])]
     ret_dict = {"actions":dump, "states":dump1}
+    print ret_dict
     return ret_dict
 
 ############  Write data ########################
@@ -322,12 +335,13 @@ def update_doorstatus(status, door):
 def insert_actionLog(access_type, door, pin, username='Someone'):
     if username is not 'Someone':
         pin = '****'
-    message = '{} attempted access at {} with {}'.format(username, door, pin)
+    message = '{} attempted access with {}'.format(username, pin)
     conn, c = get_db()
-    c.execute("INSERT INTO actionLog VALUES (?,?,?)",\
-        (datetime.datetime.utcnow(), message, access_type) )
+    c.execute("INSERT INTO actionLog VALUES (?,?,?,?)",\
+        (datetime.datetime.utcnow(), message, access_type, door) )
     conn.commit()
-    return message
+    ret = {'Message':message, 'Door': door}
+    return ret
 
 def build_user_dict_query():
     conn, c = get_db()
@@ -353,4 +367,4 @@ def validate_key(key, door):
             return None
 
 setup_db()
-setup_doors()
+# setup_doors()

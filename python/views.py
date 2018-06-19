@@ -301,14 +301,16 @@ def get_doors():
     content = request.get_json(silent=False)
     return jsonify(sql.get_all_doors()), 200
 
-@app.route("/door/setup/<door>", methods=['POST',])
+@app.route("/door/setup", methods=['POST',])
 @jwt_required
-def setup_a_door(door):
+def setup_a_door():
     '''
     Post new door detail to DB
     Receives: {'door': 'topgarage'}
     Returns: {'Status': 'Success'/'Error'. 'Message': message}
     '''
+    content = request.get_json(silent=False)
+    door = content['door']
     print 'door is '+door
     return jsonify(sql.setup_door(door))
 

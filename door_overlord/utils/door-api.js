@@ -104,9 +104,9 @@ function postKeycode(payload) {
   });
 }
 
-function postDoor(door) {
-  const url = BASE_URL+'/door/setup/'
-  return axios.post(url+door)
+function postDoor(payload) {
+  const url = BASE_URL+'/door/setup'
+  return axios.post(url, payload)
   .then(function (response) {
       return response.data
   });

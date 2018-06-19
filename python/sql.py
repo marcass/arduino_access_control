@@ -52,7 +52,7 @@ def setup_db():
     c.execute('''CREATE TABLE IF NOT EXISTS doorID
                     (door_id TEXT)''')
     c.execute('''CREATE TABLE IF NOT EXISTS actionLog
-                    (timestamp TIMESTAMP, message TEXT, type TEXT, door TEXT, FOREIGN KEY(door) REFERENCES doorID(door_id)''')
+                    (timestamp TIMESTAMP, message TEXT, type TEXT, door TEXT, FOREIGN KEY(door) REFERENCES doorID(door_iD))''')
     c.execute('''CREATE TABLE IF NOT EXISTS doorUsers
                     (user TEXT, keycode TEXT UNIQUE, enabled INTEGER, timeStart TIMESTAMP, timeEnd TIMESTAMP, FOREIGN KEY(user) REFERENCES userAuth(username) ON DELETE CASCADE)''' )
     c.execute('''CREATE TABLE IF NOT EXISTS doorStates
@@ -65,6 +65,7 @@ def setup_db():
 def setup_door(door):
     conn, c = get_db()
     c.execute("SELECT * FROM doorID")
+    print c.fetchall()
     if door in c.fetchall():
         message = 'Door already exists'
         status = 'Error'
@@ -79,7 +80,7 @@ def setup_door(door):
     #     for i in door_setup.doors:
     #         c.execute("INSERT INTO doorID VALUES (?)", (i,) )
     #     conn.commit()
-    return {'Status': status. 'Message': message}
+    return {'Status': status, 'Message': message}
 
 def setup_admin_user(user, passw):
     conn, c = get_db()

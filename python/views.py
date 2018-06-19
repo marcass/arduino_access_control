@@ -303,7 +303,7 @@ def get_doors():
 
 @app.route("/door/setup/<door>", methods=['POST',])
 @jwt_required
-def setup_a_door():
+def setup_a_door(door):
     '''
     Post new door detail to DB
     Receives: {'door': 'topgarage'}

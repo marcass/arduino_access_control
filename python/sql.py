@@ -55,7 +55,7 @@ def setup_db():
     c.execute('''CREATE TABLE IF NOT EXISTS doorUsers
                     (user TEXT, keycode TEXT UNIQUE, enabled INTEGER, timeStart TIMESTAMP, timeEnd TIMESTAMP, FOREIGN KEY(user) REFERENCES userAuth(username) ON DELETE CASCADE)''' )
     c.execute('''CREATE TABLE IF NOT EXISTS doorStates
-                    (timestamp TIMESTAMP, door TEXT, state TEXT )''')
+                    (timestamp TIMESTAMP, door TEXT, state TEXT, status_id INTEGER PRIMARY KEY AUTOINCREMENT, FOREIGN KEY(door) REFERENCES doorID(door_iD) ON DELETE CASCADE )''')
     c.execute('''CREATE TABLE IF NOT EXISTS canOpen
                     (door TEXT, userallowed TEXT, FOREIGN KEY(door) REFERENCES doorID(door_id), FOREIGN KEY(userallowed) REFERENCES userAuth(username) ON DELETE CASCADE)''')
     conn.commit() # Save (commit) the changes
@@ -325,13 +325,17 @@ def delete_user(user):
 def update_doorstatus(status, door):
     conn, c = get_db()
     utcnow = datetime.datetime.utcnow()
-    c.execute("SELECT * FROM doorStates WHERE door=? ORDER BY ID DESC LIMIT 1", (door,))
-    if status in c.fetchall():
-        print 'status unchanged'
-        return
-    else:
-        c.execute("INSERT INTO doorStates VALUES (?,?,?)", (utcnow,door,status) )
+    #c.execute("SELECT * FROM doorStates WHERE door=? ORDER BY TIMESTAMP ASC LIMIT 1", (door,))
+    print 'new status is '+status 
+    c.execute("SELECT * FROM doorStates WHERE door=? ORDER BY status_id  DESC LIMIT 1", (door,))
+    #c.execute("SELECT * FROM doorStates WHERE door=? ORDER BY status_id", (door,))
+    #print c.fetchall()
+    if status not in c.fetchall()[0]:
+        print 'updating door state'
+        c.execute("INSERT INTO doorStates(timestamp, door, state) VALUES (?,?,?)", (utcnow,door,status) )
         conn.commit()
+    else:
+        print 'status unchanged'
 
 def insert_actionLog(access_type, door, pin, username='Someone'):
     if username is not 'Someone':

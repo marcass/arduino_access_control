@@ -40,7 +40,8 @@ export default {
           },
           {text: 'Doors',
             children: [
-              {text: 'StatusLog'}
+              {text: 'StatusLog'},
+              {text: 'SetupDoor'}
             ]
           }
         ]

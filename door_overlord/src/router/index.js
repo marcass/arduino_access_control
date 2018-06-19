@@ -13,6 +13,7 @@ import StatusLog from '@/components/pages/StatusLog'
 import Three from '@/components/pages/403'
 import Four from '@/components/pages/404'
 import Logout from '@/components/pages/Logout'
+import SetupDoor from '@/components/pages/SetupDoor'
 
 // Vue.router = Router
 Vue.use(Router)
@@ -24,6 +25,11 @@ export default new Router({
       path: '/auth/logout',
       name: 'Logout',
       component: Logout
+    },
+    {
+      path: '/door/setup',
+      name: 'SetupDoor',
+      component: SetupDoor
     },
     {
       path: '/users',

@@ -325,8 +325,13 @@ def delete_user(user):
 def update_doorstatus(status, door):
     conn, c = get_db()
     utcnow = datetime.datetime.utcnow()
-    c.execute("INSERT INTO doorStates VALUES (?,?,?)", (utcnow,door,status) )
-    conn.commit()
+    c.execute("SELECT * FROM doorStates WHERE door=? ORDER BY ID DESC LIMIT 1", (door,))
+    if status in c.fetchall():
+        print 'status unchanged'
+        return
+    else:
+        c.execute("INSERT INTO doorStates VALUES (?,?,?)", (utcnow,door,status) )
+        conn.commit()
 
 def insert_actionLog(access_type, door, pin, username='Someone'):
     if username is not 'Someone':

@@ -110,7 +110,6 @@ export default {
   },
   methods: {
     postData (payload) {
-      console.log(payload)
       postUserData(payload).then((ret) => {
         this.resp = ret.data.status
       })

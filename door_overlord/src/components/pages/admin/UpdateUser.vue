@@ -62,7 +62,7 @@ export default {
       })
     },
     sendDelete (payload) {
-      console.log(payload)
+      // console.log(payload)
       deleteUser(payload)
     },
     changeattr (userin, attr, val) {
@@ -71,7 +71,7 @@ export default {
       const payload = JSON.stringify({'username': userin, [attr]: val})
       // const pl = {username: item.username, keycode: message}
       putUserData(payload, attr)
-      console.log(payload)
+      // console.log(payload)
       return 1
     },
     // doorIsEnabled () {
@@ -99,7 +99,7 @@ export default {
           var o = Object.assign({}, el)
           o.startDateObject = new Date(o.times.start)
           o.endDateObject = new Date(o.times.end)
-          console.log(o.startDateObject)
+          // console.log(o.startDateObject)
           return o
         //   // instead of `Object.assign(this.someObject, { a: 1, b: 2 })`
         //   // this.someObject = Object.assign({}, this.someObject, { a: 1, b: 2 })

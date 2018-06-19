@@ -7,7 +7,7 @@
       <p v-for="item in userlist"> {{ item.username }} </p>
     </div>
     <div class="col-2">
-     <li><h3>Username</h3>
+     <li><h3>Username (if burner it is onetime use)</h3>
        <input v-model="username">
      </li>
    </div>

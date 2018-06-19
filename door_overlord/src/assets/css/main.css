@@ -70,3 +70,11 @@ div.response {
 .user {
   border: 1px solid red;
 }
+
+.center {
+  margin: auto;
+}
+
+td {
+  text-align: left;
+}

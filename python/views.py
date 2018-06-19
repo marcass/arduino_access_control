@@ -112,14 +112,13 @@ def usekey():
     d = sql.validate_key(key, door)
     if d is None:
         x = sql.insert_actionLog('Pinpad', door, key)
-        print x
         resp = {'pin_correct':0}
         mqtt.notify_door(0, door)
     else:
         if d == 'burner':
-            print 'user tested true for burner'
+            # print 'user tested true for burner'
             sql.remove_disable_key(d)
-        print 'username = '+str(d)+' for '+door
+        # print 'username = '+str(d)+' for '+door
         y = sql.insert_actionLog('Pinpad', door, key, d)
         mqtt.notify_door(1, door)
         resp = {'pin_correct':1}
@@ -311,7 +310,6 @@ def setup_a_door():
     '''
     content = request.get_json(silent=False)
     door = content['door']
-    print 'door is '+door
     return jsonify(sql.setup_door(door))
 
 @app.route("/door/status", methods=['GET',])

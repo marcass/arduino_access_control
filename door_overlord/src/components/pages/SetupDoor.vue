@@ -62,7 +62,7 @@ export default {
       })
     },
     addDoor (door) {
-      console.log('newdoor is ' + this.newdoor)
+      // console.log('newdoor is ' + this.newdoor)
       postDoor(door).then((ret) => {
         this.resp = ret
         this.getDoors()
@@ -77,11 +77,11 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.center {
+/*.center {
   margin: auto;
 }
 
 td {
   text-align: left;
-}
+}*/
 </style>

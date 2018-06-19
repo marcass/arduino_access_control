@@ -21,7 +21,7 @@
        <li>
         <button v-on:click="postData(door, JSON.stringify({'timeStart': startDateObject, 'timeEnd': endDateObject}))">Submit</button>
       </li>
-      <li class="response">
+      <!-- <li class="response">
         Actions:
         <div v-for="item in this.resp.actions">
           {{ item }}
@@ -30,7 +30,41 @@
         <div v-for="item in this.resp.states">
           {{ item }}
         </div>
-      </li>
+      </li> -->
+      <br><br>
+      <div v-if="resp != ''">
+        <h3>Door log for {{this.door}}</h3>
+        <table class="center">
+          <tr>
+            <th colspan="2">
+              States
+            </th>
+          </tr>
+          <tr v-for="item in this.resp.states">
+            <td v-for="obj in item.state">
+              {{ obj }}
+            </td>
+            <td v-for="thing in item.time">
+              {{ thing }}
+            </td>
+          </tr>
+        </table>
+        <table class="center">
+          <tr>
+            <th colspan="2">
+              Actions
+            </th>
+          </tr>
+          <tr v-for="item in this.resp.actions">
+            <td v-for="obj in item.action">
+              {{ obj }}
+            </td>
+            <td v-for="thing in item.time">
+              {{ thing }}
+            </td>
+          </tr>
+        </table>
+      </div>
     </div>
   </div>
 </template>
@@ -72,8 +106,8 @@ export default {
       })
     },
     postData (door, payload) {
-      console.log(payload)
-      console.log(door)
+      // console.log(payload)
+      // console.log(door)
       getLog(door, payload).then((ret) => {
         console.log(ret)
         this.resp = ret
@@ -106,4 +140,8 @@ li {
 a {
   color: #42b283;
 }
+
+/*th {
+  text-align: center;
+}*/
 </style>

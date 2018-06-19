@@ -114,7 +114,7 @@ function postDoor(payload) {
 
 function deleteUser(user) {
   const url = BASE_URL+'/user/'
-  console.log(user)
+  // console.log(user)
   return axios.delete(url+user)
   .then(function (response) {
       return response.data

@@ -2,7 +2,6 @@ import pytz
 import sys
 import time
 import sqlite3
-import door_setup
 from dateutil import parser
 from passlib.hash import pbkdf2_sha256
 import datetime
@@ -52,7 +51,7 @@ def setup_db():
     c.execute('''CREATE TABLE IF NOT EXISTS doorID
                     (door_id TEXT)''')
     c.execute('''CREATE TABLE IF NOT EXISTS actionLog
-                    (timestamp TIMESTAMP, message TEXT, type TEXT, door TEXT, FOREIGN KEY(door) REFERENCES doorID(door_iD))''')
+                    (timestamp TIMESTAMP, message TEXT, type TEXT, door TEXT, FOREIGN KEY(door) REFERENCES doorID(door_iD) ON DELETE CASCADE)''')
     c.execute('''CREATE TABLE IF NOT EXISTS doorUsers
                     (user TEXT, keycode TEXT UNIQUE, enabled INTEGER, timeStart TIMESTAMP, timeEnd TIMESTAMP, FOREIGN KEY(user) REFERENCES userAuth(username) ON DELETE CASCADE)''' )
     c.execute('''CREATE TABLE IF NOT EXISTS doorStates
@@ -63,7 +62,6 @@ def setup_db():
 
 
 def setup_door(door):
-    print 'door in setup is '+door
     conn, c = get_db()
     c.execute("SELECT * FROM doorID")
     print c.fetchall()
@@ -226,20 +224,20 @@ def get_doorlog(door, resp):
     ret = c.fetchall()
     message = [i[1] for i in ret]
     actionType = [i[2] for i in ret]
+    actionTime = [localtime_from_response(i[0]) for i in ret]
     # door = [i[3] for i in ret]
-    dump = []
-    for a in ret:
-        dump = dump+[localtime_from_response(a[0]),a[1],a[2]]
+    # dump = []
+    # for a in ret:
+    #     dump = dump+[localtime_from_response(a[0]),a[1],a[2]]
     c.execute("SELECT * FROM doorStates WHERE door=? AND timestamp BETWEEN datetime(?) AND datetime(?)",  (door, timeStart, timeEnd))
-    print dump
     got = c.fetchall()
     state = [i[2] for i in got]
-    dump1 = []
-    print 'making states dump'
-    for x in got:
-        dump1 = dump1 + [x[1], x[2], localtime_from_response(x[0])]
-    ret_dict = {"actions":dump, "states":dump1}
-    print ret_dict
+    stateTime = [localtime_from_response(i[0]) for i in got]
+    # dump1 = []
+    # for x in got:
+    #     dump1 = dump1 + [x[1], x[2], localtime_from_response(x[0])]
+    # ret_dict = {"actions":dump, "states":dump1}
+    ret_dict = {"actions":{'mesage':message, 'action':actionType, 'time':actionTime}, "states":{'state':state, 'time':stateTime}}
     return ret_dict
 
 ############  Write data ########################
@@ -369,4 +367,3 @@ def validate_key(key, door):
             return None
 
 setup_db()
-# setup_doors()

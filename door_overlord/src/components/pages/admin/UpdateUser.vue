@@ -1,16 +1,61 @@
 <template>
   <div class="doors">
     <app-nav></app-nav>
-    <h2>Door Users for updating</h2>
-   <!-- <div class="col-md-5" v-for="(item, key, index) in userlist" :key="item.name"> -->
-   <div class="col-5 user" v-for="(item, key, index) in userlist" :key="item.name">
-     <div class="col-3"><h3>Username: {{ item.username }} </h3>
-       Keycode: <input v-model="item.keycode" :placeholder="item.keycode" v-on:keyup.enter="changeattr(item.username, 'keycode', item.keycode)">
-     </div>
-     <div class="col-3 hack" ><h4>Valid from:</h4> <date-picker v-model="item.startDateObject" :config="config" :placeholder="String(item.startDateObject)"></date-picker>
-       <br>
-       <h4>Expires: </h4><date-picker v-model="item.endDateObject" :config="config" :placeholder="String(item.endDateObject)"></date-picker>
-     </div>
+    <h2>Select user to update/delete</h2>
+    <select v-model="username">
+      <option disabled value="">Select user</option>
+      <option v-for="(item, key, index) in this.userlist" v-bind:key="item.username">{{ item.username }}</option>
+    </select>
+    <button v-on:click="amendUser(index)">Do stuff to this user</button>
+    <br><br>
+    <table v-if="disp">
+    <!-- <table v-for="(item, key, index) in userlist" :key="item.username"> -->
+      <tr>
+        <th colspan="5">
+          Username: {{ this.userlist[this.specificUser].username }}
+        </th>
+      </tr>
+      <tr>
+        <td>
+          Keycode: <input v-model="this.userlist[this.specificUser].keycode" :placeholder="item.keycode" v-on:keyup.enter="changeattr(item.username, 'keycode', item.keycode)">
+        </td>
+        <td>
+          <div>
+            Valid from: <date-picker v-model="item.startDateObject" :config="config" :placeholder="String(item.startDateObject)"></date-picker>
+          </div>
+        </td>
+        <td>
+          Expires: <date-picker v-model="item.endDateObject" :config="config" :placeholder="String(item.endDateObject)"></date-picker>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div class="radio" id='enabled-doors' v-for="x in doorlist">
+            <input type="checkbox" :id="x" :value="x" v-model="item.doors">
+            <label >{{ x }}</label>
+          </div>
+        </td>
+        <td class="radio">
+          Enabled: <input type="checkbox" id="checkbox" v-model="item.enabled">
+        </td>
+        <td>
+          <button v-on:click="sendData(JSON.stringify({'username': item.username, 'keycode': item.keycode, 'enabled': item.enabled, 'timeStart': item.startDateObject, 'timeEnd': item.endDateObject, 'doorlist': item.doors}))">Submit user data</button>
+          <button v-on:click="sendDelete(item.username)">Delete all user data</button>
+        </td>
+      </tr>
+    </table>
+    <div class="response">
+     Result: {{ this.resp }}
+    </div>
+
+    <!-- <div class="col-5 user" v-for="(item, key, index) in userlist" :key="item.name">
+      <div class="col-3"><h3>Username: {{ item.username }} </h3>
+        Keycode: <input v-model="item.keycode" :placeholder="item.keycode" v-on:keyup.enter="changeattr(item.username, 'keycode', item.keycode)">
+      </div>
+      <div class="col-3 hack" ><h4>Valid from:</h4> <date-picker v-model="item.startDateObject" :config="config" :placeholder="String(item.startDateObject)"></date-picker>
+        <br>
+        <h4>Expires: </h4><date-picker v-model="item.endDateObject" :config="config" :placeholder="String(item.endDateObject)"></date-picker>
+      </div>
       <div class="col-2">
         <div class="radio" id='enabled-doors' v-for="x in doorlist">
           <input type="checkbox" :id="x" :value="x" v-model="item.doors">
@@ -21,12 +66,11 @@
         <h4>Enabled: <input type="checkbox" id="checkbox" v-model="item.enabled"></h4>
         <button v-on:click="sendData(JSON.stringify({'username': item.username, 'keycode': item.keycode, 'enabled': item.enabled, 'timeStart': item.startDateObject, 'timeEnd': item.endDateObject, 'doorlist': item.doors}))">Submit user data</button>
         <button v-on:click="sendDelete(item.username)">Delete all user data</button>
-        <!-- <button v-on:click="deleteUser(JSON.stringify({'username': item.username}))">Delete all user data</button> -->
       </div>
-   </div>
-   <div class="response">
+    </div>
+    <div class="response">
      Result: {{ this.resp }}
-   </div>
+    </div> -->
   </div>
 </template>
 
@@ -42,10 +86,13 @@ export default {
     return {
       doorlist: [],
       userlist: [],
+      username: '',
       message: '',
       key: '',
+      specificUser: -1,
       resp: '',
       enableddoorlist: [],
+      disp: false,
       config: {
         format: 'ddd, MMM DD YYYY, HH:mm'
       }
@@ -60,6 +107,11 @@ export default {
       putAllUserData(payload).then((ret) => {
         this.resp = ret.data.status
       })
+    },
+    amendUser (index) {
+      this.disp = true
+      this.specificUser = index
+      // this.actionuser =
     },
     sendDelete (payload) {
       // console.log(payload)
@@ -95,6 +147,7 @@ export default {
     },
     getUsers () {
       getUsers().then((ret) => {
+        console.log(ret)
         this.userlist = ret.map(function (el) {
           var o = Object.assign({}, el)
           o.startDateObject = new Date(o.times.start)
@@ -151,5 +204,9 @@ a {
 
 .radio {
   text-align: left;
+}
+
+th {
+  text-align: center;
 }
 </style>

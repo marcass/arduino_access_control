@@ -300,6 +300,15 @@ def get_doors():
     content = request.get_json(silent=False)
     return jsonify(sql.get_all_doors()), 200
 
+@app.route("/door/<door>", methods=['DELETE',])
+@jwt_required
+def del_door(door):
+    '''
+    Deletes <door>
+    '''
+    return jsonify(sql.del_door(door)), 200
+
+
 @app.route("/door/setup", methods=['POST',])
 @jwt_required
 def setup_a_door():

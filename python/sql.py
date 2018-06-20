@@ -322,11 +322,20 @@ def delete_user(user):
     c.execute("DELETE FROM userAuth WHERE username=?", (user,))
     conn.commit()
 
+def del_door(door):
+    conn, c = get_db()
+    try:
+        c.execute("DELETE FROM doorID WHERE door_id=?", (door,))
+        conn.commit()
+        resp = {'Status': 'Success', 'Message': door + ' deleted successfully'}
+    except:
+        resp = {'Status': 'Error', 'Message': 'Door not found'}
+
 def update_doorstatus(status, door):
     conn, c = get_db()
     utcnow = datetime.datetime.utcnow()
     #c.execute("SELECT * FROM doorStates WHERE door=? ORDER BY TIMESTAMP ASC LIMIT 1", (door,))
-    print 'new status is '+status 
+    print 'new status is '+status
     c.execute("SELECT * FROM doorStates WHERE door=? ORDER BY status_id  DESC LIMIT 1", (door,))
     #c.execute("SELECT * FROM doorStates WHERE door=? ORDER BY status_id", (door,))
     #print c.fetchall()

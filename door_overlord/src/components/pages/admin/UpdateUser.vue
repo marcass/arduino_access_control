@@ -2,24 +2,29 @@
   <div class="doors">
     <app-nav></app-nav>
     <h2>Select user to update/delete</h2>
+    <!-- <div v-for="(item, index) in userlist.username">
+      <input type="radio" :id="item" :value="item" v-model="targetUser">
+        <label >{{ item }}</label>
+      </input>
+    </div> -->
     <select v-model="username">
       <option disabled value="">Select user</option>
       <option v-for="(item, key, index) in this.userlist" v-bind:key="item.username">{{ item.username }}</option>
     </select>
-    <button v-on:click="amendUser(index)">Do stuff to this user</button>
+    <button v-on:click="amendUser(username)">Do stuff to this user</button>
     <br><br>
     <table v-if="disp">
     <!-- <table v-for="(item, key, index) in userlist" :key="item.username"> -->
       <tr>
         <th colspan="5">
-          Username: {{ this.userlist[this.specificUser].username }}
+          Username: {{ this.userData.username }}
         </th>
       </tr>
       <tr>
         <td>
-          Keycode: <input v-model="this.userlist[this.specificUser].keycode" :placeholder="item.keycode" v-on:keyup.enter="changeattr(item.username, 'keycode', item.keycode)">
+          Keycode: <input v-model="this.userlist[specificUser].keycode" :placeholder="this.userlist[specificUser].keycode" v-on:keyup.enter="changeattr(this.userlist[specificUser].username, 'keycode', this.userlist[specificUser].keycode)">
         </td>
-        <td>
+        <!-- <td>
           <div>
             Valid from: <date-picker v-model="item.startDateObject" :config="config" :placeholder="String(item.startDateObject)"></date-picker>
           </div>
@@ -41,7 +46,7 @@
         <td>
           <button v-on:click="sendData(JSON.stringify({'username': item.username, 'keycode': item.keycode, 'enabled': item.enabled, 'timeStart': item.startDateObject, 'timeEnd': item.endDateObject, 'doorlist': item.doors}))">Submit user data</button>
           <button v-on:click="sendDelete(item.username)">Delete all user data</button>
-        </td>
+        </td> -->
       </tr>
     </table>
     <div class="response">
@@ -75,7 +80,7 @@
 </template>
 
 <script>
-import { getUsers, getDoors, putUserData, putAllUserData, deleteUser } from '../../../../utils/door-api'
+import { getUsers, getDoors, putUserData, putAllUserData, deleteUser, userData } from '../../../../utils/door-api'
 import 'bootstrap/dist/css/bootstrap.css'
 import datePicker from 'vue-bootstrap-datetimepicker'
 import AppNav from '../../AppNav'
@@ -86,10 +91,10 @@ export default {
     return {
       doorlist: [],
       userlist: [],
+      userData: '',
       username: '',
       message: '',
       key: '',
-      specificUser: -1,
       resp: '',
       enableddoorlist: [],
       disp: false,
@@ -108,10 +113,12 @@ export default {
         this.resp = ret.data.status
       })
     },
-    amendUser (index) {
+    amendUser (username) {
+      userData({'username': username}).then((ret) => {
+        this.userData = ret
+        console.log(ret)
+      })
       this.disp = true
-      this.specificUser = index
-      // this.actionuser =
     },
     sendDelete (payload) {
       // console.log(payload)

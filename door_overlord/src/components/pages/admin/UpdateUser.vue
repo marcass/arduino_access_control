@@ -2,19 +2,65 @@
   <div class="doors">
     <app-nav></app-nav>
     <h2>Select user to update/delete</h2>
-    <!-- <div v-for="(item, index) in userlist.username">
-      <input type="radio" :id="item" :value="item" v-model="targetUser">
-        <label >{{ item }}</label>
-      </input>
-    </div> -->
     <select v-model="username">
       <option disabled value="">Select user</option>
       <option v-for="(item, key, index) in this.userlist" v-bind:key="item.username">{{ item.username }}</option>
     </select>
     <button v-on:click="amendUser(username)">Do stuff to this user</button>
     <br><br>
-    <table v-if="disp">
-    <!-- <table v-for="(item, key, index) in userlist" :key="item.username"> -->
+    <div v-if="disp">
+      <h4>Username: {{ this.userData.username }}</h4>
+      <button v-on:click="amendKeycode()">Change keycode</button>
+      <button v-on:click="amendDoors()">Change door permissions</button>
+      <button v-on:click="amendValiddates()">Change dates allowed</button>
+      <button v-on:click="amendEnabled()">Enable or disable</button>
+      <button v-on:click="amendPass()">Change password</button>
+      <button v-on:click="delUser()">Delete user</button>
+      <br><br>
+      <div v-if="edType == 'keycode'">
+        Keycode: <input v-model="key" :placeholder="this.userData.keycode" v-on:keyup.enter="changeattr(this.userData.username, 'keycode', key)">
+      </div>
+      <div v-if="edType == 'doors'">
+        <table class="center">
+          <tr>
+            <th>
+              Currently enabled doors
+            </th>
+          </tr>
+          <tr v-for="item in this.userData.doors">
+            <td>
+              {{ item }}
+            </td>
+          </tr>
+          <tr>
+            <th>
+              Check required doors:
+            </th>
+          </tr>
+          <tr v-for="x in doorlist">
+            <td>
+              <input type="checkbox" :id="x" :value="x" v-model="doors">
+              <label >{{ x }}</label>
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div v-if="edType == 'dates'" style="position: relative">
+        Valid from: <date-picker v-model="newStart" :config="config" :placeholder="String(this.userData.times.start)"></date-picker>
+        Expires: <date-picker v-model="newEnd" :config="config" :placeholder="String(this.userData.times.end)"></date-picker>
+      </div>
+      <div v-if="edType == 'enabled'">
+        Enabled: <input type="checkbox" id="checkbox" v-model="this.userData.enabled">
+      </div>
+      <div v-if="edType == 'pass'">
+        pass stuff
+      </div>
+    </div>
+
+
+
+
+    <!-- <table v-if="disp" class="center">
       <tr>
         <th colspan="5">
           Username: {{ this.userData.username }}
@@ -22,8 +68,37 @@
       </tr>
       <tr>
         <td>
-          Keycode: <input v-model="this.userlist[specificUser].keycode" :placeholder="this.userlist[specificUser].keycode" v-on:keyup.enter="changeattr(this.userlist[specificUser].username, 'keycode', this.userlist[specificUser].keycode)">
+          Keycode: <input v-model="key" :placeholder="this.userData.keycode" v-on:keyup.enter="changeattr(this.userData.username, 'keycode', key)">
         </td>
+        <tr>
+          <td>
+            <br> -->
+            <!-- <div class="radio" id="enabled-doors" v-model="doors" >
+              <div v-for="x in this.doors">
+                <input type="checkbox" :id="x" :value="x">
+                <label >{{ x }}</label>
+              </div>
+              <div v-for="i in availDoors">
+                <input type="checkbox" :id="i" :value="i">
+                <label >{{ i }}</label>
+              </div>
+            </div> -->
+            <!-- Currently enabled doors:<br>
+            <div v-for="item in this.userData.doors">
+              <li>
+                {{ item }}
+              </li>
+            </div>
+            <div class="radio" id='enabled-doors' v-for="x in doorlist">
+              <input type="checkbox" :id="x" :value="x" v-model="doors">
+              <label >{{ x }}</label>
+            </div>
+          </td>
+        <tr>
+          <td class="radio">
+            Enabled: <input type="checkbox" id="checkbox" v-model="enabled">
+          </td>
+        </tr> -->
         <!-- <td>
           <div>
             Valid from: <date-picker v-model="item.startDateObject" :config="config" :placeholder="String(item.startDateObject)"></date-picker>
@@ -47,11 +122,10 @@
           <button v-on:click="sendData(JSON.stringify({'username': item.username, 'keycode': item.keycode, 'enabled': item.enabled, 'timeStart': item.startDateObject, 'timeEnd': item.endDateObject, 'doorlist': item.doors}))">Submit user data</button>
           <button v-on:click="sendDelete(item.username)">Delete all user data</button>
         </td> -->
-      </tr>
-    </table>
-    <div class="response">
+    <!-- </table> -->
+    <!-- <div class="response">
      Result: {{ this.resp }}
-    </div>
+    </div> -->
 
     <!-- <div class="col-5 user" v-for="(item, key, index) in userlist" :key="item.name">
       <div class="col-3"><h3>Username: {{ item.username }} </h3>
@@ -97,7 +171,12 @@ export default {
       key: '',
       resp: '',
       enableddoorlist: [],
+      newStart: '',
+      newEnd: '',
       disp: false,
+      edType: '',
+      doors: [],
+      enabled: '',
       config: {
         format: 'ddd, MMM DD YYYY, HH:mm'
       }
@@ -113,10 +192,30 @@ export default {
         this.resp = ret.data.status
       })
     },
+    amendKeycode () {
+      this.edType = 'key'
+    },
+    amendDoors () {
+      this.edType = 'doors'
+    },
+    amendValiddates () {
+      this.edType = 'dates'
+    },
+    amendEnabled () {
+      this.edType = 'enabled'
+    },
+    amendPass () {
+      this.edType = 'pass'
+    },
+    delUser () {
+      this.edType = 'key'
+    },
     amendUser (username) {
-      userData({'username': username}).then((ret) => {
+      userData(username).then((ret) => {
         this.userData = ret
-        console.log(ret)
+        // Change date format so it can be read
+        this.userData.times.start = new Date(ret.times.start)
+        this.userData.times.end = new Date(ret.times.end)
       })
       this.disp = true
     },

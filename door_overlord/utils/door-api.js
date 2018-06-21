@@ -37,11 +37,8 @@ function getUser(user) {
 }
 
 function userData(user) {
-  const url = BASE_URL+'/user'
-  return axios.get(url, user)
-  .then(function (response) {
-    return response.data
-  });
+  const url = BASE_URL+'/user/data/'+user
+  return simple_get(url)
 }
 
 function getVerifyUser(user, pass) {

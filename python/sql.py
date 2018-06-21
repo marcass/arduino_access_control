@@ -317,10 +317,14 @@ def update_canOpen(user, doors):
 
 def delete_user(user):
     conn, c = get_db()
-    #cascade delete in canOpen and doorUsers table (set in table initialisation)
-    c.execute("DELETE FROM doorUsers WHERE user=?", (user,))
-    c.execute("DELETE FROM userAuth WHERE username=?", (user,))
-    conn.commit()
+    try:
+        #cascade delete in canOpen and doorUsers table (set in table initialisation)
+        c.execute("DELETE FROM doorUsers WHERE user=?", (user,))
+        c.execute("DELETE FROM userAuth WHERE username=?", (user,))
+        conn.commit()
+        ret = {'Status': 'Success', 'Message': user+ 'deleted'}
+    except:
+        ret = {'Status': 'Error', 'Message': user+ 'not found, so cannot delete'}
 
 def del_door(door):
     conn, c = get_db()

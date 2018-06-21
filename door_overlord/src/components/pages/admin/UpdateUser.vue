@@ -15,10 +15,11 @@
       <button v-on:click="amendValiddates()">Change dates allowed</button>
       <button v-on:click="amendEnabled()">Enable or disable</button>
       <button v-on:click="amendPass()">Change password</button>
-      <button v-on:click="delUser()">Delete user</button>
+      <button v-on:click="sendDelete(userData.username)">Delete user</button>
       <br><br>
-      <div v-if="edType == 'keycode'">
-        Keycode: <input v-model="key" :placeholder="this.userData.keycode" v-on:keyup.enter="changeattr(this.userData.username, 'keycode', key)">
+      <div v-if="edType == 'key'">
+        Keycode: <input v-model="key" :placeholder="this.userData.keycode">
+        <button v-on:click="changeattr(this.userData.username, 'keycode', key)">Change keycode</button>
       </div>
       <div v-if="edType == 'doors'">
         <table class="center">
@@ -43,11 +44,18 @@
               <label >{{ x }}</label>
             </td>
           </tr>
+          <tr>
+            <td>
+              <button v-on:click="changeattr(this.userData.username, 'doors', doors)">Change doors</button>
+            </td>
+          </tr>
         </table>
       </div>
       <div v-if="edType == 'dates'" style="position: relative">
         Valid from: <date-picker v-model="newStart" :config="config" :placeholder="String(this.userData.times.start)"></date-picker>
+        <button v-on:click="changeattr(this.userData.username, 'times[\"start\"]', newStart)">Change start date</button>
         Expires: <date-picker v-model="newEnd" :config="config" :placeholder="String(this.userData.times.end)"></date-picker>
+        <button v-on:click="changeattr(this.userData.username, 'times[\"end\"]', newEnd)">Change end date</button>
       </div>
       <div v-if="edType == 'enabled'">
         Enabled: <input type="checkbox" id="checkbox" v-model="this.userData.enabled">
@@ -150,6 +158,9 @@
     <div class="response">
      Result: {{ this.resp }}
     </div> -->
+    <div v-if="response != ''">
+      {{ response.Message }}
+    </div>
   </div>
 </template>
 
@@ -179,7 +190,8 @@ export default {
       enabled: '',
       config: {
         format: 'ddd, MMM DD YYYY, HH:mm'
-      }
+      },
+      response: ''
     }
   },
   components: {
@@ -207,12 +219,10 @@ export default {
     amendPass () {
       this.edType = 'pass'
     },
-    delUser () {
-      this.edType = 'key'
-    },
     amendUser (username) {
       userData(username).then((ret) => {
         this.userData = ret
+        console.log(ret)
         // Change date format so it can be read
         this.userData.times.start = new Date(ret.times.start)
         this.userData.times.end = new Date(ret.times.end)
@@ -222,6 +232,8 @@ export default {
     sendDelete (payload) {
       // console.log(payload)
       deleteUser(payload)
+      // refesh list of users
+      getUsers()
     },
     changeattr (userin, attr, val) {
       // var key = attr
@@ -239,13 +251,13 @@ export default {
       this.x = !this.x
       return this.x
     },
-    enabled (x) {
-      if (x === 1) {
-        return true
-      } else {
-        return false
-      }
-    },
+    // enabled (x) {
+    //   if (x === 1) {
+    //     return true
+    //   } else {
+    //     return false
+    //   }
+    // },
     getDoors () {
       getDoors().then((ret) => {
         this.doorlist = ret

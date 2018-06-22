@@ -155,9 +155,11 @@ def fetch_user_data(user_in):
     conn, c = get_db()
     c.execute("SELECT * FROM doorUsers WHERE user=?", (user_in,))
     res = c.fetchall()[0]
+    c.execute("SELECT role FROM userAuth WHERE username=?", (user_in,))
+    role = c.fetchall()[0]
     c.execute("SELECT door FROM canOpen WHERE userallowed=?", (user_in,))
     doors =  [i[0] for i in c.fetchall()]
-    ret = ({'username': res[0], 'keycode': res[1], 'enabled': res[2], 'times' : {'start':res[3][:-3].replace(' ','T')+'Z','end':res[4][:-3].replace(' ','T')+'Z'}, 'doors':doors})
+    ret = ({'role': role, 'username': res[0], 'keycode': res[1], 'enabled': res[2], 'times' : {'start':res[3][:-3].replace(' ','T')+'Z','end':res[4][:-3].replace(' ','T')+'Z'}, 'doors':doors})
     return ret
 
 def get_all_users():

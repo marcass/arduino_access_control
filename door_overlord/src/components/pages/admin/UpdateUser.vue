@@ -10,13 +10,52 @@
     <br><br>
     <div v-if="disp">
       <h4>Username: {{ this.userData.username }}</h4>
-      <button v-on:click="amendKeycode()">Change keycode</button>
-      <button v-on:click="amendDoors()">Change door permissions</button>
-      <button v-on:click="amendValiddates()">Change dates allowed</button>
-      <button v-on:click="amendEnabled()">Enable or disable</button>
-      <button v-on:click="amendPass()">Change password</button>
-      <button v-on:click="sendDelete(userData.username)">Delete user</button>
+      <table class="center">
+        <tr>
+          <td>
+            <button v-on:click="amendKeycode()">Change keycode</button>
+            <button v-on:click="amendDoors()">Change door permissions</button>
+            <button v-on:click="amendValiddates()">Change dates allowed</button>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <button v-on:click="amendEnabled()">Enable or disable</button>
+            <button v-on:click="amendPass()">Change password</button>
+            <button v-on:click="amendRole()">Change role</button>
+            <button v-on:click="amendEnabled()">Enable or disable</button>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="3">
+            <button v-on:click="sendDelete(userData.username)">Delete user</button>
+          </td>
+        </tr>
+      </table>
       <br><br>
+      <div v-if="edType == 'role'" v-model="role">
+        Current role is: {{ userData.role }}
+        <table class="center">
+          <tr>
+            <td class="tabLabel">
+              <label for="admin">Admin</label>
+            </td>
+            <td>
+              <input type="radio" id="admin" value="admin">
+            </td>
+          </tr>
+          <tr>
+            <td class="tabLabel">
+              <label for="user">User</label>
+            </td>
+            <td>
+              <input type="radio" id="user" value="user">
+            </td>
+          </tr>
+        </table>
+        <br>
+        <button v-on:click="changeattr(userData.username, 'enabled', userData.enabled)">Change role</button>
+      </div>
       <div v-if="edType == 'key'">
         Keycode: <input v-model="key" :placeholder="this.userData.keycode">
         <button v-on:click="changeattr(userData.username, 'keycode', key)">Change keycode</button>
@@ -97,6 +136,7 @@ export default {
       newEnd: '',
       doors: [],
       enabled: '',
+      role: '',
       pass1: '',
       pass2: '',
       disp: false,
@@ -132,9 +172,13 @@ export default {
     amendPass () {
       this.edType = 'pass'
     },
+    amendRole () {
+      this.edType = 'role'
+    },
     amendUser (username) {
       userData(username).then((ret) => {
         this.userData = ret
+        console.log(ret)
         // Change date format so it can be read
         this.userData.times.start = new Date(ret.times.start)
         this.userData.times.end = new Date(ret.times.end)
@@ -189,6 +233,11 @@ export default {
 <style scoped>
 h1, h2 {
   font-weight: normal;
+}
+
+td {
+  padding: 5px;
+  text-align: center;
 }
 
 div.col-sm-3 {

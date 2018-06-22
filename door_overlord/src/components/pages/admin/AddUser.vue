@@ -8,7 +8,7 @@
           Existing users
         </th>
         <tr v-for="item in userlist">
-          <td>
+          <td class="middle">
             {{ item.username }}
           </td>
         </tr>
@@ -51,7 +51,7 @@
           <td class="tabLabel">
             Role
           </td>
-          <td class="middle">
+          <td>
             <input type="radio" id="admin" value="admin" v-model="role">
             <label for="admin">Admin</label>
           </td>
@@ -59,7 +59,7 @@
         <tr>
           <td>
           </td>
-          <td class="middle">
+          <td>
             <input type="radio" id="user" value="user" v-model="role">
             <label for="user">User</label>
           </td>
@@ -68,6 +68,7 @@
           <td class="tabLabel">
             Enabled
           </td>
+          <td>
             <input type="checkbox" id="checkbox" v-model="enabled">
           </td>
         </tr>
@@ -91,21 +92,22 @@
             </div>
           </td>
         </tr>
-        <tr class="middle">
-          <td colspan="2">
+        <tr>
+          <th colspan="2"  class="middle">
+            <br>
             Select doors that apply
-          </td>
+          </th>
         </tr>
-        <tr v-for="item in doorlist" class="middle">
-          <td colspan="2">
-            <div class='radio'>
-              <input type="checkbox" :id="item" :value="item" v-model="enableddoorlist">
-              <label >{{ item }}</label>
-            </div>
+        <tr v-for="item in doorlist">
+          <td class="tabLabel">
+            <label >{{ item }}</label>
+          </td>
+          <td>
+            <input type="checkbox" :id="item" :value="item" v-model="enableddoorlist">
           </td>
         </tr>
         <tr>
-          <td colspan="2">
+          <td colspan="2" class="middle">
             <button v-on:click="verifyPass()">Submit</button>
           </td>
         </tr>
@@ -154,7 +156,6 @@ export default {
     postData (payload) {
       postUserData(payload).then((ret) => {
         this.resp = ret
-        console.log(ret)
       })
       // this.$router.push('/users')
     },
@@ -173,7 +174,7 @@ export default {
         this.postData(JSON.stringify({'username': this.username, 'password': this.pass1, 'role': this.role, 'keycode': this.keycode, 'enabled': this.enabled, 'timeStart': this.startDateObject, 'timeEnd': this.endDateObject, 'doorlist': this.enableddoorlist}))
         this.getUsers()
       } else {
-        this.response = {'Status': 'Error', 'Message': 'Passwords do not match'}
+        this.resp = {'data': {'Status': 'Error', 'Message': 'Passwords do not match'}}
       }
     }
   },
@@ -195,8 +196,14 @@ td {
 }
 
 .middle {
+  text-align: center;
+}
+
+.justify {
   margin-left: auto;
-  /*margin-right: auto;*/
+  margin-right: auto;
+  width: 30%;
+  text-align: right;
 }
 /*span {
   vertical-align: top;
@@ -221,7 +228,5 @@ a {
   color: #42b283;
 }
 
-.tabLabel {
-  text-align: right;
-}
+
 </style>

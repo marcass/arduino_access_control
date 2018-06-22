@@ -78,3 +78,7 @@ div.response {
 td {
   text-align: left;
 }
+
+.tabLabel {
+  text-align: right;
+}

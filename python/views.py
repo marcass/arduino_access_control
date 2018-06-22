@@ -261,7 +261,7 @@ def update_user_doors():
     Select Username and update canOpen table
     '''
     content = request.get_json(silent=False)
-    return jsonify(sql.update_canOpen(content['username'], content['doorlist'])), 200
+    return jsonify(sql.update_canOpen(content['username'], content['doors'])), 200
 
 @app.route("/user/password", methods=['PUT',])
 @jwt_required

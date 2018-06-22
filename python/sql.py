@@ -254,22 +254,25 @@ def setup_user(user_in, passw, role=0):
 def update_doorUsers(user, column, value):
     try:
         conn, c = get_db()
-        if 'time' in column:
-            #parse timestting
-            value = utc_from_string(value).strftime('%Y-%m-%dT%H:%M:%S.%fZ')
-        c.execute("UPDATE doorUsers SET %s=? WHERE user=?" %(column), (value, user))
-        conn.commit()
-        return {'Status': 'Success', 'Message': column+' updated successfully'}
+        if column == 'password':
+            pw_hash = pbkdf2_sha256.hash(value)
+            c.execute("UPDATE userAuth SET password=? WHERE username=?", (user, pw_hash))
+            conn.commit()
+            return {'Status': 'Success', 'Message': column+' updated successfully'}
+        if column == 'role':
+            pw_hash = pbkdf2_sha256.hash(value)
+            c.execute("UPDATE userAuth SET role=? WHERE username=?", (user, value))
+            conn.commit()
+            return {'Status': 'Success', 'Message': column+' updated successfully'}
+        else:
+            if 'time' in column:
+                #parse timestting
+                value = utc_from_string(value).strftime('%Y-%m-%dT%H:%M:%S.%fZ')
+            c.execute("UPDATE doorUsers SET %s=? WHERE user=?" %(column), (value, user))
+            conn.commit()
+            return {'Status': 'Success', 'Message': column+' updated successfully'}
     except:
         return {'Status': 'Error', 'Message': column+' not updated'}
-
-def remove_disable_key(username):
-    conn, c = get_db()
-    #remove burnkey row
-    c.execute("DELETE FROM canOpen WHERE userallowed=?", ('burner',))
-    #disable in dorrUsers
-    c.execute("UPDATE doorUsers SET enabled=? WHERE user=?", (0, username))
-    conn.commit()
 
 def write_userdata(resp):
     utcnow = datetime.datetime.utcnow()
@@ -315,9 +318,9 @@ def update_canOpen(user, doors):
     if len(doors) > 0:
         for i in doors:
             c.execute("INSERT INTO canOpen VALUES (?,?)", (i, user))
-        ret = {'Status': 'Success', 'Message': doors + ' added'}
+        ret = {'Status': 'Success', 'Message': str(doors) + ' added'}
     else:
-        ret = {'Status': 'Success', 'Message': doors + ' removed'}
+        ret = {'Status': 'Success', 'Message': str(doors) + ' removed'}
     conn.commit()
     return ret
 

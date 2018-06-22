@@ -221,10 +221,9 @@ def update_user_keycode():
     content = request.get_json(silent=False)
     # print content
     if not keycode_validation(content['keycode']):
-        return jsonify({'status':'keycode failure'}), 200
+        return jsonify({'Status': 'Error', 'Message':'Keycode validation failure. Please try again'}), 200
     else:
-        sql.update_doorUsers(content['username'], 'keycode', content['keycode'])
-        resp = {}
+        resp = sql.update_doorUsers(content['username'], 'keycode', content['keycode'])
         return jsonify(resp), 200
 
 @app.route("/user/enabled", methods=['PUT',])
@@ -235,9 +234,7 @@ def update_user_enabled():
     {"username":pell", "enabled":"1"}
     '''
     content = request.get_json(silent=False)
-    sql.update_doorUsers(content['username'], 'enabled', int(content['enabled']))
-    resp = {}
-    return jsonify(resp), 200
+    return jsonify(sql.update_doorUsers(content['username'], 'enabled', int(content['enabled']))), 200
 
 @app.route("/user/timeStart", methods=['PUT',])
 @jwt_required
@@ -246,9 +243,7 @@ def update_user_timestart():
     Select Username and update in user doorUsers table
     '''
     content = request.get_json(silent=False)
-    sql.update_doorUsers(content['username'], 'timeStart', content['timeStart'])
-    resp = {}
-    return jsonify(resp), 200
+    return jsonify(sql.update_doorUsers(content['username'], 'timeStart', content['timeStart'])), 200
 
 @app.route("/user/timeEnd", methods=['PUT',])
 @jwt_required
@@ -257,9 +252,7 @@ def update_user_timeend():
     Select Username and update in user doorUsers table
     '''
     content = request.get_json(silent=False)
-    sql.update_doorUsers(content['username'], 'timeEnd', content['timeEnd'])
-    resp = {}
-    return jsonify(resp), 200
+    return jsonify(sql.update_doorUsers(content['username'], 'timeEnd', content['timeEnd'])), 200
 
 @app.route("/user/doors", methods=['PUT',])
 @jwt_required
@@ -268,9 +261,16 @@ def update_user_doors():
     Select Username and update canOpen table
     '''
     content = request.get_json(silent=False)
-    sql.update_canOpen(content['username'], content['doorlist'])
-    resp = {}
-    return jsonify(resp), 200
+    return jsonify(sql.update_canOpen(content['username'], content['doorlist'])), 200
+
+@app.route("/user/password", methods=['PUT',])
+@jwt_required
+def update_user_password():
+    '''
+    Select Username and update canOpen table
+    '''
+    content = request.get_json(silent=False)
+    return jsonify(sql.update_doorUsers(content['username'], 'password', content['password'])), 200
 
 @app.route("/users", methods=['GET',])
 @jwt_required

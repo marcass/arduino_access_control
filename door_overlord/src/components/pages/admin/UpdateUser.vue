@@ -53,15 +53,23 @@
       </div>
       <div v-if="edType == 'dates'" style="position: relative">
         Valid from: <date-picker v-model="newStart" :config="config" :placeholder="String(this.userData.times.start)"></date-picker>
-        <button v-on:click="changeattr(this.userData.username, 'times[\"start\"]', newStart)">Change start date</button>
+        <br>
+        <button v-on:click="changeattr(this.userData.username, 'timeStart', newStart)">Change start date</button>
+        <br><br>
         Expires: <date-picker v-model="newEnd" :config="config" :placeholder="String(this.userData.times.end)"></date-picker>
-        <button v-on:click="changeattr(this.userData.username, 'times[\"end\"]', newEnd)">Change end date</button>
+        <br>
+        <button v-on:click="changeattr(this.userData.username, 'timeEnd', newEnd)">Change end date</button>
       </div>
       <div v-if="edType == 'enabled'">
         Enabled: <input type="checkbox" id="checkbox" v-model="this.userData.enabled">
+        <br>
+        <button v-on:click="changeattr(this.userData.username, 'enabled', this.userData.enabled)">Change status</button>
       </div>
       <div v-if="edType == 'pass'">
-        pass stuff
+          New password: <input type="password" v-model="pass1">
+          Confirm password: <input type="password" v-model="pass2">
+          <br>
+          <button v-on:click="changePass(pass1, pass2)">Change password</button>
       </div>
     </div>
 
@@ -178,16 +186,15 @@ export default {
       userlist: [],
       userData: '',
       username: '',
-      message: '',
       key: '',
-      resp: '',
-      enableddoorlist: [],
       newStart: '',
       newEnd: '',
-      disp: false,
-      edType: '',
       doors: [],
       enabled: '',
+      pass1: '',
+      pass2: '',
+      disp: false,
+      edType: '',
       config: {
         format: 'ddd, MMM DD YYYY, HH:mm'
       },
@@ -201,7 +208,7 @@ export default {
   methods: {
     sendData (payload) {
       putAllUserData(payload).then((ret) => {
-        this.resp = ret.data.status
+        this.message = ret
       })
     },
     amendKeycode () {
@@ -235,18 +242,24 @@ export default {
       // refesh list of users
       getUsers()
     },
+    changePass () {
+      if (this.pass1 === this.pass2) {
+        this.changeattr(this.userData.username, 'password', this.pass1)
+      } else {
+        this.response = {'Status': 'Error', 'Message': 'Passwords do not match'}
+      }
+    },
     changeattr (userin, attr, val) {
       // var key = attr
       // axios.put(url,{'username': this.username, 'keycode': message})
       const payload = JSON.stringify({'username': userin, [attr]: val})
       // const pl = {username: item.username, keycode: message}
-      putUserData(payload, attr)
+      putUserData(payload, attr).then((ret) => {
+        this.response = ret
+      })
       // console.log(payload)
-      return 1
+      // return 1
     },
-    // doorIsEnabled () {
-    //   this.enableddoorlist.includes(this.doors)
-    // },
     changestatus (x) {
       this.x = !this.x
       return this.x

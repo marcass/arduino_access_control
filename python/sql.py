@@ -252,12 +252,16 @@ def setup_user(user_in, passw, role=0):
         return False
 
 def update_doorUsers(user, column, value):
-    conn, c = get_db()
-    if 'time' in column:
-        #parse timestting
-        value = utc_from_string(value).strftime('%Y-%m-%dT%H:%M:%S.%fZ')
-    c.execute("UPDATE doorUsers SET %s=? WHERE user=?" %(column), (value, user))
-    conn.commit()
+    try:
+        conn, c = get_db()
+        if 'time' in column:
+            #parse timestting
+            value = utc_from_string(value).strftime('%Y-%m-%dT%H:%M:%S.%fZ')
+        c.execute("UPDATE doorUsers SET %s=? WHERE user=?" %(column), (value, user))
+        conn.commit()
+        return {'Status': 'Success', 'Message': column+' updated successfully'}
+    except:
+        return {'Status': 'Error', 'Message': column+' not updated'}
 
 def remove_disable_key(username):
     conn, c = get_db()
@@ -289,27 +293,33 @@ def write_userdata(resp):
                 c.execute("INSERT INTO doorUsers VALUES (?,?,?,?,?)",(resp['username'], resp['keycode'], resp['enabled'], timeStart, timeEnd))
                 conn.commit()
             else:
-                return {'status':'Failed to setup user'}
+                return {'Status': 'Error',  'Message': 'Failed to setup user'}
         except:
-            return {'status':'Failed as non-unique new user'}
+            return {'Status': 'Error', 'Message': 'Failed as non-unique new user'}
     else:
         c.execute("UPDATE doorUsers SET keycode=?, enabled=?, timeStart=?, timeEnd=? WHERE user=?", (resp['keycode'], resp['enabled'], timeStart, timeEnd, resp['username']))
         conn.commit()
     update_canOpen(resp['username'], resp['doorlist'])
-    return {'status':'Success'}
+    return {'Status':'Success', 'Message': resp['username'] + ' successfully updated'}
 
 def update_canOpen(user, doors):
     conn, c = get_db()
+    # delete existing record
     try:
         c.execute("DELETE FROM canOpen WHERE userallowed=?", (user,))
         # print 'deleting new user from any existing door access'
     except:
         # print 'this user is not in canOpen so passing'
         pass
+    # add doors in door list (if any)
     if len(doors) > 0:
         for i in doors:
             c.execute("INSERT INTO canOpen VALUES (?,?)", (i, user))
+        ret = {'Status': 'Success', 'Message': doors + ' added'}
+    else:
+        ret = {'Status': 'Success', 'Message': doors + ' removed'}
     conn.commit()
+    return ret
 
 #special sql query. Look at that trickiness!
 #c.execute("SELECT * FROM canOpen WHERE userallowed IN (SELECT user FROM doorUsers WHERE enabled=1 AND ? BETWEEN timeStart AND timeEnd)", (utcnow,))

@@ -2,18 +2,12 @@
   <div class="doors">
     <app-nav></app-nav>
     <table class="center">
-      <tr>
-        <th colspan="2"  class="middle">
-          <br>
-          Select doors
-        </th>
-      </tr>
       <tr v-for="item in doors">
-        <td class="tabLabel">
-          <label >{{ item }}</label>
-        </td>
         <td>
           <input type="radio" :id="item" :value="item" v-bind:value="item" v-model="door">
+        </td>
+        <td>
+          <label >{{ item }}</label>
         </td>
       </tr>
     </table>
@@ -34,6 +28,7 @@
         <date-picker v-model="endDateObject" :config="config"></date-picker>
 
        </li>
+       <br><br>
        <li>
         <button v-on:click="postData(door, JSON.stringify({'timeStart': startDateObject, 'timeEnd': endDateObject}))">Submit</button>
       </li>

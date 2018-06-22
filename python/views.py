@@ -265,10 +265,19 @@ def update_user_doors():
 @jwt_required
 def update_user_password():
     '''
-    Select Username and update canOpen table
+    Select Username and update table
     '''
     content = request.get_json(silent=False)
     return jsonify(sql.update_doorUsers(content['username'], 'password', content['password'])), 200
+
+@app.route("/user/role", methods=['PUT',])
+@jwt_required
+def update_user_role():
+    '''
+    Select Username and update table
+    '''
+    content = request.get_json(silent=False)
+    return jsonify(sql.update_doorUsers(content['username'], 'role', content['role'])), 200
 
 @app.route("/users", methods=['GET',])
 @jwt_required

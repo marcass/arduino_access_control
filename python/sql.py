@@ -258,12 +258,11 @@ def update_doorUsers(user, column, value):
         conn, c = get_db()
         if column == 'password':
             pw_hash = pbkdf2_sha256.hash(value)
-            c.execute("UPDATE userAuth SET password=? WHERE username=?", (user, pw_hash))
+            c.execute("UPDATE userAuth SET password=? WHERE username=?", (pw_hash, user))
             conn.commit()
             return {'Status': 'Success', 'Message': column+' updated successfully'}
         if column == 'role':
-            pw_hash = pbkdf2_sha256.hash(value)
-            c.execute("UPDATE userAuth SET role=? WHERE username=?", (user, value))
+            c.execute("UPDATE userAuth SET role=? WHERE username=?", (value, user))
             conn.commit()
             return {'Status': 'Success', 'Message': column+' updated successfully'}
         else:

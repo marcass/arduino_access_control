@@ -54,7 +54,7 @@
           </tr>
         </table>
         <br>
-        <button v-on:click="changeattr(userData.username, 'enabled', userData.enabled)">Change role</button>
+        <button v-on:click="changeRole()">Change role</button>
       </div>
       <div v-if="edType == 'key'">
         Keycode: <input v-model="key" :placeholder="this.userData.keycode">
@@ -198,6 +198,9 @@ export default {
       } else {
         this.response = {'Status': 'Error', 'Message': 'Passwords do not match'}
       }
+    },
+    changeRole () {
+      this.changeattr(this.userData.username, 'role', this.role)
     },
     changeattr (userin, attr, val) {
       const payload = JSON.stringify({'username': userin, [attr]: val})

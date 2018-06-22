@@ -19,7 +19,7 @@
       <br><br>
       <div v-if="edType == 'key'">
         Keycode: <input v-model="key" :placeholder="this.userData.keycode">
-        <button v-on:click="changeattr(this.userData.username, 'keycode', key)">Change keycode</button>
+        <button v-on:click="changeattr(userData.username, 'keycode', key)">Change keycode</button>
       </div>
       <div v-if="edType == 'doors'">
         <table class="center">
@@ -46,7 +46,7 @@
           </tr>
           <tr>
             <td>
-              <button v-on:click="changeattr(this.userData.username, 'doors', doors)">Change doors</button>
+              <button v-on:click="changeattr(userData.username, 'doors', doors)">Change doors</button>
             </td>
           </tr>
         </table>
@@ -54,16 +54,16 @@
       <div v-if="edType == 'dates'" style="position: relative">
         Valid from: <date-picker v-model="newStart" :config="config" :placeholder="String(this.userData.times.start)"></date-picker>
         <br>
-        <button v-on:click="changeattr(this.userData.username, 'timeStart', newStart)">Change start date</button>
+        <button v-on:click="changeattr(userData.username, 'timeStart', newStart)">Change start date</button>
         <br><br>
         Expires: <date-picker v-model="newEnd" :config="config" :placeholder="String(this.userData.times.end)"></date-picker>
         <br>
-        <button v-on:click="changeattr(this.userData.username, 'timeEnd', newEnd)">Change end date</button>
+        <button v-on:click="changeattr(userData.username, 'timeEnd', newEnd)">Change end date</button>
       </div>
       <div v-if="edType == 'enabled'">
-        Enabled: <input type="checkbox" id="checkbox" v-model="this.userData.enabled">
+        Enabled: <input type="checkbox" id="checkbox" v-model="userData.enabled">
         <br>
-        <button v-on:click="changeattr(this.userData.username, 'enabled', this.userData.enabled)">Change status</button>
+        <button v-on:click="changeattr(userData.username, 'enabled', userData.enabled)">Change status</button>
       </div>
       <div v-if="edType == 'pass'">
           New password: <input type="password" v-model="pass1">
@@ -167,7 +167,7 @@
      Result: {{ this.resp }}
     </div> -->
     <div v-if="response != ''">
-      {{ response.Message }}
+      {{ response.data.Message }}
     </div>
   </div>
 </template>
@@ -208,7 +208,7 @@ export default {
   methods: {
     sendData (payload) {
       putAllUserData(payload).then((ret) => {
-        this.message = ret
+        this.response = ret
       })
     },
     amendKeycode () {
@@ -229,7 +229,6 @@ export default {
     amendUser (username) {
       userData(username).then((ret) => {
         this.userData = ret
-        console.log(ret)
         // Change date format so it can be read
         this.userData.times.start = new Date(ret.times.start)
         this.userData.times.end = new Date(ret.times.end)
@@ -256,8 +255,8 @@ export default {
       // const pl = {username: item.username, keycode: message}
       putUserData(payload, attr).then((ret) => {
         this.response = ret
+        console.log(this.response)
       })
-      // console.log(payload)
       // return 1
     },
     changestatus (x) {
@@ -278,7 +277,6 @@ export default {
     },
     getUsers () {
       getUsers().then((ret) => {
-        console.log(ret)
         this.userlist = ret.map(function (el) {
           var o = Object.assign({}, el)
           o.startDateObject = new Date(o.times.start)

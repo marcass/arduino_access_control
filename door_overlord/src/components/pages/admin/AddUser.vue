@@ -111,7 +111,7 @@ export default {
   methods: {
     postData (payload) {
       postUserData(payload).then((ret) => {
-        this.resp = ret.data.status
+        this.resp = ret.Message
       })
       // this.$router.push('/users')
     },

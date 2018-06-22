@@ -160,15 +160,16 @@ def remove_user(username):
     '''
     return jsonify(sql.delete_user(username)), 200
 
-@app.route("/auth/user/<username>", methods=['GET',])
+@app.route("/auth/user/<username>", methods=['GET','POST'])
 @jwt_required
 def get_user_role(username):
     '''
 
     '''
     content = request.get_json(silent=False)
-    password = request.json.get('password', None)
-    # print content
+    print content
+    password = content['password']
+    #password = request.json.get('password', None)
     return jsonify(sql.auth_user(username, password)), 200
 
 @app.route("/user/data/<username>", methods=['GET',])

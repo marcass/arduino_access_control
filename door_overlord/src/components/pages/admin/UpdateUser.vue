@@ -72,100 +72,6 @@
           <button v-on:click="changePass(pass1, pass2)">Change password</button>
       </div>
     </div>
-
-
-
-
-    <!-- <table v-if="disp" class="center">
-      <tr>
-        <th colspan="5">
-          Username: {{ this.userData.username }}
-        </th>
-      </tr>
-      <tr>
-        <td>
-          Keycode: <input v-model="key" :placeholder="this.userData.keycode" v-on:keyup.enter="changeattr(this.userData.username, 'keycode', key)">
-        </td>
-        <tr>
-          <td>
-            <br> -->
-            <!-- <div class="radio" id="enabled-doors" v-model="doors" >
-              <div v-for="x in this.doors">
-                <input type="checkbox" :id="x" :value="x">
-                <label >{{ x }}</label>
-              </div>
-              <div v-for="i in availDoors">
-                <input type="checkbox" :id="i" :value="i">
-                <label >{{ i }}</label>
-              </div>
-            </div> -->
-            <!-- Currently enabled doors:<br>
-            <div v-for="item in this.userData.doors">
-              <li>
-                {{ item }}
-              </li>
-            </div>
-            <div class="radio" id='enabled-doors' v-for="x in doorlist">
-              <input type="checkbox" :id="x" :value="x" v-model="doors">
-              <label >{{ x }}</label>
-            </div>
-          </td>
-        <tr>
-          <td class="radio">
-            Enabled: <input type="checkbox" id="checkbox" v-model="enabled">
-          </td>
-        </tr> -->
-        <!-- <td>
-          <div>
-            Valid from: <date-picker v-model="item.startDateObject" :config="config" :placeholder="String(item.startDateObject)"></date-picker>
-          </div>
-        </td>
-        <td>
-          Expires: <date-picker v-model="item.endDateObject" :config="config" :placeholder="String(item.endDateObject)"></date-picker>
-        </td>
-      </tr>
-      <tr>
-        <td>
-          <div class="radio" id='enabled-doors' v-for="x in doorlist">
-            <input type="checkbox" :id="x" :value="x" v-model="item.doors">
-            <label >{{ x }}</label>
-          </div>
-        </td>
-        <td class="radio">
-          Enabled: <input type="checkbox" id="checkbox" v-model="item.enabled">
-        </td>
-        <td>
-          <button v-on:click="sendData(JSON.stringify({'username': item.username, 'keycode': item.keycode, 'enabled': item.enabled, 'timeStart': item.startDateObject, 'timeEnd': item.endDateObject, 'doorlist': item.doors}))">Submit user data</button>
-          <button v-on:click="sendDelete(item.username)">Delete all user data</button>
-        </td> -->
-    <!-- </table> -->
-    <!-- <div class="response">
-     Result: {{ this.resp }}
-    </div> -->
-
-    <!-- <div class="col-5 user" v-for="(item, key, index) in userlist" :key="item.name">
-      <div class="col-3"><h3>Username: {{ item.username }} </h3>
-        Keycode: <input v-model="item.keycode" :placeholder="item.keycode" v-on:keyup.enter="changeattr(item.username, 'keycode', item.keycode)">
-      </div>
-      <div class="col-3 hack" ><h4>Valid from:</h4> <date-picker v-model="item.startDateObject" :config="config" :placeholder="String(item.startDateObject)"></date-picker>
-        <br>
-        <h4>Expires: </h4><date-picker v-model="item.endDateObject" :config="config" :placeholder="String(item.endDateObject)"></date-picker>
-      </div>
-      <div class="col-2">
-        <div class="radio" id='enabled-doors' v-for="x in doorlist">
-          <input type="checkbox" :id="x" :value="x" v-model="item.doors">
-          <label >{{ x }}</label>
-        </div>
-      </div>
-      <div class="col-2 radio">
-        <h4>Enabled: <input type="checkbox" id="checkbox" v-model="item.enabled"></h4>
-        <button v-on:click="sendData(JSON.stringify({'username': item.username, 'keycode': item.keycode, 'enabled': item.enabled, 'timeStart': item.startDateObject, 'timeEnd': item.endDateObject, 'doorlist': item.doors}))">Submit user data</button>
-        <button v-on:click="sendDelete(item.username)">Delete all user data</button>
-      </div>
-    </div>
-    <div class="response">
-     Result: {{ this.resp }}
-    </div> -->
     <div v-if="response != ''">
       {{ response.data.Message }}
     </div>
@@ -236,10 +142,11 @@ export default {
       this.disp = true
     },
     sendDelete (payload) {
-      // console.log(payload)
-      deleteUser(payload)
+      deleteUser(payload).then((ret) => {
+        this.response = ret
+      })
       // refesh list of users
-      getUsers()
+      this.getUsers()
     },
     changePass () {
       if (this.pass1 === this.pass2) {
@@ -249,27 +156,12 @@ export default {
       }
     },
     changeattr (userin, attr, val) {
-      // var key = attr
-      // axios.put(url,{'username': this.username, 'keycode': message})
       const payload = JSON.stringify({'username': userin, [attr]: val})
-      // const pl = {username: item.username, keycode: message}
       putUserData(payload, attr).then((ret) => {
         this.response = ret
         console.log(this.response)
       })
-      // return 1
     },
-    changestatus (x) {
-      this.x = !this.x
-      return this.x
-    },
-    // enabled (x) {
-    //   if (x === 1) {
-    //     return true
-    //   } else {
-    //     return false
-    //   }
-    // },
     getDoors () {
       getDoors().then((ret) => {
         this.doorlist = ret
@@ -281,12 +173,8 @@ export default {
           var o = Object.assign({}, el)
           o.startDateObject = new Date(o.times.start)
           o.endDateObject = new Date(o.times.end)
-          // console.log(o.startDateObject)
           return o
-        //   // instead of `Object.assign(this.someObject, { a: 1, b: 2 })`
-        //   // this.someObject = Object.assign({}, this.someObject, { a: 1, b: 2 })
         })
-        // this.userlist = ret
       })
     }
   },

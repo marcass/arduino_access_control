@@ -158,9 +158,7 @@ def remove_user(username):
     Remove Username in user doorUsers table, and update all tables...
     {'username':'mw'}
     '''
-    sql.delete_user(username)
-    resp = {}
-    return jsonify(resp), 200
+    return jsonify(sql.delete_user(username)), 200
 
 @app.route("/auth/user/<username>", methods=['GET',])
 @jwt_required

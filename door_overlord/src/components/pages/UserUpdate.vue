@@ -3,9 +3,14 @@
     <app-nav></app-nav>
     <h1>Update keycode for {{ this.username }}</h1>
     <div class="col-lg-7">
-         Keycode: <input v-model="keycode" :placeholder="this.keycode" v-on:keyup.enter="changepin({'username':username, 'keycode': keycode})">
-         <h4>Status: {{ status }}</h4>
-         Password: <input v-model="password" v-on:keyup.enter="passwordCheck(password)">
+       <!-- Keycode: <input v-model="keycode" :placeholder="this.keycode" v-on:keyup.enter="changepin({'username':username, 'keycode': keycode})"> -->
+       Keycode: <input v-model="keycode" :placeholder="this.keycode">
+       <!-- Password: <input v-model="password" v-on:keyup.enter="passwordCheck(password)"> -->
+       Password: <input type="password" v-model="password">
+       <button v-on:click="passwordCheck(password, keycode)">Submit</button>
+   </div>
+   <div v-if="this.resp != ''">
+     {{ this.resp.data.Message }}
    </div>
   </div>
 </template>
@@ -21,7 +26,9 @@ export default {
       keycode: '',
       username: '',
       status: 'Pending',
-      verified: ''
+      verified: '',
+      password: '',
+      resp: ''
     }
   },
   components: {
@@ -29,9 +36,9 @@ export default {
   },
   methods: {
     changepin (payload) {
-      putUserData(JSON.stringify(payload), 'keycode')
-      this.status = 'Success'
-      return 1
+      putUserData(JSON.stringify(payload), 'keycode').then((ret) => {
+        this.resp = ret
+      })
     },
 
     getUserKey () {
@@ -39,15 +46,17 @@ export default {
         this.keycode = ret.keycode
       })
     },
-    passwordCheck (password) {
-      getVerifyUser(this.$auth.user().username, password).then((ret) => {
-        this.verfied = ret.data.status
+    passwordCheck (pass, key) {
+      getVerifyUser(this.username, {'password': pass}).then((ret) => {
+      // getVerifyUser(this.$auth.user().username, password).then((ret) => {
+        this.verified = ret
+        if (this.verified.status === 'passed') {
+          this.changepin({'username': this.username, 'keycode': key})
+        } else {
+          this.resp = {'data': {'Status': 'Error', 'Message': 'Password check failed'}}
+        }
+        // console.log(this.resp)
       })
-      if (this.verified === 'passed') {
-        return 1
-      } else {
-        return 0
-      }
     }
   },
   mounted () {

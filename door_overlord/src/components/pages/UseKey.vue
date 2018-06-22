@@ -7,11 +7,9 @@
         <li>
           <div class="open" v-if="item.status === 'open'">
             {{ item.door }} is currently {{ item.status }} at {{ item.time }}
-         <!-- <br> -->
           </div>
           <div class="closed" v-if="item.status === 'closed'">
             {{ item.door }} is currently {{ item.status }} at {{ item.time }}
-         <!-- <br> -->
           </div>
           <div class="unknown" v-if="item.status === 'unknown'">
             {{ item.door }} is currently {{ item.status }} at {{ item.time }}
@@ -19,15 +17,12 @@
           </div>
         </li>
       </ul>
+      <ul>
+        <li>
+          <button v-on:click="getDoorStatus()">Update status</button>
+        </li>
+      </ul>
     </div>
-    <!-- <div class="statusbad" v-if="item.status === "closed"">
-      <li>
-         <p> {{ item.door }} is currently {{ item.status }} at {{ item.time }}</p>
-       <br>
-      </li>
-    </div>
-  </ul>
-</div> -->
     <div class="col-2">
       <h3>Choose your door</h3>
       <div class="radio" id='doors' v-for="x in doorlist">
@@ -38,18 +33,16 @@
     <div class="col-3">
       <h3>Input your keycode, then press #</h3>
       <keyboard layouts="123A|456B|789C|*0{#:enter}D" v-model="keycode" @enter="postkey"></keyboard>
-      <p> Keycode = {{ keycode }}</p>
-      <div class="statusgood" v-if="resp.pin_correct === 1">
-       <p>Status</p>
-      </div>
-      <!-- <div class="statusbad" v-if="resp.pin_correct === false"> -->
-      <div class="statusbad" v-else>
-       <p>Status</p>
+      <!-- <p> Keycode = {{ keycode }}</p> -->
+      <div v-if="keysent">
+        <div class="statusgood" v-if="resp.pin_correct === 1">
+         <p>Status</p>
+        </div>
+        <div class="statusbad" v-else>
+         <p>Status</p>
+        </div>
       </div>
     </div>
-     <!-- <div v-else>
-      <p>Status</p>
-     </div> -->
   </div>
 </template>
 
@@ -62,6 +55,7 @@ export default {
   data () {
     return {
       doorlist: [],
+      keysent: false,
       keycode: '',
       doorselected: '',
       doorstatus: [],
@@ -79,6 +73,7 @@ export default {
         this.resp = ret
       })
       this.keycode = ''
+      this.keysent = true
     },
     getDoors () {
       getDoors().then((ret) => {
@@ -91,12 +86,6 @@ export default {
       })
       return this.doorstatus.status
     },
-    // getDoorStatus () {
-    //   getDoorStatus().then((ret) => {
-    //     this.doorsstatus = ret
-    //     console.log(ret)
-    //   })
-    // }
     getDoorStatus () {
       getDoorStatus().then((ret) => {
         this.doorsstatus = ret
@@ -105,7 +94,6 @@ export default {
     }
   },
   mounted () {
-    // console.log('user = ' + this.$auth.user().username + ' role = ' + this.$auth.user().role)
     this.getDoors()
     this.getDoorStatus()
   }

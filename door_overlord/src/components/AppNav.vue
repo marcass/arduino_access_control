@@ -33,6 +33,7 @@ export default {
           {text: 'Logout'},
           {text: 'Users',
             children: [
+              {text: 'UserUpdate'},
               {text: 'EditUser'},
               {text: 'ListAllowed'},
               {text: 'AddUser'}

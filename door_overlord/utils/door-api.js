@@ -41,9 +41,9 @@ function userData(user) {
   return simple_get(url)
 }
 
-function getVerifyUser(user, pass) {
+function getVerifyUser(user, payload) {
   const url = BASE_URL+'/auth/user/'
-  return axios.get(url+user, pass)
+  return axios.post(url+user, payload)
   .then(function (response) {
       return response.data
   });

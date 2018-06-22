@@ -1,17 +1,33 @@
 <template>
   <div class="doors">
     <app-nav></app-nav>
-    <h1>Please choose a door</h1>
+    <table class="center">
+      <tr>
+        <th colspan="2"  class="middle">
+          <br>
+          Select doors
+        </th>
+      </tr>
+      <tr v-for="item in doors">
+        <td class="tabLabel">
+          <label >{{ item }}</label>
+        </td>
+        <td>
+          <input type="radio" :id="item" :value="item" v-bind:value="item" v-model="door">
+        </td>
+      </tr>
+    </table>
+
+    <!-- <h1>Please choose a door</h1>
     <div class='radio'>
       <p v-for="item in doors">
         <input type="radio" :id="door" v-bind:value="item" v-model="door">
         <label for="door">{{ item }}</label>
         <br>
       </p>
-    </div>
-    <span>Picked: {{ door }}</span>
+    </div> -->
     <div style="position:relative">
-      <li>Log Start (default is 7d ago):
+      <li>Log Start (default is 1d ago):
         <date-picker v-model="startDateObject" :config="config"></date-picker>
       </li>
       <li>Log end time (default is now):
@@ -122,6 +138,9 @@ h1, h2 {
   font-weight: normal;
 }
 
+td {
+  padding: 5px;
+}
 ul {
   list-style-type: none;
   padding: 0;

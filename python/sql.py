@@ -217,12 +217,12 @@ def get_doorlog(door, resp):
     if (start is not None) and (len(start) > 0):
         timeStart = utc_from_string(start)
     else:
-        timeStart = datetime.datetime.utcnow() - timedelta(days=7)
+        timeStart = datetime.datetime.utcnow() - timedelta(days=1)
     if (end is not None) and (len(end) > 0):
         timeEnd = utc_from_string(end)
     else:
         timeEnd = datetime.datetime.utcnow()
-    c.execute("SELECT * FROM actionLog WHERE door=? AND timestamp BETWEEN datetime(?) AND datetime(?)", (door, timeStart, timeEnd))
+    c.execute("SELECT * FROM actionLog WHERE door=? AND timestamp BETWEEN datetime(?) AND datetime(?) ORDER BY timestamp DESC", (door, timeStart, timeEnd))
     ret = c.fetchall()
     message = [i[1] for i in ret]
     actionType = [i[2] for i in ret]
@@ -231,7 +231,7 @@ def get_doorlog(door, resp):
     # dump = []
     # for a in ret:
     #     dump = dump+[localtime_from_response(a[0]),a[1],a[2]]
-    c.execute("SELECT * FROM doorStates WHERE door=? AND timestamp BETWEEN datetime(?) AND datetime(?)",  (door, timeStart, timeEnd))
+    c.execute("SELECT * FROM doorStates WHERE door=? AND timestamp BETWEEN datetime(?) AND datetime(?) ORDER BY timestamp DESC",  (door, timeStart, timeEnd))
     got = c.fetchall()
     state = [i[2] for i in got]
     stateTime = [localtime_from_response(i[0]) for i in got]

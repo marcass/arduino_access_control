@@ -33,7 +33,7 @@
         </tr>
       </table>
       <br><br>
-      <div v-if="edType == 'role'" v-model="role">
+      <div v-if="edType == 'role'">
         Current role is: {{ userData.role }}
         <table class="center">
           <tr>
@@ -41,7 +41,7 @@
               <label for="admin">Admin</label>
             </td>
             <td>
-              <input type="radio" id="admin" value="admin">
+              <input type="radio" id="admin" value="admin" v-model="role">
             </td>
           </tr>
           <tr>
@@ -49,7 +49,7 @@
               <label for="user">User</label>
             </td>
             <td>
-              <input type="radio" id="user" value="user">
+              <input type="radio" id="user" value="user" v-model="role">
             </td>
           </tr>
         </table>
@@ -118,7 +118,7 @@
 </template>
 
 <script>
-import { getUsers, getDoors, putUserData, putAllUserData, deleteUser, userData } from '../../../../utils/door-api'
+import { getUsers, getDoors, putUserData, putAllUserData, deleteDoorUser, userData } from '../../../../utils/door-api'
 import 'bootstrap/dist/css/bootstrap.css'
 import datePicker from 'vue-bootstrap-datetimepicker'
 import AppNav from '../../AppNav'
@@ -178,17 +178,21 @@ export default {
     amendUser (username) {
       userData(username).then((ret) => {
         this.userData = ret
-        console.log(ret)
+        // console.log(ret)
         // Change date format so it can be read
         this.userData.times.start = new Date(ret.times.start)
         this.userData.times.end = new Date(ret.times.end)
       })
       this.disp = true
+      this.response = ''
+      this.edType = ''
     },
     sendDelete (payload) {
-      deleteUser(payload).then((ret) => {
+      deleteDoorUser(payload).then((ret) => {
         this.response = ret
       })
+      this.response = ''
+      this.edType = ''
       // refesh list of users
       this.getUsers()
     },
@@ -206,7 +210,8 @@ export default {
       const payload = JSON.stringify({'username': userin, [attr]: val})
       putUserData(payload, attr).then((ret) => {
         this.response = ret
-        console.log(this.response)
+        this.disp = false
+        // console.log(this.response)
       })
     },
     getDoors () {

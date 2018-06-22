@@ -17,7 +17,7 @@ axios.defaults.headers.delete['Content-Type'] = 'application/json';
 //     console.log('RES', res);
 // });
 
-export {getADoorStatus, getUsers, getUser, getDoors, getDoorStatus, getAllowedUsers, postCreds, putUserData, putAllUserData, postUserData, postKeycode, deleteUser, postAuth, getVerifyUser, getLog, postDoor, delDoor, userData};
+export {getADoorStatus, getUsers, getUser, getDoors, getDoorStatus, getAllowedUsers, postCreds, putUserData, putAllUserData, postUserData, postKeycode, deleteDoorUser, postAuth, getVerifyUser, getLog, postDoor, delDoor, userData};
 
 function simple_get(url) {
   return axios.get(url)
@@ -116,7 +116,7 @@ function postDoor(payload) {
   });
 }
 
-function deleteUser(user) {
+function deleteDoorUser(user) {
   const url = BASE_URL+'/user/'
   // console.log(user)
   return axios.delete(url+user)

@@ -3,11 +3,17 @@
     <app-nav></app-nav>
     <h1>Update keycode for {{ this.username }}</h1>
     <div class="col-lg-7">
-       <!-- Keycode: <input v-model="keycode" :placeholder="this.keycode" v-on:keyup.enter="changepin({'username':username, 'keycode': keycode})"> -->
-       Keycode: <input v-model="keycode" :placeholder="this.keycode">
-       <!-- Password: <input v-model="password" v-on:keyup.enter="passwordCheck(password)"> -->
-       Password: <input type="password" v-model="password">
-       <button v-on:click="passwordCheck(password, keycode)">Submit</button>
+      <ul>
+        <li>
+          Keycode: <input v-model="keycode" :placeholder="this.keycode">
+        </li>
+        <li>
+          Password: <input type="password" v-model="password">
+        </li>
+        <li>
+          <button v-on:click="passwordCheck(password, keycode)">Submit</button>
+        </li>
+      </ul>
    </div>
    <div v-if="this.resp != ''">
      {{ this.resp.data.Message }}

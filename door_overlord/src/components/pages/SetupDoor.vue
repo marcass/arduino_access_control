@@ -9,7 +9,7 @@
    <div v-if="this.thingy == 'edit'">
      <div class="col-md-5">
        <p>
-         The new door name must correxpond to an entry in an arduino script that is manipulating the controller of the door.
+         The new door name must correspond to an entry in an arduino script that is manipulating the controller of the door.
        </p>
        <table class='center'>
          <tr>

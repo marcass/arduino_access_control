@@ -59,9 +59,9 @@ def parseData(data, method, route):
                 r = put(data, route)
             print 'Post NOT 200 response is: ' +str(r)
         except:
-            print 'Could not get data on retry'
-    else:
-        print 'Successful request'
+            r =  {'Status': 'Error', 'Message': 'Failed ot get token, so cannot perform request'}
+    print r.json()
+    return r.json()
 
 def use_key(key, door):
     d = sql.validate_key(key, door)
@@ -83,9 +83,12 @@ def update_door_status(door, status):
 
 def use_key_api(key, door):
     method = 'POST'
-    parseData({'door': door, 'pincode': key}, method, '/usekey')
+    ret = parseData({'door': door, 'pincode': key}, method, '/usekey')
+    return ret.json()
+
 
 def update_door_status_api(door, status):
     method = 'PUT'
     data = {'door': door, 'status': status}
-    parseData(data, method, '/door/status')
+    ret = parseData(data, method, '/door/status')
+    return ret.json()

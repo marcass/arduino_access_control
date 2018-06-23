@@ -345,9 +345,9 @@ def del_door(door):
     try:
         c.execute("DELETE FROM doorID WHERE door_id=?", (door,))
         conn.commit()
-        resp = {'Status': 'Success', 'Message': door + ' deleted successfully'}
+        resp = {'Status': 'Updated', 'Message': door + ' deleted successfully'}
     except:
-        resp = {'Status': 'Error', 'Message': 'Door not found'}
+        resp = {'Status': 'Unchanged', 'Message': 'Door not found'}
 
 def update_doorstatus(status, door):
     conn, c = get_db()
@@ -361,8 +361,10 @@ def update_doorstatus(status, door):
         print 'updating door state'
         c.execute("INSERT INTO doorStates(timestamp, door, state) VALUES (?,?,?)", (utcnow,door,status) )
         conn.commit()
+        ret = {'Status': 'Success', 'Message': 'Door status changed so updating'}
     else:
-        print 'status unchanged'
+        ret = {'Status': 'Success', 'Message': 'Door status unchanged'}
+    return ret
 
 def insert_actionLog(access_type, door, pin, username='Someone'):
     if username is not 'Someone':

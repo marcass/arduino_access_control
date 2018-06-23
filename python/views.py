@@ -342,8 +342,7 @@ def getLog(door):
 @jwt_required
 def update_status():
     content = request.get_json(silent=False)
-    sql.update_doorstatus(content["status"], content['door'])
-    return jsonify(content), 200
+    return jsonify(sql.update_doorstatus(content["status"], content['door'])), 200
 
 @app.route("/getlog", methods=['GET',])
 @jwt_required

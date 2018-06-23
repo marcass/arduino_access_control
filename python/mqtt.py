@@ -27,7 +27,6 @@ def on_message(client, userdata, msg):
     # print 'Door is '+door
     if 'request' in msg.topic:
         # print 'Checking door key'
-        topic = 'doors/response/'+door
         if (middleman.use_key(msg.payload, door)):
             resp = "1"
         else:
@@ -44,6 +43,24 @@ def on_message(client, userdata, msg):
         except:
             print 'Status error'
 
+def on_message_api(client, userdata, msg):
+    door = msg.topic.split('/')[-1]
+    if 'request' in msg.topic:
+        key = msg.payload
+        resp = middleman.use_key_api(key, door)['pin_correct']
+        print 'key rsponse is '+str(resp)
+        try:
+            notify_door(resp, door)
+            print 'key sent successfully'
+        except:
+            print 'failed to publish'
+    if 'status' in msg.topic:
+        try:
+            resp = middleman.update_door_status_api(door, msg.payload)
+            print resp
+        except:
+            print 'Status error'
+    return resp
 
 #subscribe to broker and test for messages below alert values
 client = mqtt.Client("Python_doors")

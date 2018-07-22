@@ -36,7 +36,7 @@ def on_message(client, userdata, msg):
         data.write_data(temp_type, 'temperature', int(msg.payload))
     if 'state' in msg.topic:
         try:
-            state = msg.payload.split('/')[0]
+            state = msg.payload.replace('\r', '')
         except:
             state = msg.payload
         # print 'state is blah '+str(msg.payload)

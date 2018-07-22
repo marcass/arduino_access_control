@@ -1,4 +1,5 @@
 from influxdb import InfluxDBClient
+from datetime import timedelta
 import datetime
 # initialise as None status
 state = None
@@ -25,7 +26,8 @@ def write_data(data_type, group, data):
             'fields': {
                 'value': data
             },
-            'time': datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+            'time': int(datetime.datetime.now().strftime("%s")) * 1000
+            # 'time': datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%fZ")
             }
         ]
     print json_data
@@ -33,6 +35,9 @@ def write_data(data_type, group, data):
     # print 'Update success'
 
 def get_data():
+    date_stop = datetime.datetime.now() - timedelta(days=1)
+    date_string = date_stop.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+    # results = client.query('SELECT "duration" FROM "boiler"."autogen"."boilerEvents" WHERE time > %s' %(date_string))
     results = client.query('SELECT * FROM "boiler"."autogen"."boilerEvents"')
     # lists = results.raw['series'][0]['values']
     # print results.raw
@@ -44,14 +49,36 @@ def get_data():
     for i in water_data:
         wtimes.append(i['time'])
         wvalues.append(i['value'])
-    water = [{'x': wtimes, 'y': wvalues}]
+    water = {'marker': {'color': 'red', 'size': '10', 'symbol': 104}, 'name': 'water', 'type': 'line', 'x': wtimes, 'y': wvalues}
     auger_data = results.get_points(tags={'value_type':'auger'})
     for i in auger_data:
         atimes.append(i['time'])
         avalues.append(i['value'])
-    auger = [{'x': atimes, 'y': avalues}]
+    auger = {'marker': {'color': 'blue', 'size': '10', 'symbol': 104}, 'name': 'auger', 'x': atimes, 'y': avalues}
+    ftimes = []
+    fvalues = []
+    fan_data = results.get_points(tags={'value_type':'fan', 'status': 'Heating'})
+    for i in fan_data:
+        ftimes.append(i['time'])
+        fvalues.append(i['value'])
+    fan = {'marker': {'color': 'yellow', 'size': '10', 'symbol': 104}, 'name': 'fan', 'x': ftimes, 'y': fvalues, 'yaxis': 'y2'}
+    fdtimes = []
+    fdvalues = []
+    feed_data = results.get_points(tags={'value_type':'feed', 'status': 'Heating'})
+    for i in feed_data:
+        fdtimes.append(i['time'])
+        fdvalues.append(i['value'])
+    feed = {'marker': {'color': 'black', 'size': '10', 'symbol': 104}, 'name': 'feed', 'x': fdtimes, 'y': fdvalues, 'yaxis': 'y2'}
+    ptimes = []
+    pvalues = []
+    pause_data = results.get_points(tags={'value_type':'pause', 'status': 'Heating'})
+    for i in pause_data:
+        ptimes.append(i['time'])
+        pvalues.append(i['value'])
+    pause = {'marker': {'color': 'green', 'size': '10', 'symbol': 104}, 'name': 'pause', 'x': ptimes, 'y': pvalues, 'yaxis': 'y2'}
+    state_plot = {}
     # , 'value_type':value_type
-    print [water, auger]
-    return water
+    # print [water, auger]
+    return [water, auger, fan, feed, pause]
     # return results.get_points({'value_type':'water'})
     # return results.raw['series'][0]['values']

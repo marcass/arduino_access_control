@@ -15,6 +15,7 @@ export default {
   data () {
     return {
       data: [],
+      other: [{ x: [1, 3], y: [2, 4] }],
       layout: {},
       options: {}
     }

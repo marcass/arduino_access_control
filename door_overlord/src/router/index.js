@@ -14,6 +14,7 @@ import Three from '@/components/pages/403'
 import Four from '@/components/pages/404'
 import Logout from '@/components/pages/Logout'
 import SetupDoor from '@/components/pages/SetupDoor'
+import Boiler from '@/components/pages/Boiler'
 
 // Vue.router = Router
 Vue.use(Router)
@@ -44,10 +45,6 @@ export default new Router({
       component: Login
       // meta: {auth: false}
     },
-    // {
-    //   path: '/dooroverlord',
-    //   redirect: {name: 'usekey'}
-    // },
     {
       path: '/adduser',
       name: 'AddUser',
@@ -94,6 +91,12 @@ export default new Router({
       component: StatusLog,
       meta: {auth: ['admin']}
       // meta: {auth: true}
+    },
+    {
+      path: '/boiler',
+      name: 'Boiler',
+      component: Boiler,
+      meta: {auth: ['admin', 'user']}
     },
     {
       path: '/403',

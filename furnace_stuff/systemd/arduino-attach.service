@@ -1,0 +1,10 @@
+[Unit]
+Description=Python serial port listener for boiler
+ 
+[Service]
+Type=simple
+User=marcus
+ExecStart=/usr/bin/python /home/marcus/git/furnace_control/python/serial_listen.py
+
+[Install]
+WantedBy=multi-user.target

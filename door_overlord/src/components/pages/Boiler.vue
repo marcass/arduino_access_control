@@ -3,6 +3,7 @@
     <app-nav></app-nav>
     <h1>Boiler behaviour</h1>
     <vue-plotly :data="data" :layout="layout" :options="options"/>
+    <!-- <vue-plotly :data="data[1]" :layout="layout" :options="options"/> -->
   </div>
 </template>
 
@@ -16,7 +17,11 @@ export default {
     return {
       data: [],
       other: [{ x: [1, 3], y: [2, 4] }],
-      layout: {},
+      layout: {
+        'title': 'Boiler data',
+        'yaxis': {'title': 'Temperature'},
+        'yaxis2': {'title': 'Percent', 'overlaying': 'y', 'side': 'right'}
+      },
       options: {}
     }
   },
@@ -27,7 +32,7 @@ export default {
   methods: {
     getData () {
       getBoilerData().then((ret) => {
-        console.log(ret)
+        // console.log(ret)
         this.data = ret
       })
     }

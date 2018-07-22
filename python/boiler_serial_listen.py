@@ -1,6 +1,6 @@
 import serial
 import time
-import alerts
+import boiler_alerts as alerts
 import creds
 import boiler_data as data
 #import paho.mqtt.client as mqtt
@@ -40,7 +40,7 @@ def on_message(client, userdata, msg):
         except:
             state = msg.payload
         # print 'state is blah '+str(msg.payload)
-        data.write('state', 'status', state)
+        data.update_status(state)
     if 'pid' in msg.topic:
         pid_type = msg.topic.split('/')[-1:][0]
         data.write_data(pid_type, 'pid', int(msg.payload))

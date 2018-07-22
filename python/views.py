@@ -65,7 +65,7 @@ import json
 import mqtt
 import middleman
 import views_auth
-import boiler_data
+import boiler_data as boiler
 from init import app, jwt
 from flask_jwt_extended import jwt_required, \
     create_access_token, jwt_refresh_token_required, \
@@ -95,7 +95,7 @@ def boiler_data():
     '''
     Returns data dump of everything
     '''
-    return jsonify(boiler_data.get_data()), 200
+    return jsonify(boiler.get_data()), 200
 
 @app.route("/listallowed", methods=['GET',])
 @jwt_required

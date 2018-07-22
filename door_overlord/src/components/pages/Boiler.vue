@@ -16,7 +16,9 @@ export default {
   data () {
     return {
       data: [],
-      other: [{ x: [1, 3], y: [2, 4] }],
+      period: 1,
+      range: '',
+      values: [],
       layout: {
         'title': 'Boiler data',
         'yaxis': {'title': 'Temperature'},

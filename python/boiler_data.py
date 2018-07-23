@@ -53,12 +53,7 @@ def get_values():
     return value_types
 
 def get_data():
-    # date_stop = datetime.datetime.now() - timedelta(days=1)
-    # date_string = date_stop.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
-    # results = client.query('SELECT "duration" FROM "boiler"."autogen"."boilerEvents" WHERE time > %s' %(date_string))
     results = client.query('SELECT * FROM "boiler"."autogen"."boilerEvents"')
-    # lists = results.raw['series'][0]['values']
-    # print results.raw
     water_data = results.get_points(tags={'value_type':'water'})
     wtimes = []
     wvalues = []
@@ -95,8 +90,27 @@ def get_data():
         pvalues.append(i['value'])
     pause = {'marker': {'color': 'green', 'size': '10', 'symbol': 104}, 'name': 'pause', 'x': ptimes, 'y': pvalues, 'yaxis': 'y2'}
     state_plot = {}
-    # , 'value_type':value_type
-    # print [water, auger]
     return [water, auger, fan, feed, pause]
-    # return results.get_points({'value_type':'water'})
-    # return results.raw['series'][0]['values']
+
+def custom_data(payload):
+    # client.query('SELECT "duration" FROM "pyexample"."autogen"."brushEvents" WHERE time > now() - 4d GROUP BY "user"')
+    # payload = {'items':graph_items, 'range':range, 'period':period}
+    q_time = str(payload['period']+payload['range'])
+    results = client.query('SELECT * FROM "boiler"."autogen"."boilerEvents" WHERE time > now() - %s' %(q_time))
+    res = []
+    colours = ['red', 'blue', 'green', 'black', 'yellow']
+    count = 0
+    for i in content['items']:
+        times = []
+        values = []
+        out = {'marker': {'color': '', 'size': '10', 'symbol': 104}, 'name': 'water', 'type': 'line', 'x': '', 'y': ''}
+        data = results.get_points(tags={'value_type':i})
+        for a in data:
+            times.append(a['time'])
+            values.append(a['value'])
+        out['colour'] = colours[count]
+        count += 1
+        out['x'] = times
+        out['y'] = values
+        res.append(out)
+    return res

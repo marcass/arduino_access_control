@@ -97,6 +97,15 @@ def boiler_data():
     '''
     return jsonify(boiler.get_data()), 200
 
+@app.route("/boiler", methods=['POST',])
+@jwt_required
+def boiler__custom_data():
+    '''
+    Returns data dump of specified data
+    '''
+    content = request.get_json(silent=False)
+    return jsonify(boiler.custom_data(content)), 200
+
 @app.route("/boiler/values", methods=['GET',])
 @jwt_required
 def boiler_values():

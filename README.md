@@ -33,4 +33,8 @@ Letsencrypt cert needs to be renewed periodically:
 
 ## Troubleshooting
 ### My uwsgi won't work (upstream timeout errors in /var/log/nginx/error.log)
-* Changing /tmp/api.sock ownership to www-data:www-data then restarting door service and nginx service did the trick
+* `# systemclt stop door`
+* running (from python dir) $ uwsgi --ini uwsgi.py
+* Ctrl+C that process after testing api is delivering
+* `# systemctl start door`
+This seems to work

@@ -1,5 +1,6 @@
 # arduino_access_control
 Use arduino to control access to electrically actuated devices
+Plus put boiler interface stuff in there as an afterthought
 
 ## Components
 * Electronically actuated device (garage door/door/or anything you want to access)
@@ -29,3 +30,7 @@ Letsencrypt cert needs to be renewed periodically:
 1. Open port 80 on router to webserver (need to enable ipv6 for fritzbox to allow this then disable as ISP falls apart with IPv6 used)
 2. run `sudo certbot renew`
 3. Disable access via port 80
+
+## Troubleshooting
+### My uwsgi won't work (upstream timeout errors in /var/log/nginx/error.log)
+* Changing /tmp/api.sock ownership to www-data:www-data then restarting door service and nginx service did the trick

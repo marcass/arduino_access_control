@@ -2,13 +2,19 @@
   <div>
     <app-nav></app-nav>
     <h1>Boiler behaviour</h1>
+    <div>
+      <select v-model="graph_items" multiple>
+        <option disabled value="">Select attribute(s) to graph</option>
+        <option v-for="item in values" v-bind:key="item">{{ item }}</option>
+      </select>
+    </div>
     <vue-plotly :data="data" :layout="layout" :options="options"/>
     <!-- <vue-plotly :data="data[1]" :layout="layout" :options="options"/> -->
   </div>
 </template>
 
 <script>
-import { getBoilerData } from '../../../utils/door-api'
+import { getBoilerData, getBoilerValues } from '../../../utils/door-api'
 import AppNav from '../AppNav'
 import VuePlotly from '@statnett/vue-plotly'
 export default {
@@ -19,6 +25,7 @@ export default {
       period: 1,
       range: '',
       values: [],
+      graph_items: [],
       layout: {
         'title': 'Boiler data',
         'yaxis': {'title': 'Temperature'},
@@ -34,13 +41,20 @@ export default {
   methods: {
     getData () {
       getBoilerData().then((ret) => {
-        // console.log(ret)
+        console.log(ret)
         this.data = ret
+      })
+    },
+    getValues () {
+      getBoilerValues().then((ret) => {
+        console.log(ret)
+        this.values = ret
       })
     }
   },
   mounted () {
     this.getData()
+    this.getValues()
   }
 }
 </script>

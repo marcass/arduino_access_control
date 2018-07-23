@@ -17,7 +17,7 @@ axios.defaults.headers.delete['Content-Type'] = 'application/json';
 //     console.log('RES', res);
 // });
 
-export {getBoilerData, getBoilerValues, getADoorStatus, getUsers, getUser, getDoors, getDoorStatus, getAllowedUsers, postCreds, putUserData, putAllUserData, postUserData, postKeycode, deleteDoorUser, postAuth, getVerifyUser, getLog, postDoor, delDoor, userData};
+export {getBoilerData, getBoilerValues, postCustomData, getADoorStatus, getUsers, getUser, getDoors, getDoorStatus, getAllowedUsers, postCreds, putUserData, putAllUserData, postUserData, postKeycode, deleteDoorUser, postAuth, getVerifyUser, getLog, postDoor, delDoor, userData};
 
 function simple_get(url) {
   return axios.get(url)
@@ -39,6 +39,11 @@ function getBoilerData() {
 function getBoilerValues() {
   const url = BASE_URL+'/boiler/values'
   return simple_get(url)
+}
+
+function postCustomData(payload) {
+  const url = BASE_URL+'/boiler'
+  return axios.post(url, payload);
 }
 
 function getUser(user) {

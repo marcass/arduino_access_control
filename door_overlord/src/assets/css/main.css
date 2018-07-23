@@ -1,3 +1,40 @@
+/*https://www.creativebloq.com/how-to/create-a-responsive-layout-with-css-grid*/
+.boxes {
+  display: grid;
+  grid-auto-rows: minmax(125px, auto);
+  grid-gap: .5rem;
+}
+
+@media screen and (min-width: 40em) {
+  .boxes {
+    grid-template-columns: repeat(6, 1fr);
+    grid-gap: 2px;
+  }
+
+  .boxes li:nth-child(2) {
+    grid-column: span 2;
+    grid-row: span 7;
+  }
+
+  .boxes li:nth-child(3) {
+    grid-column: span 4;
+    grid-row: span 3;
+  }
+
+  .boxes li:nth-child(4) {
+    grid-column: span 2;
+    grid-row: span 4;
+  }
+
+  .boxes li:nth-child(5),
+  .boxes li:nth-child(6) {
+    grid-column: span 2;
+    grid-row: span 2;
+  }
+}
+
+
+
 /*REsponsive design!
 First ensure that all HTML elements have the box-sizing property set to border-box.
 This makes sure that the padding and border are included in the total width and height
@@ -37,7 +74,6 @@ body{
     float: left;
     padding: 15px;
     margin: 0 auto;
-    /*border: 1px solid red;*/
 }
 
 /*Clear after div (using row class)*/
@@ -65,10 +101,6 @@ div.response {
   position: relative;
   left: auto !important;
   right: 0px;
-}
-
-.user {
-  border: 1px solid red;
 }
 
 .center {

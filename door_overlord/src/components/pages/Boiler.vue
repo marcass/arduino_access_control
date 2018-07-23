@@ -1,16 +1,18 @@
 <template>
-  <div>
-    <app-nav></app-nav>
-    <h1>Boiler behaviour</h1>
-    <div>
+  <div class='wrapper'>
+    <div class='main-head'>
+      <app-nav></app-nav>
+      <h1>Boiler behaviour</h1>
+    </div>
+    <div class='side'>
       <select v-model="graph_items" multiple>
         <option disabled value="">Select attribute(s) to graph</option>
         <option v-for="item in values" v-bind:key="item">{{ item }}</option>
       </select>
       <select v-model="range">
         <option disabled value="">Select graph range</option>
-        <option value="h">Hours</option>
-        <option value="d">Days</option>
+        <option value="hours">Hours</option>
+        <option value="days">Days</option>
       </select>
       <select v-model="period">
         <option disabled value="">Select graph period</option>
@@ -18,8 +20,10 @@
       </select>
       <button v-on:click="graph({'items':graph_items, 'range':range, 'period':period})">Make the graph</button>
     </div>
-    <vue-plotly :data="data" :layout="layout" :options="options"/>
+    <div class='content'>
+      <vue-plotly :data="data" :layout="layout" :options="options"/>
     <!-- <vue-plotly :data="data[1]" :layout="layout" :options="options"/> -->
+    </div>
   </div>
 </template>
 
@@ -61,8 +65,8 @@ export default {
         this.values = ret
       })
     },
-    graph () {
-      postCustomData().then((ret) => {
+    graph (payload) {
+      postCustomData(payload).then((ret) => {
         this.data = ret
       })
     }

@@ -1,39 +1,56 @@
-/*https://www.creativebloq.com/how-to/create-a-responsive-layout-with-css-grid*/
-.boxes {
+/*https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Grid_Layout/Realizing_common_layouts_using_CSS_Grid_Layout*/
+.wrapper {
   display: grid;
-  grid-auto-rows: minmax(125px, auto);
-  grid-gap: .5rem;
+  grid-gap: 20px;
+  grid-template-areas:
+  "header"
+  "nav"
+  "content"
+  "sidebar"
+  "ad"
+  "footer";
 }
 
-@media screen and (min-width: 40em) {
-  .boxes {
-    grid-template-columns: repeat(6, 1fr);
-    grid-gap: 2px;
-  }
+.main-head {
+  grid-area: header;
+}
+.content {
+  grid-area: content;
+}
+.main-nav {
+  grid-area: nav;
+}
+.side {
+  grid-area: sidebar;
+}
+.ad {
+  grid-area: ad;
+}
+.main-footer {
+  grid-area: footer;
+}
 
-  .boxes li:nth-child(2) {
-    grid-column: span 2;
-    grid-row: span 7;
-  }
-
-  .boxes li:nth-child(3) {
-    grid-column: span 4;
-    grid-row: span 3;
-  }
-
-  .boxes li:nth-child(4) {
-    grid-column: span 2;
-    grid-row: span 4;
-  }
-
-  .boxes li:nth-child(5),
-  .boxes li:nth-child(6) {
-    grid-column: span 2;
-    grid-row: span 2;
+@media (min-width: 500px) {
+  .wrapper {
+    grid-template-columns: 1fr 3fr;
+    grid-template-areas:
+    "header  header"
+    "nav     nav"
+    "sidebar content"
+    "ad      footer";
   }
 }
 
-
+@media (min-width: 700px) {
+  .wrapper {
+    grid-template-columns: 1fr 4fr 1fr;
+    grid-template-areas:
+    "header header  header"
+    "nav    content sidebar"
+    "nav    content ad"
+    "footer footer  footer"
+   }
+ }
 
 /*REsponsive design!
 First ensure that all HTML elements have the box-sizing property set to border-box.

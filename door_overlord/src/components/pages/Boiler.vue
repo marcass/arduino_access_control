@@ -7,6 +7,16 @@
         <option disabled value="">Select attribute(s) to graph</option>
         <option v-for="item in values" v-bind:key="item">{{ item }}</option>
       </select>
+      <select v-model="range">
+        <option disabled value="">Select graph range</option>
+        <option value="h">Hours</option>
+        <option value="d">Days</option>
+      </select>
+      <select v-model="period">
+        <option disabled value="">Select graph period</option>
+        <option v-for="n in 365" v-bind:key="n">{{ n }}</option>
+      </select>
+      <button v-on:click="graph({'items':graph_items, 'range':range, 'period':period})">Make the graph</button>
     </div>
     <vue-plotly :data="data" :layout="layout" :options="options"/>
     <!-- <vue-plotly :data="data[1]" :layout="layout" :options="options"/> -->
@@ -14,7 +24,7 @@
 </template>
 
 <script>
-import { getBoilerData, getBoilerValues } from '../../../utils/door-api'
+import { getBoilerData, getBoilerValues, postCustomData } from '../../../utils/door-api'
 import AppNav from '../AppNav'
 import VuePlotly from '@statnett/vue-plotly'
 export default {
@@ -23,7 +33,7 @@ export default {
     return {
       data: [],
       period: 1,
-      range: '',
+      range: 'days',
       values: [],
       graph_items: [],
       layout: {
@@ -41,14 +51,19 @@ export default {
   methods: {
     getData () {
       getBoilerData().then((ret) => {
-        console.log(ret)
+        // console.log(ret)
         this.data = ret
       })
     },
     getValues () {
       getBoilerValues().then((ret) => {
-        console.log(ret)
+        // console.log(ret)
         this.values = ret
+      })
+    },
+    graph () {
+      postCustomData().then((ret) => {
+        this.data = ret
       })
     }
   },

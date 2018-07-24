@@ -31,6 +31,7 @@
 import { getBoilerData, getBoilerValues, postCustomData } from '../../../utils/door-api'
 import AppNav from '../AppNav'
 import VuePlotly from '@statnett/vue-plotly'
+import Plotly from 'plotly.js/dist/plotly'
 export default {
   name: 'doors',
   data () {
@@ -50,7 +51,8 @@ export default {
   },
   components: {
     AppNav,
-    VuePlotly
+    VuePlotly,
+    plotly
   },
   methods: {
     getData () {

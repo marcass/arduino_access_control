@@ -15,25 +15,10 @@ const env = config.build.env
 
 const webpackConfig = merge(baseWebpackConfig, {
   module: {
-    rules: [
-        // process.env.NODE_ENV === 'production' ? { test: /\.js$/, use: 'babel-loader' } : {},
-        {
-          test: /\.js$/,
-          use: [
-            'babel-loader',
-            'ify-loader',
-            'transform-loader?plotly.js/tasks/util/compress_attributes.js',
-          ]
-        },
-        utils.styleLoaders({
-          sourceMap: config.build.productionSourceMap,
-          extract: true
-        })
-      ]
-    // rules: utils.styleLoaders({
-    //   sourceMap: config.build.productionSourceMap,
-    //   extract: true
-    // })
+    rules: utils.styleLoaders({
+      sourceMap: config.build.productionSourceMap,
+      extract: true
+    })
   },
   devtool: config.build.productionSourceMap ? '#source-map' : false,
   output: {

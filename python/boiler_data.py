@@ -11,6 +11,8 @@ client.switch_database('boiler')
 # client.drop_database('boiler')
 
 value_types = ['water', 'auger', 'setpoint', 'burn', 'fan', 'feed', 'pause']
+temps = ['water', 'auger', 'setpoint']
+pids = ['burn', 'fan', 'feed', 'pause']
 
 def update_status(new_state):
     global state
@@ -103,8 +105,12 @@ def custom_data(payload):
     for i in payload['items']:
         times = []
         values = []
-        out = {'marker': {'color': '', 'size': '10', 'symbol': 104}, 'name': i, 'type': 'line', 'x': '', 'y': ''}
-        data = results.get_points(tags={'value_type':i})
+        if i in temps:
+            out = {'marker': {'color': '', 'size': '10', 'symbol': 104}, 'name': i, 'type': 'line', 'x': '', 'y': ''}
+            data = results.get_points(tags={'value_type':i})
+        if i in pids:
+            out = {'marker': {'color': '', 'size': '10', 'symbol': 104}, 'name': i, 'type': 'line', 'x': '', 'y': '', 'yaxis': 'y2'}
+            data = results.get_points(tags={'value_type':i, 'status': 'Heating'})
         for a in data:
             times.append(a['time'])
             values.append(a['value'])

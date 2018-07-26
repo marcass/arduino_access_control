@@ -11,12 +11,28 @@
       </select>
       <select v-model="range">
         <option disabled value="">Select graph range</option>
-        <option value="hours">Hours</option>
+        <option v-for="item in table", value="item.value">{{ item.label }}</option>
         <option value="days">Days</option>
       </select>
-      <select v-model="period">
-        <option disabled value="">Select graph period</option>
-        <option v-for="n in 365" v-bind:key="n">{{ n }}</option>
+      <select v-model="period" v-if="range == '24_hours'">
+        <option disabled value="">Select graph period in hours</option>
+        <option v-for="n in 24" v-bind:key="n">{{ n }}</option>
+      </select>
+      <select v-model="period" v-if="range == '7_days'">
+        <option disabled value="">Select graph period in days</option>
+        <option v-for="n in 7" v-bind:key="n">{{ n }}</option>
+      </select>
+      <select v-model="period" v-if="range == '2_months'">
+        <option disabled value="">Select graph period in days</option>
+        <option v-for="n in 60" v-bind:key="n">{{ n }}</option>
+      </select>
+      <select v-model="period" v-if="range == '1_year'">
+        <option disabled value="">Select graph period in Months</option>
+        <option v-for="n in 12" v-bind:key="n">{{ n }}</option>
+      </select>
+      <select v-model="period" v-if="range == '5_years'">
+        <option disabled value="">Select graph period in Years</option>
+        <option v-for="n in 5" v-bind:key="n">{{ n }}</option>
       </select>
       <button v-on:click="graph({'items':graph_items, 'range':range, 'period':period})">Make the graph</button>
     </div>
@@ -39,6 +55,7 @@ export default {
       data: [],
       period: 1,
       range: 'days',
+      table: [{'label':'Hours', 'value': '24_hours'}, {'label':'Days', 'value':'7_days'}, {'label': 'Months', 'value':'2_months'}, {'label':'Year', 'value':'1_year'}, {'label':'Years', 'value':'5_years'}],
       values: [],
       graph_items: [],
       layout: {

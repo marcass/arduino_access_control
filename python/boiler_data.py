@@ -5,6 +5,7 @@ import time
 # initialise as None status
 state = None
 retention_policies = ['24_hours', '7_days','2_months', '1_year', '5_years']
+durations = {'24_hours': '1d', '7_days': '7d', '2_months': '4w', '1_year': '52w', '5_years': '260w'}
 
 client = InfluxDBClient(host='localhost', port=8086)
 client.create_database('boiler')
@@ -20,8 +21,11 @@ def setup_RP():
         RP_list.append(i['name'])
     for i in retention_policies:
         if i not in RP_list:
-            create_retention_policy(i, duration, replication, database=None, default=False)
-            print 'put it in'
+            create_retention_policy(i, durations[i], 1, database='boiler', default=False)
+    # need to setup up continuous queries
+    # https://influxdb-python.readthedocs.io/en/latest/api-documentation.html
+    # https://docs.influxdata.com/influxdb/v1.6/guides/downsampling_and_retention/
+
 
 
 value_types = ['water', 'auger', 'setpoint', 'burn', 'fan', 'feed', 'pause']

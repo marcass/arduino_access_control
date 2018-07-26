@@ -4,11 +4,25 @@ import datetime
 import time
 # initialise as None status
 state = None
+retention_policies = ['24_hours', '7_days','2_months', '1_year', '5_years']
 
 client = InfluxDBClient(host='localhost', port=8086)
 client.create_database('boiler')
 client.switch_database('boiler')
 # client.drop_database('boiler')
+
+def setup_RP():
+    global retention_policies
+    RP = get_list_retention_policies('boiler')
+    RP_list = []
+    for i in RP:
+        # produce list of existing retention policies
+        RP_list.append(i['name'])
+    for i in retention_policies:
+        if i not in RP_list:
+            create_retention_policy(i, duration, replication, database=None, default=False)
+            print 'put it in'
+
 
 value_types = ['water', 'auger', 'setpoint', 'burn', 'fan', 'feed', 'pause']
 temps = ['water', 'auger', 'setpoint']
@@ -121,3 +135,5 @@ def custom_data(payload):
         res.append(out)
         print res
     return res
+
+setup_RP()

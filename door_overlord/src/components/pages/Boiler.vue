@@ -21,7 +21,7 @@
       <button v-on:click="graph({'items':graph_items, 'range':range, 'period':period})">Make the graph</button>
     </div>
     <div class='content'>
-      <vue-plotly :data="data" :layout="layout" :options="options"/>
+      <vue-plotly :data="this.data" :layout="this.layout" :options="options"/>
     <!-- <vue-plotly :data="data[1]" :layout="layout" :options="options"/> -->
     </div>
   </div>
@@ -31,7 +31,7 @@
 import { getBoilerData, getBoilerValues, postCustomData } from '../../../utils/door-api'
 import AppNav from '../AppNav'
 import VuePlotly from '@statnett/vue-plotly'
-import Plotly from 'plotly.js/dist/plotly'
+// import Plotly from 'plotly.js/dist/plotly'
 export default {
   name: 'doors',
   data () {
@@ -51,8 +51,7 @@ export default {
   },
   components: {
     AppNav,
-    VuePlotly,
-    plotly
+    VuePlotly
   },
   methods: {
     getData () {

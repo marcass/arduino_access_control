@@ -119,4 +119,5 @@ def custom_data(payload):
         out['x'] = times
         out['y'] = values
         res.append(out)
+        print res
     return res

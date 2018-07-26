@@ -13,6 +13,8 @@ const OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
 
 const env = config.build.env
 
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
+
 const webpackConfig = merge(baseWebpackConfig, {
   module: {
     rules: [
@@ -49,7 +51,8 @@ const webpackConfig = merge(baseWebpackConfig, {
     // UglifyJs do not support ES6+, you can also use babel-minify for better treeshaking: https://github.com/babel/minify
     new webpack.optimize.UglifyJsPlugin({
       compress: {
-        warnings: false
+        warnings: false,
+        exclude: 'plotly.js*'
       },
       sourceMap: true
     }),

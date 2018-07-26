@@ -16,6 +16,7 @@
     "axios": "^0.17.1",
     "ify-loader": "^1.1.0",
     "liquor-tree": "^0.2.30",
+    "npm-lifecycle": "^2.0.3",
     "plotly.js": "^1.39.2",
     "save": "^2.3.2",
     "transform-loader": "^0.2.4",

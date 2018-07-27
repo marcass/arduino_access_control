@@ -5,7 +5,7 @@ import time
 # initialise as None status
 state = None
 retention_policies = ['24_hours', '7_days','2_months', '1_year', '5_years']
-durations = {'24_hours': '1d', '7_days': '7d', '2_months': '4w', '1_year': '52w', '5_years': '260w'}
+durations = {'24_hours': {'dur':'1d', 'default':True}, '7_days': {'dur':'7d', 'default':False}, '2_months': {'dur':'4w' 'default':False}, '1_year': {'dur':'52w','default':False}, '5_years': {'dur':'260w','default':False}}
 
 client = InfluxDBClient(host='localhost', port=8086)
 client.create_database('boiler')
@@ -21,10 +21,23 @@ def setup_RP():
         RP_list.append(i['name'])
     for i in retention_policies:
         if i not in RP_list:
-            create_retention_policy(i, durations[i], 1, database='boiler', default=False)
+            create_retention_policy(i, durations[i]['dur'], 1, database='boiler', default=durations[i]['default'])
     # need to setup up continuous queries
     # https://influxdb-python.readthedocs.io/en/latest/api-documentation.html
     # https://docs.influxdata.com/influxdb/v1.6/guides/downsampling_and_retention/
+    client.query("CREATE CONTINUOUS QUERY 'cq_7_days' ON 'boilerEvents' BEGIN SELECT mean('value') AS 'mean_value' INTO '7_days'.'values_7d' FROM 'value' GROUP BY time(10m) END")
+    client.query("CREATE CONTINUOUS QUERY 'cq_2_months' ON 'boilerEvents' BEGIN SELECT mean('values_7d') AS 'mean_value' INTO '2_months'.'values_2_months' FROM 'values_7d' GROUP BY time(1h) END")
+    client.query("CREATE CONTINUOUS QUERY 'cq_1_year' ON 'boilerEvents' BEGIN SELECT mean('values_2_months') AS 'mean_value' INTO '1_year'.'values_1_year' FROM 'values_2_months' GROUP BY time(2h) END")
+    client.query("CREATE CONTINUOUS QUERY 'cq_5_years' ON 'boilerEvents' BEGIN SELECT mean('values_1_year') AS 'mean_value' INTO '5_years'.'values_5_years' FROM 'values_1_year' GROUP BY time(12h) END")
+
+
+
+# CREATE CONTINUOUS QUERY "cq_7_days" ON "boilerEvents" BEGIN
+#   SELECT mean("value") AS "mean_value"
+#   INTO "7_days"."downsampled_values"
+#   FROM "value"
+#   GROUP BY time(30m)
+# END
 
 
 

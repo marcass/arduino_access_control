@@ -11,8 +11,9 @@
       </select>
       <select v-model="range">
         <option disabled value="">Select graph range</option>
-        <option v-for="item in table", value="item.value">{{ item.label }}</option>
-        <option value="days">Days</option>
+        <option v-for="item, index in label", :value="val[index]">{{ item }}</option>
+        <!-- <option v-for="item in table", :value="item.value", v-bind:key="item.label">{{ item.label }}</option> -->
+        <!-- <option value="days">Days</option> -->
       </select>
       <select v-model="period" v-if="range == '24_hours'">
         <option disabled value="">Select graph period in hours</option>
@@ -55,7 +56,9 @@ export default {
       data: [],
       period: 1,
       range: 'days',
-      table: [{'label':'Hours', 'value': '24_hours'}, {'label':'Days', 'value':'7_days'}, {'label': 'Months', 'value':'2_months'}, {'label':'Year', 'value':'1_year'}, {'label':'Years', 'value':'5_years'}],
+      table: [{'label': 'Hours', 'val': '24_hours'}, {'label': 'Days', 'val': '7_days'}, {'label': 'Months', 'val': '2_months'}, {'label': 'Year', 'val': '1_year'}, {'label': 'Years', 'val': '5_years'}],
+      val: ['24_hours', '7_days', '2_months', '1_year', '5_years'],
+      label: ['Hours', 'Days', 'Months', 'Year', 'Years'],
       values: [],
       graph_items: [],
       layout: {
@@ -73,13 +76,13 @@ export default {
   methods: {
     getData () {
       getBoilerData().then((ret) => {
-        // console.log(ret)
+        console.log(ret)
         this.data = ret
       })
     },
     getValues () {
       getBoilerValues().then((ret) => {
-        // console.log(ret)
+        console.log(ret)
         this.values = ret
       })
     },

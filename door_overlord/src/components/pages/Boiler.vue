@@ -10,9 +10,9 @@
         <option v-for="item in values" v-bind:key="item">{{ item }}</option>
       </select>
       <select v-model="range">
-        <option disabled value="">Select graph range</option>
-        <option v-for="item, index in label", :value="val[index]">{{ item }}</option>
-        <!-- <option v-for="item in table", :value="item.value", v-bind:key="item.label">{{ item.label }}</option> -->
+        <option disabled value="a">Select graph range</option>
+        <option v-for="item, index in label" :value="val[index]">{{ item }}</option>
+        <!-- <option v-for="item in table" :value="item.value", v-bind:key="item.label">{{ item.label }}</option> -->
         <!-- <option value="days">Days</option> -->
       </select>
       <select v-model="period" v-if="range == '24_hours'">
@@ -55,10 +55,11 @@ export default {
     return {
       data: [],
       period: 1,
-      range: 'days',
+      range: '7_days',
       table: [{'label': 'Hours', 'val': '24_hours'}, {'label': 'Days', 'val': '7_days'}, {'label': 'Months', 'val': '2_months'}, {'label': 'Year', 'val': '1_year'}, {'label': 'Years', 'val': '5_years'}],
       val: ['24_hours', '7_days', '2_months', '1_year', '5_years'],
       label: ['Hours', 'Days', 'Months', 'Year', 'Years'],
+      // label: ['a', 'b', 'c'],
       values: [],
       graph_items: [],
       layout: {
@@ -87,6 +88,7 @@ export default {
       })
     },
     graph (payload) {
+      console.log(payload)
       postCustomData(payload).then((ret) => {
         this.data = ret
       })

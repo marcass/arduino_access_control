@@ -4,10 +4,14 @@ import datetime
 import time
 # initialise as None status
 state = None
+# setup reteniton plicy list
 retention_policies = ['24_hours', '7_days','2_months', '1_year', '5_years']
+# setup retention policy detail
 durations = {'24_hours': {'dur':'1d', 'default':True}, '7_days': {'dur':'7d', 'default':False},
              '2_months': {'dur':'4w', 'default':False}, '1_year': {'dur':'52w','default':False}, '5_years': {'dur':'260w','default':False}}
-
+# orgainse graphing periods
+periods = {'hours': ['24_hours'], 'days': ['7_days', '2_months'], 'months': ['1_year'], 'years': ['5_years']}
+# setup db
 client = InfluxDBClient(host='localhost', port=8086)
 client.create_database('boiler')
 client.switch_database('boiler')
@@ -26,7 +30,6 @@ def setup_RP():
     for i in retention_policies:
         if i not in RP_list:
             client.create_retention_policy(i, durations[i]['dur'], 1, database='boiler', default=durations[i]['default'])
-    # need to setup up continuous queries
     # https://influxdb-python.readthedocs.io/en/latest/api-documentation.html
     # https://docs.influxdata.com/influxdb/v1.6/guides/downsampling_and_retention/
     client.query('CREATE CONTINUOUS QUERY "cq_7_days" ON "boiler" BEGIN SELECT mean("value") AS "mean_value" INTO "7_days"."values_7d" FROM "value" GROUP BY time(1m) END')
@@ -34,17 +37,7 @@ def setup_RP():
     client.query('CREATE CONTINUOUS QUERY "cq_1_year" ON "boiler" BEGIN SELECT mean("values_2_months") AS "mean_value" INTO "1_year"."values_1_year" FROM "values_2_months" GROUP BY time(30m) END')
     client.query('CREATE CONTINUOUS QUERY "cq_5_years" ON "boiler" BEGIN SELECT mean("values_1_year") AS "mean_value" INTO "5_years"."values_5_years" FROM "values_1_year" GROUP BY time(1h) END')
 
-
-
-# CREATE CONTINUOUS QUERY "cq_7_days" ON "boilerEvents" BEGIN
-#   SELECT mean("value") AS "mean_value"
-#   INTO "7_days"."downsampled_values"
-#   FROM "value"
-#   GROUP BY time(30m)
-# END
-
-
-
+# Organise grpahing detail for y-axis
 value_types = ['water', 'auger', 'setpoint', 'burn', 'fan', 'feed', 'pause']
 temps = ['water', 'auger', 'setpoint']
 pids = ['burn', 'fan', 'feed', 'pause']
@@ -123,17 +116,30 @@ def get_data():
     # return [water, auger, fan, feed, pause]
     return [water]
 
+
+ "mean_value" INTO "7_days"."values_7d" FROM "value"
+"mean_value" INTO "2_months"."values_2_months" FROM "values_7d"
+"mean_value" INTO "1_year"."values_1_year" FROM "values_2_months"
+"mean_value" INTO "5_years"."values_5_years" FROM "values_1_year"
+
+q_dict = {'24_hours': {'rp_val':'value'}, '7_days': {'rp_val':'values_7d'}, '2_months': {'rp_val':'values_2_months'}, '1_year': {'rp_val':'values_1_year'}, '5_years': {'rp_val':'values_5_years'}}
 def custom_data(payload):
-    # client.query('SELECT "duration" FROM "pyexample"."autogen"."brushEvents" WHERE time > now() - 4d GROUP BY "user"')
-    # payload = {'items':graph_items, 'range':range, 'period':period}
+    global periods
+    # payload = {"items": ["water", "auger", "setpoint"], "range": "24_hours", "period": "3"}
     try:
-        if payload['range'] == 'days':
-            timestamp = (datetime.datetime.now() - datetime.timedelta(days=int(payload['period']))).strftime("%Y-%m-%dT%H:%M:%S.%f000Z")
-        if payload['range'] == 'hours':
+        if payload['range'] in periods['hours']:
             timestamp = (datetime.datetime.now() - datetime.timedelta(hours=int(payload['period']))).strftime("%Y-%m-%dT%H:%M:%S.%f000Z")
+        if payload['range'] in periods['days']:
+            timestamp = (datetime.datetime.now() - datetime.timedelta(days=int(payload['period']))).strftime("%Y-%m-%dT%H:%M:%S.%f000Z")
+        if payload['range'] in periods['months']:
+            timestamp = (datetime.datetime.now() - datetime.timedelta(months=int(payload['period']))).strftime("%Y-%m-%dT%H:%M:%S.%f000Z")
+        if payload['range'] in periods['years']:
+            timestamp = (datetime.datetime.now() - datetime.timedelta(years=int(payload['period']))).strftime("%Y-%m-%dT%H:%M:%S.%f000Z")
     except:
         timestamp = (datetime.datetime.now() - datetime.timedelta(hours=int(payload['period']))).strftime("%Y-%m-%dT%H:%M:%S.%f000Z")
-    results = client.query('SELECT * FROM "boiler"."autogen"."boilerEvents" WHERE time > %s' %("'"+timestamp+"'"))
+    # results = client.query('SELECT * FROM "boiler"."autogen"."boilerEvents" WHERE time > %s' %("'"+timestamp+"'"))
+    target = payload["range"]+"."+q_dict[payload["range"]]["rp_val"]
+    results = client.query('SELECT * FROM %s WHERE time > %s' %(target, "'"+timestamp+"'"))
     res = []
     colours = ['red', 'blue', 'green', 'black', 'yellow', 'orange']
     count = 0
@@ -148,7 +154,7 @@ def custom_data(payload):
             data = results.get_points(tags={'value_type':i, 'status': 'Heating'})
         for a in data:
             times.append(a['time'])
-            values.append(a['value'])
+            values.append(a[q_dict[payload["range"]]["rp_val"]])
         out['colour'] = colours[count]
         count += 1
         out['x'] = times

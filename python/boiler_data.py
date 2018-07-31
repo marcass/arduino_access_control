@@ -13,7 +13,19 @@ durations = {'24_hours': {'dur':'1d', 'default':True}, '7_days': {'dur':'7d', 'd
 periods = {'hours': ['24_hours'], 'days': ['7_days', '2_months'], 'months': ['1_year'], 'years': ['5_years']}
 # setup db
 client = InfluxDBClient(host='localhost', port=8086)
-client.create_database('boiler')
+# setup db if it ins't already:
+def setup_db():
+    flag = False
+    for i in client.get_list_database():
+        if 'boiler' in i['name']:
+            flag = True
+        else:
+            print 'doing nothing'
+    if flag:
+        client.create_database('boiler')
+
+setup_db()
+
 client.switch_database('boiler')
 # client.drop_database('boiler')
 
@@ -116,14 +128,10 @@ def get_data():
     # return [water, auger, fan, feed, pause]
     return [water]
 
-
- "mean_value" INTO "7_days"."values_7d" FROM "value"
-"mean_value" INTO "2_months"."values_2_months" FROM "values_7d"
-"mean_value" INTO "1_year"."values_1_year" FROM "values_2_months"
-"mean_value" INTO "5_years"."values_5_years" FROM "values_1_year"
-
 q_dict = {'24_hours': {'rp_val':'value'}, '7_days': {'rp_val':'values_7d'}, '2_months': {'rp_val':'values_2_months'}, '1_year': {'rp_val':'values_1_year'}, '5_years': {'rp_val':'values_5_years'}}
 def custom_data(payload):
+    print 'payload for graph is:'
+    print payload
     global periods
     # payload = {"items": ["water", "auger", "setpoint"], "range": "24_hours", "period": "3"}
     try:
@@ -139,7 +147,8 @@ def custom_data(payload):
         timestamp = (datetime.datetime.now() - datetime.timedelta(hours=int(payload['period']))).strftime("%Y-%m-%dT%H:%M:%S.%f000Z")
     # results = client.query('SELECT * FROM "boiler"."autogen"."boilerEvents" WHERE time > %s' %("'"+timestamp+"'"))
     target = payload["range"]+"."+q_dict[payload["range"]]["rp_val"]
-    results = client.query('SELECT * FROM %s WHERE time > %s' %(target, "'"+timestamp+"'"))
+    print target
+    results = client.query('SELECT * FROM %s WHERE time > %s' %('"'+payload["range"]+'"'+'.'+'"'+q_dict[payload["range"]]["rp_val"]+'"', "'"+timestamp+"'"))
     res = []
     colours = ['red', 'blue', 'green', 'black', 'yellow', 'orange']
     count = 0

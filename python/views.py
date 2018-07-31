@@ -104,6 +104,7 @@ def boiler__custom_data():
     Returns data dump of specified data
     '''
     content = request.get_json(silent=False)
+    print 'getting data for graph'
     return jsonify(boiler.custom_data(content)), 200
 
 @app.route("/boiler/values", methods=['GET',])

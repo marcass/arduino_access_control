@@ -67,7 +67,8 @@ export default {
         'yaxis': {'title': 'Temperature'},
         'yaxis2': {'title': 'Percent', 'overlaying': 'y', 'side': 'right'}
       },
-      options: {}
+      options: {},
+      timeRes: ''
     }
   },
   components: {
@@ -91,13 +92,22 @@ export default {
       console.log(payload)
       postCustomData(payload).then((ret) => {
         this.data = ret
+        // need to convert UTC time string to local time
+        // var xVals = data.map(function(x) {
+        //   return moment.utc(x.Timestamp).valueOf();
+        // })
         console.log(ret)
       })
     }
+    // dateConvert (timeString) {
+    //   var date = new Date(timeString)
+    //   this.timeRes = date.toString()
+    // }
   },
   mounted () {
     this.getData()
     this.getValues()
+    // this.dateConvert('2018-08-01T10:02:07.862211072Z')
   }
 }
 </script>

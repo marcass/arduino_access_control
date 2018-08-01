@@ -91,6 +91,7 @@ export default {
       console.log(payload)
       postCustomData(payload).then((ret) => {
         this.data = ret
+        console.log(ret)
       })
     }
   },

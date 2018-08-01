@@ -44,10 +44,10 @@ def setup_RP():
             client.create_retention_policy(i, durations[i]['dur'], 1, database='boiler', default=durations[i]['default'])
     # https://influxdb-python.readthedocs.io/en/latest/api-documentation.html
     # https://docs.influxdata.com/influxdb/v1.6/guides/downsampling_and_retention/
-    client.query('CREATE CONTINUOUS QUERY "cq_7_days" ON "boiler" BEGIN SELECT mean("value") AS "mean_value" INTO "7_days"."values_7d" FROM "value" GROUP BY time(1m) END')
-    client.query('CREATE CONTINUOUS QUERY "cq_2_months" ON "boiler" BEGIN SELECT mean("values_7d") AS "mean_value" INTO "2_months"."values_2_months" FROM "values_7d" GROUP BY time(10m) END')
-    client.query('CREATE CONTINUOUS QUERY "cq_1_year" ON "boiler" BEGIN SELECT mean("values_2_months") AS "mean_value" INTO "1_year"."values_1_year" FROM "values_2_months" GROUP BY time(30m) END')
-    client.query('CREATE CONTINUOUS QUERY "cq_5_years" ON "boiler" BEGIN SELECT mean("values_1_year") AS "mean_value" INTO "5_years"."values_5_years" FROM "values_1_year" GROUP BY time(1h) END')
+    client.query('CREATE CONTINUOUS QUERY "cq_7_days" ON "boiler" BEGIN SELECT mean("value") AS "mean_value" INTO "7_days"."values_7d" FROM "boilerEvents" GROUP BY time(1m) END')
+    client.query('CREATE CONTINUOUS QUERY "cq_2_months" ON "boiler" BEGIN SELECT mean("values_7d") AS "mean_value" INTO "2_months"."values_2_months" FROM "boilerEvents" GROUP BY time(10m) END')
+    client.query('CREATE CONTINUOUS QUERY "cq_1_year" ON "boiler" BEGIN SELECT mean("values_2_months") AS "mean_value" INTO "1_year"."values_1_year" FROM "boilerEvents" GROUP BY time(30m) END')
+    client.query('CREATE CONTINUOUS QUERY "cq_5_years" ON "boiler" BEGIN SELECT mean("values_1_year") AS "mean_value" INTO "5_years"."values_5_years" FROM "boilerEvents" GROUP BY time(1h) END')
 
 # Organise grpahing detail for y-axis
 value_types = ['water', 'auger', 'setpoint', 'burn', 'fan', 'feed', 'pause']

@@ -51,10 +51,19 @@ def setup_RP():
             client.create_retention_policy(i, durations[i]['dur'], 1, database='boiler', default=durations[i]['default'])
     # https://influxdb-python.readthedocs.io/en/latest/api-documentation.html
     # https://docs.influxdata.com/influxdb/v1.6/guides/downsampling_and_retention/
-    client.query('CREATE CONTINUOUS QUERY "cq_7_days" ON "boiler" BEGIN SELECT mean(water) AS "water_1m", mean(auger) AS "auger_1m", mean(setpoint) AS "setpoint_1m", mean(burn) AS "burn_1m", mean(fan) AS "fan_1m", mean(feed) AS "feed_1m", mean(pause) AS "pause_1m" INTO "7_days".values_7d FROM "boilerData" GROUP BY time(1m) END')
-    client.query('CREATE CONTINUOUS QUERY "cq_2_months" ON "boiler" BEGIN SELECT mean(water) AS "water_10m", mean(auger) AS "auger_10m", mean(setpoint) AS "setpoint_10m", mean(burn) AS "burn_10m", mean(fan) AS "fan_10m", mean(feed) AS "feed_10m", mean(pause) AS "pause_10m" INTO "2_months".values_2mo FROM "boilerData" GROUP BY time(10m) END')
-    client.query('CREATE CONTINUOUS QUERY "cq_1_year" ON "boiler" BEGIN SELECT mean(water) AS "water_30m", mean(auger) AS "auger_30m", mean(setpoint) AS "setpoint_30m", mean(burn) AS "burn_30m", mean(fan) AS "fan_30m", mean(feed) AS "feed_30m", mean(pause) AS "pause_30m" INTO "1_year".values_1y FROM "boilerData" GROUP BY time(30m) END')
-    client.query('CREATE CONTINUOUS QUERY "cq_5_years" ON "boiler" BEGIN SELECT mean(water) AS "water_1h", mean(auger) AS "auger_1h", mean(setpoint) AS "setpoint_1h", mean(burn) AS "burn_1h", mean(fan) AS "fan_1h", mean(feed) AS "feed_1h", mean(pause) AS "pause_1h" INTO "5_years".values_5y FROM "boilerData" GROUP BY time(1h) END')
+    try:
+        # client.query('CREATE CONTINUOUS QUERY "cq_7_days" ON "boiler" BEGIN SELECT mean(water) AS "water_1m", mean(auger) AS "auger_1m", mean(setpoint) AS "setpoint_1m", mean(burn) AS "burn_1m", mean(fan) AS "fan_1m", mean(feed) AS "feed_1m", mean(pause) AS "pause_1m" INTO "7_days".values_7d FROM "boilerData" GROUP BY time(1m) END')
+        # client.query('CREATE CONTINUOUS QUERY "cq_2_months" ON "boiler" BEGIN SELECT mean(water) AS "water_10m", mean(auger) AS "auger_10m", mean(setpoint) AS "setpoint_10m", mean(burn) AS "burn_10m", mean(fan) AS "fan_10m", mean(feed) AS "feed_10m", mean(pause) AS "pause_10m" INTO "2_months".values_2mo FROM "boilerData" GROUP BY time(10m) END')
+        # client.query('CREATE CONTINUOUS QUERY "cq_1_year" ON "boiler" BEGIN SELECT mean(water) AS "water_30m", mean(auger) AS "auger_30m", mean(setpoint) AS "setpoint_30m", mean(burn) AS "burn_30m", mean(fan) AS "fan_30m", mean(feed) AS "feed_30m", mean(pause) AS "pause_30m" INTO "1_year".values_1y FROM "boilerData" GROUP BY time(30m) END')
+        # client.query('CREATE CONTINUOUS QUERY "cq_5_years" ON "boiler" BEGIN SELECT mean(water) AS "water_1h", mean(auger) AS "auger_1h", mean(setpoint) AS "setpoint_1h", mean(burn) AS "burn_1h", mean(fan) AS "fan_1h", mean(feed) AS "feed_1h", mean(pause) AS "pause_1h" INTO "5_years".values_5y FROM "boilerData" GROUP BY time(1h) END')
+        client.query('CREATE CONTINUOUS QUERY "cq_7_days" ON "boiler" BEGIN SELECT mean(water) AS "water", mean(auger) AS "auger", mean(setpoint) AS "setpoint", mean(burn) AS "burn", mean(fan) AS "fan", mean(feed) AS "feed", mean(pause) AS "pause" INTO "7_days".values_7d FROM "boilerData" GROUP BY time(1m) END')
+        client.query('CREATE CONTINUOUS QUERY "cq_2_months" ON "boiler" BEGIN SELECT mean(water) AS "water", mean(auger) AS "auger", mean(setpoint) AS "setpoint", mean(burn) AS "burn", mean(fan) AS "fan", mean(feed) AS "feed", mean(pause) AS "pause" INTO "2_months".values_2mo FROM "boilerData" GROUP BY time(10m) END')
+        client.query('CREATE CONTINUOUS QUERY "cq_1_year" ON "boiler" BEGIN SELECT mean(water) AS "water", mean(auger) AS "auger", mean(setpoint) AS "setpoint", mean(burn) AS "burn", mean(fan) AS "fan", mean(feed) AS "feed", mean(pause) AS "pause" INTO "1_year".values_1y FROM "boilerData" GROUP BY time(30m) END')
+        client.query('CREATE CONTINUOUS QUERY "cq_5_years" ON "boiler" BEGIN SELECT mean(water) AS "water", mean(auger) AS "auger", mean(setpoint) AS "setpoint", mean(burn) AS "burn", mean(fan) AS "fan", mean(feed) AS "feed", mean(pause) AS "pause" INTO "5_years".values_5y FROM "boilerData" GROUP BY time(1h) END')
+    except:
+        # already exist
+        pass
+
 
 # Organise grpahing detail for y-axis
 value_types = ['water', 'auger', 'setpoint', 'burn', 'fan', 'feed', 'pause']
@@ -95,7 +104,7 @@ def get_values():
 def get_data():
     q_time = (datetime.datetime.utcnow() - datetime.timedelta(days=1)).strftime("%Y-%m-%dT%H:%M:%S.%f000Z")
     # Need stupid single quites around timestamp to nanoscecond precision
-    results = client.query("SELECT 'water' FROM '24_hours'.boilerData WHERE time > %s" %("'"+q_time+"'"))
+    results = client.query('SELECT water FROM "24_hours".boilerData WHERE time > \'%s\'' %(q_time))
     water_data = results.get_points()
     wtimes = []
     wvalues = []
@@ -133,7 +142,7 @@ def get_data():
     # return [water, auger, fan, feed, pause]
     return [water]
 
-q_dict = {'24_hours': {'rp_val':'value'}, '7_days': {'rp_val':'values_7d'}, '2_months': {'rp_val':'values_2mo'}, '1_year': {'rp_val':'values_1y'}, '5_years': {'rp_val':'values_5y'}}
+q_dict = {'24_hours': {'rp_val':'boilerData'}, '7_days': {'rp_val':'values_7d'}, '2_months': {'rp_val':'values_2mo'}, '1_year': {'rp_val':'values_1y'}, '5_years': {'rp_val':'values_5y'}}
 def custom_data(payload):
     print 'payload for graph is:'
     print payload
@@ -151,30 +160,34 @@ def custom_data(payload):
     except:
         timestamp = (datetime.datetime.utcnow() - datetime.timedelta(hours=int(payload['period']))).strftime("%Y-%m-%dT%H:%M:%S.%f000Z")
     # results = client.query('SELECT * FROM "boiler"."autogen"."boilerEvents" WHERE time > %s' %("'"+timestamp+"'"))
-    target = payload["range"]+"."+q_dict[payload["range"]]["rp_val"]
-    print target
-    results = client.query('SELECT * FROM %s WHERE time > %s' %('"'+payload["range"]+'"'+'.'+'"'+q_dict[payload["range"]]["rp_val"]+'"', "'"+timestamp+"'"))
+    # target = payload["range"]+"."+q_dict[payload["range"]]["rp_val"]
+    # print target
     res = []
     colours = ['red', 'blue', 'green', 'black', 'yellow', 'orange']
     count = 0
     for i in payload['items']:
+        # get value name:
+
+        results = client.query('SELECT %s FROM %s WHERE time > \'%s\'' %(i, '"'+payload["range"]+'"'+'.'+'"'+q_dict[payload["range"]]["rp_val"]+'"', timestamp))
+        # print results.raw
         times = []
         values = []
         if i in temps:
-            out = {'marker': {'color': '', 'size': '10', 'symbol': 104}, 'name': i, 'type': 'line', 'x': '', 'y': ''}
-            data = results.get_points(tags={'value_type':i})
+            out = {'marker': {'color': '', 'size': '10', 'symbol': 104}, 'name': i, 'type': 'line', 'x': '', 'y': '', 'yaxis': 'yaxis'}
+            data = results.get_points()
         if i in pids:
-            out = {'marker': {'color': '', 'size': '10', 'symbol': 104}, 'name': i, 'type': 'line', 'x': '', 'y': '', 'yaxis': 'y2'}
-            data = results.get_points(tags={'value_type':i, 'status': 'Heating'})
+            out = {'marker': {'color': '', 'size': '10', 'symbol': 104}, 'name': i, 'type': 'line', 'x': '', 'y': '', 'yaxis': 'yaxis2'}
+            data = results.get_points(tags={'status': 'Heating'})
+        print data
         for a in data:
             times.append(a['time'])
-            values.append(a[q_dict[payload["range"]]["rp_val"]])
+            values.append(a[i])
         out['colour'] = colours[count]
         count += 1
         out['x'] = times
         out['y'] = values
         res.append(out)
-        print res
+    print res
     return res
 
 setup_RP()

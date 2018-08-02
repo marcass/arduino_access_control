@@ -78,26 +78,44 @@ export default {
   methods: {
     getData () {
       getBoilerData().then((ret) => {
-        console.log(ret)
+        // console.log(ret)
         this.data = ret
       })
     },
     getValues () {
       getBoilerValues().then((ret) => {
-        console.log(ret)
+        // console.log(ret)
         this.values = ret
       })
     },
     graph (payload) {
-      console.log(payload)
+      // console.log(payload)
       postCustomData(payload).then((ret) => {
-        this.data = ret
+        this.data = this.convTime(ret)
+        // this.data = ret
         // need to convert UTC time string to local time
         // var xVals = data.map(function(x) {
         //   return moment.utc(x.Timestamp).valueOf();
         // })
-        console.log(ret)
+        // console.log(ret)
       })
+    },
+    convTime (data) {
+      var i
+      console.log('changing dates')
+      data.forEach(function(y))
+      for (i in data) {
+        var a
+        for (a in data[i].y) {
+          var localTime
+          console.log(a)
+          var x = new Date(a)
+          localTime = x.toString()
+          data[i].y.splice(a, 1, localTime)
+          console.log(localTime)
+        }
+      }
+      return data
     }
     // dateConvert (timeString) {
     //   var date = new Date(timeString)

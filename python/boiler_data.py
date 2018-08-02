@@ -174,10 +174,11 @@ def custom_data(payload):
         values = []
         if i in temps:
             out = {'marker': {'color': '', 'size': '10', 'symbol': 104}, 'name': i, 'type': 'line', 'x': '', 'y': '', 'yaxis': 'yaxis'}
-            data = results.get_points()
+            # data = results.get_points()
         if i in pids:
             out = {'marker': {'color': '', 'size': '10', 'symbol': 104}, 'name': i, 'type': 'line', 'x': '', 'y': '', 'yaxis': 'yaxis2'}
-            data = results.get_points(tags={'status': 'Heating'})
+            # data = results.get_points(tags={'status': 'Heating'})
+        data = results.get_points()
         print data
         for a in data:
             times.append(a['time'])

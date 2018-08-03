@@ -85,7 +85,8 @@ export default {
     },
     getValues () {
       getBoilerValues().then((ret) => {
-        this.values = ret
+        console.log(ret)
+        this.values = ret.values
       })
     },
     graph (payload) {
@@ -110,7 +111,8 @@ export default {
     },
     getState () {
       getBoilerState().then((ret) => {
-        this.state = ret
+        console.log(ret)
+        this.state = ret.state
       })
     }
   },

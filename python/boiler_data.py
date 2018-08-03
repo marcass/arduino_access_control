@@ -70,9 +70,9 @@ def update_status(new_state):
     global state
     state = new_state
 
-def state():
+def get_state():
     global state
-    return state
+    return {'state': state}
 
 def write_data(data_type, group, data):
     global state
@@ -99,7 +99,7 @@ def write_data(data_type, group, data):
 
 def get_values():
     global value_types
-    return value_types
+    return {'values': value_types}
 
 def get_data():
     q_time = (datetime.datetime.utcnow() - datetime.timedelta(days=1)).strftime("%Y-%m-%dT%H:%M:%S.%f000Z")

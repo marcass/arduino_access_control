@@ -3,6 +3,7 @@
     <div class='main-head'>
       <app-nav></app-nav>
       <h1>Boiler behaviour</h1>
+      <h3>Boiler state is {{ state }}</h3>
     </div>
     <div class='side'>
       <select v-model="graph_items" multiple>
@@ -45,7 +46,7 @@
 </template>
 
 <script>
-import { getBoilerData, getBoilerValues, postCustomData } from '../../../utils/door-api'
+import { getBoilerData, getBoilerValues, postCustomData, getBoilerState } from '../../../utils/door-api'
 import AppNav from '../AppNav'
 import VuePlotly from '@statnett/vue-plotly'
 // import Plotly from 'plotly.js/dist/plotly'
@@ -68,7 +69,8 @@ export default {
         'yaxis2': {'title': 'Percent', 'overlaying': 'y', 'side': 'right'}
       },
       options: {},
-      timeRes: ''
+      timeRes: '',
+      state: ''
     }
   },
   components: {
@@ -105,11 +107,17 @@ export default {
         data[i].x = result
       }
       return data
+    },
+    getState () {
+      getBoilerState().then((ret) => {
+        this.state = ret
+      })
     }
   },
   mounted () {
     this.getData()
     this.getValues()
+    this.getState()
     // this.dateConvert('2018-08-01T10:02:07.862211072Z')
   }
 }

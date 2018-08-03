@@ -116,6 +116,15 @@ def boiler_values():
     print boiler.value_types
     return jsonify(boiler.value_types), 200
 
+@app.route("/boiler/state", methods=['GET',])
+@jwt_required
+def boiler_state():
+    '''
+    Returns boiler state
+    '''
+    print boiler.value_types
+    return jsonify(boiler.state), 200
+
 @app.route("/listallowed", methods=['GET',])
 @jwt_required
 def list_allowed_keys():

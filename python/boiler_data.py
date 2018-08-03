@@ -28,8 +28,8 @@ def setup_db():
         print 'making db'
         client.create_database('boiler')
 
+# setup db and use currnet db
 setup_db()
-
 client.switch_database('boiler')
 # client.drop_database('boiler')
 
@@ -52,10 +52,6 @@ def setup_RP():
     # https://influxdb-python.readthedocs.io/en/latest/api-documentation.html
     # https://docs.influxdata.com/influxdb/v1.6/guides/downsampling_and_retention/
     try:
-        # client.query('CREATE CONTINUOUS QUERY "cq_7_days" ON "boiler" BEGIN SELECT mean(water) AS "water_1m", mean(auger) AS "auger_1m", mean(setpoint) AS "setpoint_1m", mean(burn) AS "burn_1m", mean(fan) AS "fan_1m", mean(feed) AS "feed_1m", mean(pause) AS "pause_1m" INTO "7_days".values_7d FROM "boilerData" GROUP BY time(1m) END')
-        # client.query('CREATE CONTINUOUS QUERY "cq_2_months" ON "boiler" BEGIN SELECT mean(water) AS "water_10m", mean(auger) AS "auger_10m", mean(setpoint) AS "setpoint_10m", mean(burn) AS "burn_10m", mean(fan) AS "fan_10m", mean(feed) AS "feed_10m", mean(pause) AS "pause_10m" INTO "2_months".values_2mo FROM "boilerData" GROUP BY time(10m) END')
-        # client.query('CREATE CONTINUOUS QUERY "cq_1_year" ON "boiler" BEGIN SELECT mean(water) AS "water_30m", mean(auger) AS "auger_30m", mean(setpoint) AS "setpoint_30m", mean(burn) AS "burn_30m", mean(fan) AS "fan_30m", mean(feed) AS "feed_30m", mean(pause) AS "pause_30m" INTO "1_year".values_1y FROM "boilerData" GROUP BY time(30m) END')
-        # client.query('CREATE CONTINUOUS QUERY "cq_5_years" ON "boiler" BEGIN SELECT mean(water) AS "water_1h", mean(auger) AS "auger_1h", mean(setpoint) AS "setpoint_1h", mean(burn) AS "burn_1h", mean(fan) AS "fan_1h", mean(feed) AS "feed_1h", mean(pause) AS "pause_1h" INTO "5_years".values_5y FROM "boilerData" GROUP BY time(1h) END')
         client.query('CREATE CONTINUOUS QUERY "cq_7_days" ON "boiler" BEGIN SELECT mean(water) AS "water", mean(auger) AS "auger", mean(setpoint) AS "setpoint", mean(burn) AS "burn", mean(fan) AS "fan", mean(feed) AS "feed", mean(pause) AS "pause" INTO "7_days".values_7d FROM "boilerData" GROUP BY time(1m) END')
         client.query('CREATE CONTINUOUS QUERY "cq_2_months" ON "boiler" BEGIN SELECT mean(water) AS "water", mean(auger) AS "auger", mean(setpoint) AS "setpoint", mean(burn) AS "burn", mean(fan) AS "fan", mean(feed) AS "feed", mean(pause) AS "pause" INTO "2_months".values_2mo FROM "boilerData" GROUP BY time(10m) END')
         client.query('CREATE CONTINUOUS QUERY "cq_1_year" ON "boiler" BEGIN SELECT mean(water) AS "water", mean(auger) AS "auger", mean(setpoint) AS "setpoint", mean(burn) AS "burn", mean(fan) AS "fan", mean(feed) AS "feed", mean(pause) AS "pause" INTO "1_year".values_1y FROM "boilerData" GROUP BY time(30m) END')
@@ -73,6 +69,10 @@ pids = ['burn', 'fan', 'feed', 'pause']
 def update_status(new_state):
     global state
     state = new_state
+
+def state():
+    global state
+    return state
 
 def write_data(data_type, group, data):
     global state

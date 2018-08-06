@@ -66,6 +66,7 @@ import mqtt
 import middleman
 import views_auth
 import boiler_data as boiler
+import sensor_data as sensor
 from init import app, jwt
 from flask_jwt_extended import jwt_required, \
     create_access_token, jwt_refresh_token_required, \
@@ -85,10 +86,11 @@ def keycode_validation(keycode):
     else:
         return False
 
-@app.route("/")
-def hello():
-    return "Hello World!"
+# @app.route("/")
+# def hello():
+#     return "Hello World!"
 
+# Boiler Routes #########################################
 @app.route("/boiler", methods=['GET',])
 @jwt_required
 def boiler_data():
@@ -123,6 +125,17 @@ def boiler_state():
     '''
     return jsonify(boiler.get_state()), 200
 
+# Sensor data routes ####################################
+@app.route("/data", methods=['POST',])
+@jwt_required
+def update_data():
+    '''
+    Writes data to influx from remote sensor
+    '''
+    content = request.get_json(silent=False)
+    return jsonify(sensors.update_data(content)), 200
+
+# Door control routes#####################################
 @app.route("/listallowed", methods=['GET',])
 @jwt_required
 def list_allowed_keys():

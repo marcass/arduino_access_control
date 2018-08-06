@@ -83,7 +83,7 @@ void loop() {
   String postData = "{group: julian, sensor: "+sensorID+", temp:" +temp+"}";
   String contentType = "application/x-www-form-urlencoded";
   client.beginRequest();
-  client.post("/temps");
+  client.post("/data");
 //  https://github.com/arduino-libraries/ArduinoHttpClient/blob/master/examples/CustomHeader/CustomHeader.ino up to here
 //  Creds in secrets.h
   client.sendBasicAuth(API_user, API_pass); // send the username and password for authentication

@@ -244,7 +244,7 @@ def add_user():
             timeEnd = content['timeEnd'] # parse this to datetime in sql scrip
         else:
             content.update({'timeEnd':0})
-        if len(content['keycode']) > 0;
+        if len(content['keycode']) > 0:
             if not keycode_validation(content['keycode']):
                 return jsonify({'status':'keycode failure'}), 200
         #sql.write_userdata(content)

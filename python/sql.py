@@ -399,5 +399,8 @@ def validate_key(key, door):
             return user
         except:
             return None
+    else:
+        # empty keycodes disallowed
+        return None
 
 setup_db()

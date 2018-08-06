@@ -9,10 +9,8 @@
 #define ONE_WIRE_BUS 2
 // Pass our oneWire reference to Dallas Temperature.
 DallasTemperature sensors(&oneWire);
-float temp;
 String sensorID = "hall";
-String jwtHeader;
-String 
+String token;
 
 ///////please enter your sensitive data in the Secret tab/secrets.h
 /////// Wifi Settings ///////
@@ -66,37 +64,56 @@ void getAuth() {
   Serial.print("POST Response: ");
   Serial.println(response);
 //  parse jwt here
+//https://github.com/bblanchon/ArduinoJson
 }
 
-void loop() {
+float temp() {
   Serial.print("Measuing temp...");
   sensors.requestTemperatures(); // Send the command to get temperatures
   Serial.println("DONE");
-  temp = sensors.getTempCByIndex(0)
+//  temp = sensors.getTempCByIndex(0)
   Serial.print("Temperature for Device 1 is: ");
   Serial.print(temp); // Why "byIndex"? 
     // You can have more than one IC on the same bus. 
     // 0 refers to the first IC on the wire
+  return sensors.getTempCByIndex(0)
+}
+
+String updateAPI() {
   Serial.println("making GET request with HTTP basic authentication");
 //  build json
 //  char PostData[] = "{\"group\": \"julian\", \"sensor\": sensorID, \"temp\": temp}";
   String postData = "{group: julian, sensor: "+sensorID+", temp:" +temp+"}";
-  String contentType = "application/x-www-form-urlencoded";
+//  String contentType = "application/x-www-form-urlencoded";
   client.beginRequest();
-  client.post("/data  ");
+  client.post("/data");
+//  client.sendHeader(HTTP_HEADER_CONTENT_TYPE, "application/x-www-form-urlencoded");
+  client.sendHeader(HTTP_HEADER_CONTENT_TYPE, "application/json");
+  client.sendHeader(HTTP_HEADER_CONTENT_LENGTH, postData.length());
+  client.sendHeader("X-CUSTOM-HEADER", "Authorization: Bearer "+token);
 //  https://github.com/arduino-libraries/ArduinoHttpClient/blob/master/examples/CustomHeader/CustomHeader.ino up to here
 //  Creds in secrets.h
-  client.sendBasicAuth(API_user, API_pass); // send the username and password for authentication
+//  client.sendBasicAuth(API_user, API_pass); // send the username and password for authentication
   client.endRequest();
-
+  client.write((const byte*)postData.c_str(), postData.length());
   // read the status code and body of the response
-  statusCode = client.responseStatusCode();
+  return client.responseStatusCode();
   response = client.responseBody();
-
   Serial.print("Status code: ");
   Serial.println(statusCode);
   Serial.print("Response: ");
   Serial.println(response);
   Serial.println("Wait five seconds");
+}
+
+void loop() {
+  thisTemp = temp();
+  resp = updateAPI();
+  if (resp == "200") { //Consider testing for 401
+    Serial.println("Data successfully posted");
+  }else if (resp == "401"){
+    getAuth();
+    resp = updateAPI();
+  }
   delay(5000);
 }

@@ -70,7 +70,22 @@ import sensor_data as sensor
 from init import app, jwt
 from flask_jwt_extended import jwt_required, \
     create_access_token, jwt_refresh_token_required, \
-    create_refresh_token, get_jwt_identity
+    create_refresh_token, get_jwt_identity, get_jwt_claims
+
+# to access roles/user in token:
+@app.route('/protected', methods=['GET'])
+@jwt_required
+def protected():
+    ret = {
+        'current_identity': get_jwt_identity(),  # test
+        'current_role': get_jwt_claims()  # ['foo', 'bar']
+    }
+    # or could just do:
+    # if get_jwt_claims() in ['some list of roles allowed']:
+    #     print 'doing stuff'
+    # else:
+    #     return jsonify({"msg": "Forbidden"}), 403
+    return jsonify(ret), 200
 
 
 def get_access_log(days):
@@ -86,9 +101,18 @@ def keycode_validation(keycode):
     else:
         return False
 
-# @app.route("/")
-# def hello():
-#     return "Hello World!"
+@app.route("/")
+@jwt_required
+def hello():
+    allowed = ['admin']
+    print get_jwt_identity()
+    print get_jwt_claims()
+    if get_jwt_claims() in allowed:
+        print 'doing stuff'
+        return "Hello World!"
+    else:
+        return jsonify({"msg": "Forbidden"}), 403
+
 
 # Boiler Routes #########################################
 @app.route("/boiler", methods=['GET',])

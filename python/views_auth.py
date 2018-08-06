@@ -5,7 +5,7 @@ import sql
 from flask import Flask, request, jsonify
 from flask_jwt_extended import jwt_required, \
     create_access_token, jwt_refresh_token_required, \
-    create_refresh_token, get_jwt_identity
+    create_refresh_token, get_jwt_identity, get_jwt_claims
 
 from init import app, jwt
 import creds
@@ -36,6 +36,24 @@ app.config['JWT_HEADER_TYPE'] = 'Bearer'
 #     print ret
 #     return jsonify(ret), 200
 
+# http://flask-jwt-extended.readthedocs.io/en/latest/tokens_from_complex_object.html
+# Create a function that will be called whenever create_access_token
+# is used. It will take whatever object is passed into the
+# create_access_token method, and lets us define what custom claims
+# should be added to the access token.
+@jwt.user_claims_loader
+def add_claims_to_access_token(user):
+    return {'role': user['role']}
+
+
+# Create a function that will be called whenever create_access_token
+# is used. It will take whatever object is passed into the
+# create_access_token method, and lets us define what the identity
+# of the access token should be.
+@jwt.user_identity_loader
+def user_identity_lookup(user):
+    return user['username']
+
 @app.route('/auth/login', methods=['POST'])
 def auth():
     try:
@@ -46,11 +64,13 @@ def auth():
         content = sql.auth_user(username, password)
         # print content
         if content['status'] == 'passed':
+            # Create user and role object
+            user = {'username':username, 'role':content['role']}
             # Use create_access_token() and create_refresh_token() to create our
             # access and refresh tokens
             ret = {
-                'access_token': create_access_token(identity=username),
-                'refresh_token': create_refresh_token(identity=username), 'data':{
+                'access_token': create_access_token(identity=user),
+                'refresh_token': create_refresh_token(identity=user), 'data':{
                 'role': content['role']}
             }
             # print ret

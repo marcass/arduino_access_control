@@ -51,7 +51,11 @@
           <td class="tabLabel">
             Role
           </td>
-          <td>
+          <td v-for="item in roles">
+            <input type="radio" id="item" value="item" v-model="role">
+            <label for="item">{{ item }}</label>
+          </td>
+          <!-- <td>
             <input type="radio" id="admin" value="admin" v-model="role">
             <label for="admin">Admin</label>
           </td>
@@ -62,7 +66,7 @@
           <td>
             <input type="radio" id="user" value="user" v-model="role">
             <label for="user">User</label>
-          </td>
+          </td> -->
         </tr>
         <tr>
           <td class="tabLabel">
@@ -143,6 +147,7 @@ export default {
       pass1: '',
       pass2: '',
       role: '',
+      roles: ['admin', 'user', 'sensor', 'mqtt']
       endDateObject: '',
       startDateObject: '',
       enabled: ''

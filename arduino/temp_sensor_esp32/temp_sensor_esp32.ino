@@ -21,6 +21,45 @@ const char* password = SECRET_PASS;
 char serverAddress[] = API_SERVER;  // server address
 int port = API_PORT;
 
+// CA details for https:
+// https://techtutorialsx.com/2017/11/18/esp32-arduino-https-get-request/
+const char* root_ca = \
+"-----BEGIN CERTIFICATE-----
+MIIGDTCCBPWgAwIBAgISAxEJX04zgM2AaLHfb/GzCXpaMA0GCSqGSIb3DQEBCwUA
+MEoxCzAJBgNVBAYTAlVTMRYwFAYDVQQKEw1MZXQncyBFbmNyeXB0MSMwIQYDVQQD
+ExpMZXQncyBFbmNyeXB0IEF1dGhvcml0eSBYMzAeFw0xODA3MDQxOTQ1MjVaFw0x
+ODEwMDIxOTQ1MjVaMBwxGjAYBgNVBAMTEXNraWJvLmR1Y2tkbnMub3JnMIIBIjAN
+BgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvK9zUIdWI6QABIwsuGd3H+8Vjg9O
+s09x852RvANt1ZTkQfZcNp+Wl3cj49MYWpKZem8SbDsbUg1wdVXutEnMuvPqH+5k
+koD6FGPF+bk1uQU2RgOe3JlIoxe3IvJZB44i78dLoAzQVLc3uH+38Qe2hgheW1o/
+nfJuXjedSAu9yh84bf0P6fERl0xiPEprjWIjvhwOIoWf+fl+W6uWxAH9PiKoNIxO
+jgtj6Gz4Wq1dSx9VrZYOeJgaU5zk6eK+VNQ7XEyYYgPn3896IDt0gT3Grr5IJ9my
+azlnn6TUd2iiWbdVszkQM+RER3pwEge/Kl0McX8vuHk/giG91rMNBPCJ3wIDAQAB
+o4IDGTCCAxUwDgYDVR0PAQH/BAQDAgWgMB0GA1UdJQQWMBQGCCsGAQUFBwMBBggr
+BgEFBQcDAjAMBgNVHRMBAf8EAjAAMB0GA1UdDgQWBBQlUje6dtyzfkjMLlZtsCec
+ST/VjTAfBgNVHSMEGDAWgBSoSmpjBH3duubRObemRWXv86jsoTBvBggrBgEFBQcB
+AQRjMGEwLgYIKwYBBQUHMAGGImh0dHA6Ly9vY3NwLmludC14My5sZXRzZW5jcnlw
+dC5vcmcwLwYIKwYBBQUHMAKGI2h0dHA6Ly9jZXJ0LmludC14My5sZXRzZW5jcnlw
+dC5vcmcvMBwGA1UdEQQVMBOCEXNraWJvLmR1Y2tkbnMub3JnMIH+BgNVHSAEgfYw
+gfMwCAYGZ4EMAQIBMIHmBgsrBgEEAYLfEwEBATCB1jAmBggrBgEFBQcCARYaaHR0
+cDovL2Nwcy5sZXRzZW5jcnlwdC5vcmcwgasGCCsGAQUFBwICMIGeDIGbVGhpcyBD
+ZXJ0aWZpY2F0ZSBtYXkgb25seSBiZSByZWxpZWQgdXBvbiBieSBSZWx5aW5nIFBh
+cnRpZXMgYW5kIG9ubHkgaW4gYWNjb3JkYW5jZSB3aXRoIHRoZSBDZXJ0aWZpY2F0
+ZSBQb2xpY3kgZm91bmQgYXQgaHR0cHM6Ly9sZXRzZW5jcnlwdC5vcmcvcmVwb3Np
+dG9yeS8wggEEBgorBgEEAdZ5AgQCBIH1BIHyAPAAdgDbdK/uyynssf7KPnFtLOW5
+qrs294Rxg8ddnU83th+/ZAAAAWRnCugLAAAEAwBHMEUCIE3zA7vs05ofLR/Rk61D
+D/tL0UsD68RaIGksvUl/CMXsAiEAhEV52zlTfhJKp2HfojwJIKyfkbjQ+t6SVNWC
+nOQRfVgAdgApPFGWVMg5ZbqqUPxYB9S3b79Yeily3KTDDPTlRUf0eAAAAWRnCugb
+AAAEAwBHMEUCIQCoNpRTM5fprKtUEPABNMDfXdVDgudNovjSY2meOr+DAgIgVcpE
+rDL9wReqjFrSn9re4WNVkp2oGL1XFxeZTzmGWTQwDQYJKoZIhvcNAQELBQADggEB
+ADIOSyELErhxe5wihLiQkORg3DgrBmN/TdpbcsJGpv7XiXe+fTZkikTmaIPyrXpV
+C7BdubS/23RdEKhM40NTn11mV3E/KEC3eAuZpe8X/GhH5dW1zEp32qAHCvUI9PBG
+hDwgdbE9YmUNLgxECHtm7kFDnne5VpN9KAYGvP9i+GA/jEGqpdIZJsvO5Ig75dO/
+rsgC95AuXyspf9ElxIvaNKVCpTQvcxp0fiuLymbAHE82rSIcWbnezpLlvTtqHgU8
+plSEFaR3VgpHudhiM0JkCK6zPJilKHLwQk88H0etfOh9r7McmNo5wtKpQvLXTxM/
+UwgVeTkHC9trs74WsJ5fsrk=
+-----END CERTIFICATE-----";
+
 WiFiClient wifi;
 HttpClient client = HttpClient(wifi, serverAddress, port);
 int status = WL_IDLE_STATUS;
@@ -55,6 +94,7 @@ void setup() {
 }
 
 void getAuth() {
+  client.begin(serverAddress, root_ca);
   client.beginRequest();
   client.post("/auth/login");
   String postData = "{username: "+API_user+", password : "+API_pass+"}";
@@ -65,7 +105,7 @@ void getAuth() {
   // read the status code and body of the response
   statusCode = client.responseStatusCode();
   response = client.responseBody();
-
+  client.end();
   Serial.print("POST Status code: ");
   Serial.println(statusCode);
   Serial.print("POST Response: ");
@@ -88,8 +128,8 @@ float temp() {
   Serial.print("Measuing temp...");
   sensors.requestTemperatures(); // Send the command to get temperatures
   Serial.println("DONE");
-  // Why "byIndex"? 
-  // You can have more than one IC on the same bus. 
+  // Why "byIndex"?
+  // You can have more than one IC on the same bus.
   // 0 refers to the first IC on the wire
 //  float intemp = sensors.getTempCByIndex(0);
 //  // Convert to string
@@ -101,10 +141,11 @@ float temp() {
 int updateAPI() {
   Serial.println("making GET request with HTTP basic authentication");
 //  build json
-  char PostData[] = "{\"group\": \"julian\", \"sensor\": sensorID, \"temp\": temp}";
+  char PostData[] = "{\"type\":\"temp\", \"group\": \"julian\", \"sensor\": sensorID, \"value\": temp}";
   String postData = String(PostData);
 //  String postData = "{group: julian, sensor: "+sensorID+", temp:" +temp+"}";
 //  String contentType = "application/x-www-form-urlencoded";
+  client.begin(serverAddress, root_ca);
   client.beginRequest();
   client.post("/data");
 //  client.sendHeader(HTTP_HEADER_CONTENT_TYPE, "application/x-www-form-urlencoded");
@@ -121,6 +162,7 @@ int updateAPI() {
   // read the status code and body of the response
   statusCode = client.responseStatusCode();
   response = client.responseBody();
+  client.end();
   Serial.print("Status code: ");
   Serial.println(statusCode);
   Serial.print("Response: ");

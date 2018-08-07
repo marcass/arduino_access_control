@@ -1,5 +1,7 @@
 #include <WiFi.h>
 //#include <WiFi101.h>
+//don't use arduin http client, use this: https://github.com/espressif/arduino-esp32/blob/51a4432ca8e71be202358ceb068f3047bb8ad762/libraries/HTTPClient/src/HTTPClient.h
+// with instructions: https://techtutorialsx.com/2017/05/19/esp32-http-get-requests/
 #include <ArduinoHttpClient.h>
 #include "secrets.h"
 #include <OneWire.h>

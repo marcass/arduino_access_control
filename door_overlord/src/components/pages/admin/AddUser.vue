@@ -52,7 +52,7 @@
             Role
           </td>
           <td v-for="item in roles">
-            <input type="radio" id="item" value="item" v-model="role">
+            <input type="radio" :id="item" :value="item" v-model="role">
             <label for="item">{{ item }}</label>
           </td>
           <!-- <td>
@@ -147,7 +147,7 @@ export default {
       pass1: '',
       pass2: '',
       role: '',
-      roles: ['admin', 'user', 'sensor', 'mqtt']
+      roles: ['admin', 'user', 'sensor', 'python'],
       endDateObject: '',
       startDateObject: '',
       enabled: ''

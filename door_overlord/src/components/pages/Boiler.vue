@@ -112,7 +112,7 @@ export default {
     getState () {
       getBoilerState().then((ret) => {
         console.log(ret)
-        this.state = ret.state
+        this.state = ret
       })
     }
   },

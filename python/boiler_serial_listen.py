@@ -40,7 +40,7 @@ def on_message(client, userdata, msg):
         except:
             state = msg.payload
         # print 'state is blah '+str(msg.payload)
-        data.update_status(state)
+        data.write_data('state', 'status', str(msg.payload))
     if 'pid' in msg.topic:
         pid_type = msg.topic.split('/')[-1:][0]
         data.write_data(pid_type, 'pid', int(msg.payload))

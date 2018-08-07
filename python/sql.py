@@ -64,7 +64,7 @@ def setup_db():
 def setup_door(door):
     conn, c = get_db()
     c.execute("SELECT * FROM doorID")
-    print c.fetchall()
+    # print c.fetchall()
     if door in c.fetchall():
         message = 'Door already exists'
         status = 'Error'
@@ -153,19 +153,28 @@ def get_all_doors():
 
 def fetch_user_data(user_in):
     conn, c = get_db()
-    c.execute("SELECT * FROM doorUsers WHERE user=?", (user_in,))
-    res = c.fetchall()[0]
+    try:
+        c.execute("SELECT * FROM doorUsers WHERE user=?", (user_in,))
+        res = c.fetchall()[0]
+    except:
+        # user not in can open so make blank response
+        res = ['','','','','']
     c.execute("SELECT role FROM userAuth WHERE username=?", (user_in,))
     role = c.fetchall()[0]
-    c.execute("SELECT door FROM canOpen WHERE userallowed=?", (user_in,))
-    doors =  [i[0] for i in c.fetchall()]
-    ret = ({'role': role, 'username': res[0], 'keycode': res[1], 'enabled': res[2], 'times' : {'start':res[3][:-3].replace(' ','T')+'Z','end':res[4][:-3].replace(' ','T')+'Z'}, 'doors':doors})
+    try:
+        c.execute("SELECT door FROM canOpen WHERE userallowed=?", (user_in,))
+        doors =  [i[0] for i in c.fetchall()]
+    except:
+        doors = []
+    ret = ({'role': role, 'username': user_in, 'keycode': res[1], 'enabled': res[2], 'times' : {'start':res[3][:-3].replace(' ','T')+'Z','end':res[4][:-3].replace(' ','T')+'Z'}, 'doors':doors})
     return ret
 
 def get_all_users():
     conn, c = get_db()
+    c.execute("SELECT username FROM userAuth")
+    users = [i[0] for i in c.fetchall()]
     ret = []
-    for user_in in get_doorUser_col('user'):
+    for user_in in users:
         ret.append(fetch_user_data(user_in))
     return ret
 
@@ -241,12 +250,16 @@ def get_doorlog(door, resp):
 ############  Write data ########################
 def setup_user(user_in, passw, role=0):
     conn, c = get_db()
+    # print user_in
+    # print passw
+    # print role
     try:
         if user_in == 'burner':
             role = 'burner'
         if role == 0:
             role = 'user'
         pw_hash = pbkdf2_sha256.hash(passw)
+        c.execute("SELECT * FROM userAuth")
         c.execute("INSERT INTO userAuth VALUES (?,?,?)", (user_in, pw_hash, role))
         conn.commit()
         return True
@@ -278,33 +291,40 @@ def update_doorUsers(user, column, value):
 def write_userdata(resp):
     utcnow = datetime.datetime.utcnow()
     conn, c = get_db()
-    start = resp['timeStart']
-    end = resp['timeEnd']
-    if (start == '') or (start == None):
-        timeStart = utcnow
+    if (resp['role'] == 'admin') or (resp['role'] == 'user') or (resp['role'] == 'burner'):
+        # this user can open doors
+        start = resp['timeStart']
+        end = resp['timeEnd']
+        if (start == '') or (start == None):
+            timeStart = utcnow
+        else:
+            timeStart = utc_from_string(start).strftime('%Y-%m-%dT%H:%M:%S.%fZ')
+        #2017-11-05T23:17:22.303Z
+        if (end == '') or (end == None):
+            from dateutil.relativedelta import relativedelta
+            timeEnd = utcnow + relativedelta(years=+20)
+        else:
+            timeEnd = utc_from_string(end).strftime('%Y-%m-%dT%H:%M:%S.%fZ')
+        users_in = get_doorUser_col('user')
+        if resp['username'] not in users_in:
+            try:
+                if (setup_user(resp['username'], resp['password'], resp['role'])):
+                    c.execute("INSERT INTO doorUsers VALUES (?,?,?,?,?)",(resp['username'], resp['keycode'], resp['enabled'], timeStart, timeEnd))
+                    conn.commit()
+                else:
+                    return {'Status': 'Error',  'Message': 'Failed to setup user'}
+            except:
+                return {'Status': 'Error', 'Message': 'Failed as non-unique new user'}
+        else:
+            c.execute("UPDATE doorUsers SET keycode=?, enabled=?, timeStart=?, timeEnd=? WHERE user=?", (resp['keycode'], resp['enabled'], timeStart, timeEnd, resp['username']))
+            conn.commit()
+        update_canOpen(resp['username'], resp['doorlist'])
+        return {'Status':'Success', 'Message': 'Door user '+resp['username'] + ' successfully updated'}
     else:
-        timeStart = utc_from_string(start).strftime('%Y-%m-%dT%H:%M:%S.%fZ')
-    #2017-11-05T23:17:22.303Z
-    if (end == '') or (end == None):
-        from dateutil.relativedelta import relativedelta
-        timeEnd = utcnow + relativedelta(years=+20)
-    else:
-        timeEnd = utc_from_string(end).strftime('%Y-%m-%dT%H:%M:%S.%fZ')
-    users_in = get_doorUser_col('user')
-    if resp['username'] not in users_in:
-        try:
-            if (setup_user(resp['username'], resp['password'], resp['role'])):
-                c.execute("INSERT INTO doorUsers VALUES (?,?,?,?,?)",(resp['username'], resp['keycode'], resp['enabled'], timeStart, timeEnd))
-                conn.commit()
-            else:
-                return {'Status': 'Error',  'Message': 'Failed to setup user'}
-        except:
-            return {'Status': 'Error', 'Message': 'Failed as non-unique new user'}
-    else:
-        c.execute("UPDATE doorUsers SET keycode=?, enabled=?, timeStart=?, timeEnd=? WHERE user=?", (resp['keycode'], resp['enabled'], timeStart, timeEnd, resp['username']))
-        conn.commit()
-    update_canOpen(resp['username'], resp['doorlist'])
-    return {'Status':'Success', 'Message': resp['username'] + ' successfully updated'}
+        if (setup_user(resp['username'], resp['password'], resp['role'])):
+            return {'Status':'Success', 'Message': 'Backend user '+resp['username'] + ' successfully updated'}
+        else:
+            return {'Status': 'Error',  'Message': 'Failed to setup user'}
 
 def update_canOpen(user, doors):
     conn, c = get_db()
@@ -353,7 +373,7 @@ def update_doorstatus(status, door):
     conn, c = get_db()
     utcnow = datetime.datetime.utcnow()
     #c.execute("SELECT * FROM doorStates WHERE door=? ORDER BY TIMESTAMP ASC LIMIT 1", (door,))
-    print 'new status is '+status
+    # print 'new status is '+status
     c.execute("SELECT * FROM doorStates WHERE door=? ORDER BY status_id  DESC LIMIT 1", (door,))
     #c.execute("SELECT * FROM doorStates WHERE door=? ORDER BY status_id", (door,))
     #print c.fetchall()

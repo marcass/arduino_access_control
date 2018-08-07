@@ -6,36 +6,35 @@ server {
         # SSL configuration
         #
         listen 443 ssl;
-        server_name <server_url>;
-	ssl_certificate /etc/letsencrypt/live/<url>/fullchain.pem;
-        ssl_certificate_key /etc/letsencrypt/live/<url>/privkey.pem;
-
-	## redirect non http traffic to https if you wish:
-        #if ($scheme = http) {
-        #       return 301 https://<url>/;
-        #}
-
+        server_name skibo.duckdns.org;
+        ssl_certificate /etc/letsencrypt/live/skibo.duckdns.org/fullchain.pem;
+        ssl_certificate_key /etc/letsencrypt/live/skibo.duckdns.org/privkey.pem;
         root /var/www/html;
-
         # Add index.php to the list if you are using PHP
         index index.html index.htm index.nginx-debian.html;
 
         location / {
-                add_header 'Access-Control-Allow-Origin' '*';
-                add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, DELETE, OPTIONS';
-                # First attempt to serve request as file, then
-                # as directory, then fall back to displaying a 404.
-                try_files $uri $uri/ =404;
+             # First attempt to serve request as file, then
+             # as directory, then fall back to displaying a 404.
+             try_files $uri $uri/ =404;
         }
 
-	#lets encrypt renewal
         location /.well-known/acme-challenge {
                 root /var/www/letsencrypt;
         }
 
-	#rewrite for api
+        #door api
+#        location /api {
+#                rewrite ^/api(.*) $1 break;
+#                proxy_pass http://127.0.0.1:5000/;
+#        }
+
+        #uwsgi api
         location /api {
-                rewrite ^/api(.*) $1 break;
-                proxy_pass http://127.0.0.1:5000/;
+               rewrite ^/api(.*) $1 break;
+               try_files $uri @api; }
+        location @api {
+                include uwsgi_params;
+                uwsgi_pass unix:///tmp/api.sock;
         }
 }

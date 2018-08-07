@@ -71,8 +71,8 @@ def update_status(new_state):
     state = new_state
 
 def get_state():
-    global state
-    return {'state': state}
+    results = client.query('SELECT state FROM "24_hours".boilerData LIMIT 1')
+    return results.raw['series'][0]['values'][0][1]
 
 def write_data(data_type, group, data):
     global state
@@ -94,7 +94,6 @@ def write_data(data_type, group, data):
             'time': datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S.%fZ")
             }
         ]
-    print json_data
     client.write_points(json_data)
 
 def get_values():
@@ -144,8 +143,8 @@ def get_data():
 
 q_dict = {'24_hours': {'rp_val':'boilerData'}, '7_days': {'rp_val':'values_7d'}, '2_months': {'rp_val':'values_2mo'}, '1_year': {'rp_val':'values_1y'}, '5_years': {'rp_val':'values_5y'}}
 def custom_data(payload):
-    print 'payload for graph is:'
-    print payload
+    # print 'payload for graph is:'
+    # print payload
     global periods
     # payload = {"items": ["water", "auger", "setpoint"], "range": "24_hours", "period": "3"}
     try:
@@ -179,7 +178,7 @@ def custom_data(payload):
             out = {'marker': {'color': '', 'size': '10', 'symbol': 104}, 'name': i, 'type': 'line', 'x': '', 'y': '', 'yaxis': 'yaxis2'}
             # data = results.get_points(tags={'status': 'Heating'})
         data = results.get_points()
-        print data
+        # print data
         for a in data:
             times.append(a['time'])
             values.append(a[i])
@@ -188,7 +187,7 @@ def custom_data(payload):
         out['x'] = times
         out['y'] = values
         res.append(out)
-    print res
+    # print res
     return res
 
 setup_RP()

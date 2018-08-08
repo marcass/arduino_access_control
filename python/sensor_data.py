@@ -48,17 +48,17 @@ def setup_RP():
         print 'No retention polices here'
     for i in retention_policies:
         if i not in RP_list:
-            client.create_retention_policy(i, durations[i]['dur'], 1, database='boiler', default=durations[i]['default'])
+            client.create_retention_policy(i, durations[i]['dur'], 1, database='sensors', default=durations[i]['default'])
     # https://influxdb-python.readthedocs.io/en/latest/api-documentation.html
     # https://docs.influxdata.com/influxdb/v1.6/guides/downsampling_and_retention/
     try:
-        client.query('CREATE CONTINUOUS QUERY "cq_7_days" ON %s BEGIN SELECT mean(temp) AS "temp", mean(humidity) AS "humidity", "location" AS "location" INTO "7_days".values_7d FROM "sensorData" GROUP BY time(1m), * END' %(db_name))
+        client.query('CREATE CONTINUOUS QUERY "cq_7_days" ON %s BEGIN SELECT mean(temp) AS "temp", mean(humidity) AS "humidity", "location" AS "location" INTO "7_days".values_7d FROM "sensorData" GROUP BY time(5m), * END' %(db_name))
         client.query('CREATE CONTINUOUS QUERY "cq_2_months" ON %s BEGIN SELECT mean(temp) AS "temp", mean(humidity) AS "humidity", "location" AS "location" INTO "2_months".values_2mo FROM "sensorData" GROUP BY time(10m), * END' %(db_name))
-        client.query('CREATE CONTINUOUS QUERY "cq_1_year" ON %s BEGIN SELECT mean(temp) AS "temp", mean(humidity) AS "humidity", "location" AS "location" INTO "1_year".values_1y FROM "sensorData" GROUP BY time(30m), * END' %(db_name))
-        client.query('CREATE CONTINUOUS QUERY "cq_5_years" ON %s BEGIN SELECT mean(temp) AS "temp", mean(humidity) AS "humidity", "location" AS "location" INTO "5_years".values_5y FROM "sensorData" GROUP BY time(1h), * END' %(db_name))
+        client.query('CREATE CONTINUOUS QUERY "cq_1_year" ON %s BEGIN SELECT mean(temp) AS "temp", mean(humidity) AS "humidity", "location" AS "location" INTO "1_year".values_1y FROM "sensorData" GROUP BY time(20m), * END' %(db_name))
+        client.query('CREATE CONTINUOUS QUERY "cq_5_years" ON %s BEGIN SELECT mean(temp) AS "temp", mean(humidity) AS "humidity", "location" AS "location" INTO "5_years".values_5y FROM "sensorData" GROUP BY time(30m), * END' %(db_name))
     except:
         # already exist
-        pass
+        print "Failed to create CQ's, do they already exist?"
 
 def write_data(json):
     if data_type not in value_types:

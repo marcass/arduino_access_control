@@ -60,9 +60,9 @@ def setup_RP():
         # already exist
         print "Failed to create CQ's, do they already exist?"
 
+setup_RP()
+
 def write_data(json):
-    if data_type not in value_types:
-        value_types.append(data_type)
     json_data = [
         {
             'measurement': 'sensorData',
@@ -76,7 +76,6 @@ def write_data(json):
             'time': datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S.%fZ")
             }
         ]
-    print json_data
     client.write_points(json_data)
 
 

@@ -66,7 +66,7 @@ import mqtt
 import middleman
 import views_auth
 import boiler_data as boiler
-import sensor_data as sensor
+import sensor_data as sensors
 from init import app, jwt
 from flask_jwt_extended import jwt_required, \
     create_access_token, jwt_refresh_token_required, \
@@ -168,10 +168,10 @@ def update_data():
     '''
     Writes data to influx from remote sensor
     '''
-    allowed = ['admin', 'senors', 'python']
+    allowed = ['admin', 'sensor', 'python']
     if get_jwt_claims()['role'] in allowed:
         content = request.get_json(silent=False)
-        return jsonify(sensors.update_data(content)), 200
+        return jsonify(sensors.write_data(content)), 200
     else:
         return jsonify({"msg": "Forbidden"}), 403
 

@@ -63,20 +63,24 @@ def setup_RP():
 setup_RP()
 
 def write_data(json):
-    json_data = [
-        {
-            'measurement': 'sensorData',
-            'tags': {
-                'group': json['group'],
-                'sensorID': json['sensor']
-            },
-            'fields': {
-                json['type']: json['value']
-            },
-            'time': datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S.%fZ")
-            }
-        ]
-    client.write_points(json_data)
+    try:
+        json_data = [
+            {
+                'measurement': 'sensorData',
+                'tags': {
+                    'group': json['group'],
+                    'sensorID': json['sensor']
+                },
+                'fields': {
+                    json['type']: json['value']
+                },
+                'time': datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+                }
+            ]
+        client.write_points(json_data)
+        return {'Status': 'success', 'Message': 'successfully wrote data points'}
+    except:
+        return {'Status': 'error', 'Messgage': 'failed to wrote data points'}
 
 
 # def get_data():

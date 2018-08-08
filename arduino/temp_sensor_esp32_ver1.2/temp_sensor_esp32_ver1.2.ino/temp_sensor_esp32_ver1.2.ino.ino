@@ -13,14 +13,15 @@
 //#define prod
 
 // Data wire is plugged into pin 2 on the Arduino
-#define ONE_WIRE_BUS 2
+#define ONE_WIRE_BUS 15
 OneWire oneWire(ONE_WIRE_BUS);
 // Pass our oneWire reference to Dallas Temperature.
 DallasTemperature sensors(&oneWire);
 const char sensorID[] = "hall";
 String curToken;
 float thisTemp;
-const char* Token;
+//const char* Token;
+String Token;
 
 ///////please enter your sensitive data in the Secret tab/secrets.h
 /////// Wifi Settings ///////
@@ -144,8 +145,6 @@ HTTPClient http;
 int status = WL_IDLE_STATUS;
 String response;
 int statusCode = 0;
-//Ensure token fits in here
-StaticJsonBuffer<500> jsonBuffer;
 
 void connectWifi(){
   WiFi.begin (ssid, password);
@@ -174,8 +173,10 @@ void setup() {
   Token = getAuth();
 }
 
-const char* getAuth() {
+String getAuth() {
   String payload;
+  //Ensure token fits in here
+  StaticJsonBuffer<200> jsonBuffer;
   JsonObject& creds = jsonBuffer.createObject();
   creds["username"] = API_user;
   creds["password"] = API_pass;
@@ -211,7 +212,7 @@ const char* getAuth() {
   const char* jwt_token = root["access_token"];
   Serial.println(jwt_token);
 //  return String(jwt_token);
-  return jwt_token;
+  return "Bearer "+ String(jwt_token);
 }
 
 float temp() {
@@ -229,6 +230,8 @@ float temp() {
 }
 
 void updateAPI() {
+  //Ensure token fits in here
+  StaticJsonBuffer<500> jsonBuffer;
   //build json object
   Serial.print("SensorID is ");
   Serial.println(sensorID);
@@ -243,23 +246,20 @@ void updateAPI() {
   Serial.println();
   Serial.println("making POST request");
   http.begin(SERVER_443_data);
-//  sprintf(auth_header, "%s = %s", auth_start, curToken);
-//  Serial.println(auth_header);
-  http.addHeader("Content-Type", "application/json", false, false);
-  String bits = "bearer "+curToken;
-  http.addHeader("Authorization", bits, true, false);
-//  http.setUserAgent("bearer");
-//  http.setAuthorization(Token);
+  http.addHeader("Authorization", Token);
+  http.addHeader("Content-Type", "application/json");
   String input;
   root.printTo(input);
-  int len = input.length();
-  Serial.println(len);
   int httpCode = http.POST(input);
   // httpCode will be negative on error
   if(httpCode > 0) {
     // HTTP header has been send and Server response header has been handled
-    Serial.print("HTT code = ");
+    Serial.print("HTTP code = ");
     Serial.println(httpCode);
+    if(httpCode == 401){
+    //token expired so get a new one
+      Token = getAuth();
+    }
     // file found at server
     if(httpCode == HTTP_CODE_OK) {
         String payload = http.getString();
@@ -273,9 +273,12 @@ void updateAPI() {
 
 void loop() {
   #ifdef test
-    thisTemp = 19.13;
+    thisTemp = temp();
+    Serial.println(thisTemp);
     updateAPI();
 //    http.begin(SERVER_80);
+//    Serial.println(Token);
+//    http.addHeader("Authorization", Token);
 //    int httpCode = http.GET();
 //    if (httpCode > 0) { //Check for the returning code 
 //        String payload = http.getString();
@@ -285,7 +288,8 @@ void loop() {
 //      Serial.println("Error on HTTP request");
 //    }
 //    http.end(); //Free the resources
-    thisTemp = thisTemp + 0.50;
+//    thisTemp = thisTemp + 0.50;
+//    Serial.print(thisTemp);
     delay(10000);
   #endif
   #ifdef testssl

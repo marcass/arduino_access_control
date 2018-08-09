@@ -66,13 +66,12 @@ def write_data(json):
     try:
         json_data = [
             {
-                'measurement': 'sensorData',
+                'measurement': json['group'],
                 'tags': {
-                    'group': json['group'],
                     'sensorID': json['sensor']
                 },
                 'fields': {
-                    json['type']: json['value']
+                    json['type']: float(json['value'])
                 },
                 'time': datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S.%fZ")
                 }
@@ -82,7 +81,23 @@ def write_data(json):
     except:
         return {'Status': 'error', 'Messgage': 'failed to wrote data points'}
 
+def get_sensorIDs(location):
+    # results = client.query('SHOW TAG VALUES ON "sensors" WITH KEY = sensorID')
+    # results = client.query('SHOW TAG VALUES ON "sensors" WITH KEY = sensorID WHERE "group" = \"%s\"' %(location))
+    results = client.query('SHOW TAG VALUES ON "sensors" FROM \"%s\" WITH KEY = sensorID' %(location))
+    sensors = results.get_points()
+    ids = []
+    for i in sensors:
+        ids.append(i['value'])
+    return ids
 
+def get_measurements():
+    results = client.query('SHOW MEASUREMENTS ON "sensors"')
+    sites = results.get_points()
+    locs = []
+    for i in sites:
+        locs.append(i['name'])
+    return locs
 # def get_data():
 #     q_time = (datetime.datetime.utcnow() - datetime.timedelta(days=1)).strftime("%Y-%m-%dT%H:%M:%S.%f000Z")
 #     # Need stupid single quites around timestamp to nanoscecond precision

@@ -168,11 +168,11 @@ def update_data():
     '''
     Writes data to influx from remote sensor
     '''
-    print request.headers
+    # print request.headers
     allowed = ['admin', 'sensor', 'python']
     if get_jwt_claims()['role'] in allowed:
         content = request.get_json(silent=False)
-        print content
+        # print content
         return jsonify(sensors.write_data(content)), 200
     else:
         return jsonify({"msg": "Forbidden"}), 403

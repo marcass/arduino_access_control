@@ -17,8 +17,7 @@
 OneWire oneWire(ONE_WIRE_BUS);
 // Pass our oneWire reference to Dallas Temperature.
 DallasTemperature sensors(&oneWire);
-const char sensorID[] = "hall";
-String curToken;
+const char sensorID[] = SENSOR_NAME;
 float thisTemp;
 String Token;
 
@@ -92,6 +91,7 @@ String getAuth() {
   creds["username"] = API_user;
   creds["password"] = API_pass;
   creds.printTo(Serial);
+  //http.begin(SERVER_80_auth);
   http.begin(SERVER_443_auth, root_ca);
   http.addHeader("Content-Type", "application/json");
   String input;
@@ -150,12 +150,13 @@ void updateAPI() {
   Serial.println(thisTemp);
   JsonObject& root = jsonBuffer.createObject();
   root["type"] = "temp";
-  root["group"] = "julian";
+  root["group"] = SITE;
   root["value"] = thisTemp;
   root["sensor"] = sensorID;
   root.printTo(Serial);
   Serial.println();
   Serial.println("making POST request");
+  //http.begin(SERVER_80_data);
   http.begin(SERVER_443_data, root_ca);
   http.addHeader("Authorization", Token);
   http.addHeader("Content-Type", "application/json");

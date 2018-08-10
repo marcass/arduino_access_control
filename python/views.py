@@ -182,11 +182,12 @@ def update_data():
 def get_data():
     '''
     Get data from influx about sensor types
+    returns: {"sensorID": [sensorID1, sensorID2....], "measurements": [location1, location 2....], "types": ['temp', humidity etc]}
     '''
     # print request.headers
     allowed = ['admin', 'sensor', 'python']
     if get_jwt_claims()['role'] in allowed:
-        return jsonify({"sensorID": sensors.get_sensorIDs(), "measurements": sensor.get_measurements()), 200
+        return jsonify({"sensorID": sensors.get_sensorIDs(), "measurements": sensor.get_measurements()}), 200
     else:
         return jsonify({"msg": "Forbidden"}), 403
 

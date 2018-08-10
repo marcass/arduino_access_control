@@ -99,47 +99,6 @@ def get_measurements():
         locs.append(i['name'])
     return locs
 
-# def get_data():
-#     q_time = (datetime.datetime.utcnow() - datetime.timedelta(days=1)).strftime("%Y-%m-%dT%H:%M:%S.%f000Z")
-#     # Need stupid single quites around timestamp to nanoscecond precision
-#     results = client.query('SELECT water FROM "24_hours".sensorData WHERE time > \'%s\'' %(q_time))
-#     water_data = results.get_points()
-#     wtimes = []
-#     wvalues = []
-#     for i in water_data:
-#         wtimes.append(i['time'])
-#         wvalues.append(i['water'])
-#     water = {'marker': {'color': 'red', 'size': '10', 'symbol': 104}, 'name': 'water', 'type': 'line', 'x': wtimes, 'y': wvalues}
-#     auger_data = results.get_points(tags={'value_type':'auger'})
-#     # for i in auger_data:
-#     #     atimes.append(i['time'])
-#     #     avalues.append(i['value'])
-#     # auger = {'marker': {'color': 'blue', 'size': '10', 'symbol': 104}, 'name': 'auger', 'x': atimes, 'y': avalues}
-#     # ftimes = []
-#     # fvalues = []
-#     # fan_data = results.get_points(tags={'value_type':'fan', 'status': 'Heating'})
-#     # for i in fan_data:
-#     #     ftimes.append(i['time'])
-#     #     fvalues.append(i['value'])
-#     # fan = {'marker': {'color': 'yellow', 'size': '10', 'symbol': 104}, 'name': 'fan', 'x': ftimes, 'y': fvalues, 'yaxis': 'y2'}
-#     # fdtimes = []
-#     # fdvalues = []
-#     # feed_data = results.get_points(tags={'value_type':'feed', 'status': 'Heating'})
-#     # for i in feed_data:
-#     #     fdtimes.append(i['time'])
-#     #     fdvalues.append(i['value'])
-#     # feed = {'marker': {'color': 'black', 'size': '10', 'symbol': 104}, 'name': 'feed', 'x': fdtimes, 'y': fdvalues, 'yaxis': 'y2'}
-#     # ptimes = []
-#     # pvalues = []
-#     # pause_data = results.get_points(tags={'value_type':'pause', 'status': 'Heating'})
-#     # for i in pause_data:
-#     #     ptimes.append(i['time'])
-#     #     pvalues.append(i['value'])
-#     # pause = {'marker': {'color': 'green', 'size': '10', 'symbol': 104}, 'name': 'pause', 'x': ptimes, 'y': pvalues, 'yaxis': 'y2'}
-#     # state_plot = {}
-#     # return [water, auger, fan, feed, pause]
-#     return [water]
-#
 q_dict = {'24_hours': {'rp_val':'sensorData', 'period_type': 'hours'}, '7_days': {'rp_val':'values_7d', 'period_type': 'days'}, '2_months': {'rp_val':'values_2mo', 'period_type': 'days'}, '1_year': {'rp_val':'values_1y', 'period_type': 'months'}, '5_years': {'rp_val':'values_5y', 'period_type': 'years'}}
 def custom_data(payload):
     # payload = {"measurement": <location>, "sensors":[{'id': <sens1>, 'type': <temp/hum>}........], "range":<RP to graph from>, "period": int}

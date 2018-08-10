@@ -81,15 +81,21 @@ def write_data(json):
     except:
         return {'Status': 'error', 'Messgage': 'failed to wrote data points'}
 
-def get_sensorIDs(location):
-    # results = client.query('SHOW TAG VALUES ON "sensors" WITH KEY = sensorID')
-    # results = client.query('SHOW TAG VALUES ON "sensors" WITH KEY = sensorID WHERE "group" = \"%s\"' %(location))
-    results = client.query('SHOW TAG VALUES ON "sensors" FROM \"%s\" WITH KEY = sensorID' %(location))
-    sensors = results.get_points()
-    ids = []
-    for i in sensors:
-        ids.append(i['value'])
-    return ids
+def get_sensorIDs():
+    locations = get_measurements()
+    ret = []
+    for a in locations:
+        # results = client.query('SHOW TAG VALUES ON "sensors" WITH KEY = sensorID')
+        # results = client.query('SHOW TAG VALUES ON "sensors" WITH KEY = sensorID WHERE "group" = \"%s\"' %(location))
+        results = client.query('SHOW TAG VALUES ON "sensors" FROM \"%s\" WITH KEY = sensorID' %(a))
+        sensors = results.get_points()
+        ids = []
+        for i in sensors:
+            ids.append(i['value'])
+        res = {a: ids}
+        ret.append(res)
+    print ret
+    return ret
 
 def get_measurements():
     results = client.query('SHOW MEASUREMENTS ON "sensors"')

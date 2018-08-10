@@ -177,6 +177,35 @@ def update_data():
     else:
         return jsonify({"msg": "Forbidden"}), 403
 
+@app.route("/data", methods=['GET',])
+@jwt_required
+def get_data():
+    '''
+    Get data from influx about sensor types
+    '''
+    # print request.headers
+    allowed = ['admin', 'sensor', 'python']
+    if get_jwt_claims()['role'] in allowed:
+        return jsonify({"sensorID": sensors.get_sensorIDs(), "measurements": sensor.get_measurements()), 200
+    else:
+        return jsonify({"msg": "Forbidden"}), 403
+
+@app.route("/data/values", methods=['POST',])
+@jwt_required
+def get_data(payload):
+    '''
+    Get data from influx
+    sends: {"measurement": <location>, "type": <temp/hum>, "sensors":[<sens1>, <sens2>....], "range":<RP to graph from>, "period": int}
+    returns: traces for plotly
+    '''
+    # print request.headers
+    allowed = ['admin', 'sensor', 'python']
+    if get_jwt_claims()['role'] in allowed:
+        content = request.get_json(silent=False)
+        return jsonify(sensors.custom_data(content)), 200
+    else:
+        return jsonify({"msg": "Forbidden"}), 403
+
 # Door control routes#####################################
 @app.route("/listallowed", methods=['GET',])
 @jwt_required

@@ -98,6 +98,7 @@ def get_measurements():
     for i in sites:
         locs.append(i['name'])
     return locs
+
 # def get_data():
 #     q_time = (datetime.datetime.utcnow() - datetime.timedelta(days=1)).strftime("%Y-%m-%dT%H:%M:%S.%f000Z")
 #     # Need stupid single quites around timestamp to nanoscecond precision
@@ -139,53 +140,42 @@ def get_measurements():
 #     # return [water, auger, fan, feed, pause]
 #     return [water]
 #
-# q_dict = {'24_hours': {'rp_val':'sensorData'}, '7_days': {'rp_val':'values_7d'}, '2_months': {'rp_val':'values_2mo'}, '1_year': {'rp_val':'values_1y'}, '5_years': {'rp_val':'values_5y'}}
-# def custom_data(payload):
-#     print 'payload for graph is:'
-#     print payload
-#     global periods
-#     # payload = {"items": ["water", "auger", "setpoint"], "range": "24_hours", "period": "3"}
-#     try:
-#         if payload['range'] in periods['hours']:
-#             timestamp = (datetime.datetime.utcnow() - datetime.timedelta(hours=int(payload['period']))).strftime("%Y-%m-%dT%H:%M:%S.%f000Z")
-#         if payload['range'] in periods['days']:
-#             timestamp = (datetime.datetime.utcnow() - datetime.timedelta(days=int(payload['period']))).strftime("%Y-%m-%dT%H:%M:%S.%f000Z")
-#         if payload['range'] in periods['months']:
-#             timestamp = (datetime.datetime.utcnow() - datetime.timedelta(months=int(payload['period']))).strftime("%Y-%m-%dT%H:%M:%S.%f000Z")
-#         if payload['range'] in periods['years']:
-#             timestamp = (datetime.datetime.utcnow() - datetime.timedelta(years=int(payload['period']))).strftime("%Y-%m-%dT%H:%M:%S.%f000Z")
-#     except:
-#         timestamp = (datetime.datetime.utcnow() - datetime.timedelta(hours=int(payload['period']))).strftime("%Y-%m-%dT%H:%M:%S.%f000Z")
-#     # results = client.query('SELECT * FROM "boiler"."autogen"."boilerEvents" WHERE time > %s' %("'"+timestamp+"'"))
-#     # target = payload["range"]+"."+q_dict[payload["range"]]["rp_val"]
-#     # print target
-#     res = []
-#     colours = ['red', 'blue', 'green', 'black', 'yellow', 'orange']
-#     count = 0
-#     for i in payload['items']:
-#         # get value name:
-#
-#         results = client.query('SELECT %s FROM %s WHERE time > \'%s\'' %(i, '"'+payload["range"]+'"'+'.'+'"'+q_dict[payload["range"]]["rp_val"]+'"', timestamp))
-#         # print results.raw
-#         times = []
-#         values = []
-#         if i in temps:
-#             out = {'marker': {'color': '', 'size': '10', 'symbol': 104}, 'name': i, 'type': 'line', 'x': '', 'y': '', 'yaxis': 'yaxis'}
-#             # data = results.get_points()
-#         if i in pids:
-#             out = {'marker': {'color': '', 'size': '10', 'symbol': 104}, 'name': i, 'type': 'line', 'x': '', 'y': '', 'yaxis': 'yaxis2'}
-#             # data = results.get_points(tags={'status': 'Heating'})
-#         data = results.get_points()
-#         print data
-#         for a in data:
-#             times.append(a['time'])
-#             values.append(a[i])
-#         out['colour'] = colours[count]
-#         count += 1
-#         out['x'] = times
-#         out['y'] = values
-#         res.append(out)
-#     print res
-#     return res
-#
-# setup_RP()
+q_dict = {'24_hours': {'rp_val':'sensorData', 'period_type': 'hours'}, '7_days': {'rp_val':'values_7d', 'period_type': 'days'}, '2_months': {'rp_val':'values_2mo', 'period_type': 'days'}, '1_year': {'rp_val':'values_1y', 'period_type': 'months'}, '5_years': {'rp_val':'values_5y', 'period_type': 'years'}}
+def custom_data(payload):
+    # payload = {"measurement": <location>, "sensors":[{'id': <sens1>, 'type': <temp/hum>}........], "range":<RP to graph from>, "period": int}
+    print 'payload for graph is:'
+    print payload
+    try:
+        arg_dict = {q_dict[payload['range']]['period_type']: payload['period']}
+        timestamp = (datetime.datetime.utcnow() - datetime.timedelta(**arg_dict)).strftime("%Y-%m-%dT%H:%M:%S.%f000Z")
+    except:
+        timestamp = (datetime.datetime.utcnow() - datetime.timedelta(hours=int(payload['period']))).strftime("%Y-%m-%dT%H:%M:%S.%f000Z")
+    # results = client.query('SELECT * FROM "boiler"."autogen"."boilerEvents" WHERE time > %s' %("'"+timestamp+"'"))
+    # target = payload["range"]+"."+q_dict[payload["range"]]["rp_val"]
+    # print target
+    res = []
+    colours = ['red', 'blue', 'green', 'black', 'yellow', 'orange']
+    count = 0
+    for i in payload['sensors']:
+        results = client.query('SELECT %s FROM \"%s\".\"%s\" WHERE time > \'%s\'' %(i['type'], payload["range"], payload['measurement'], timestamp))
+        # print results.raw
+        times = []
+        values = []
+        # if i in temps:
+        out = {'marker': {'color': '', 'size': '10', 'symbol': 104}, 'name': i['name'], 'type': 'line', 'x': '', 'y': '', 'yaxis': 'yaxis'}
+            # data = results.get_points()
+        # if i in pids:
+        #     out = {'marker': {'color': '', 'size': '10', 'symbol': 104}, 'name': i, 'type': 'line', 'x': '', 'y': '', 'yaxis': 'yaxis2'}
+            # data = results.get_points(tags={'status': 'Heating'})
+        data = results.get_points(tags={"sensorID": i['id']})
+        print data
+        for a in data:
+            times.append(a['time'])
+            values.append(a[i['type']])
+        out['colour'] = colours[count]
+        count += 1
+        out['x'] = times
+        out['y'] = values
+        res.append(out)
+    print res
+    return res

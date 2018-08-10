@@ -196,7 +196,7 @@ def get_data():
 def get_data(payload):
     '''
     Get data from influx
-    sends: {"measurement": <location>, "type": <temp/hum>, "sensors":[<sens1>, <sens2>....], "range":<RP to graph from>, "period": int}
+    sends: {"measurement": [{"location": <location1>, "sensors":[{'id': <sens1>, 'type': <temp/hum>}........]},....], "range":<RP to graph from>, "period": int}
     returns: traces for plotly
     '''
     # print request.headers

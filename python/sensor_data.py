@@ -101,7 +101,7 @@ def get_measurements():
 
 q_dict = {'24_hours': {'rp_val':'sensorData', 'period_type': 'hours'}, '7_days': {'rp_val':'values_7d', 'period_type': 'days'}, '2_months': {'rp_val':'values_2mo', 'period_type': 'days'}, '1_year': {'rp_val':'values_1y', 'period_type': 'months'}, '5_years': {'rp_val':'values_5y', 'period_type': 'years'}}
 def custom_data(payload):
-    # payload = {"measurement": <location>, "sensors":[{'id': <sens1>, 'type': <temp/hum>}........], "range":<RP to graph from>, "period": int}
+    # payload = {"measurement": [{"location": <location1>, "sensors":[{'id': <sens1>, 'type': <temp/hum>}........]},....], "range":<RP to graph from>, "period": int}
     print 'payload for graph is:'
     print payload
     try:
@@ -115,26 +115,27 @@ def custom_data(payload):
     res = []
     colours = ['red', 'blue', 'green', 'black', 'yellow', 'orange']
     count = 0
-    for i in payload['sensors']:
-        results = client.query('SELECT %s FROM \"%s\".\"%s\" WHERE time > \'%s\'' %(i['type'], payload["range"], payload['measurement'], timestamp))
-        # print results.raw
-        times = []
-        values = []
-        # if i in temps:
-        out = {'marker': {'color': '', 'size': '10', 'symbol': 104}, 'name': i['name'], 'type': 'line', 'x': '', 'y': '', 'yaxis': 'yaxis'}
-            # data = results.get_points()
-        # if i in pids:
-        #     out = {'marker': {'color': '', 'size': '10', 'symbol': 104}, 'name': i, 'type': 'line', 'x': '', 'y': '', 'yaxis': 'yaxis2'}
-            # data = results.get_points(tags={'status': 'Heating'})
-        data = results.get_points(tags={"sensorID": i['id']})
-        print data
-        for a in data:
-            times.append(a['time'])
-            values.append(a[i['type']])
-        out['colour'] = colours[count]
-        count += 1
-        out['x'] = times
-        out['y'] = values
-        res.append(out)
+    for x in payload['measurement']:
+        for i in x['sensors']:
+            results = client.query('SELECT %s FROM \"%s\".\"%s\" WHERE time > \'%s\'' %(i['type'], payload["range"], payload['measurement'], timestamp))
+            # print results.raw
+            times = []
+            values = []
+            # if i in temps:
+            out = {'marker': {'color': '', 'size': '10', 'symbol': 104}, 'name': i['location']+' '+i['id'], 'type': 'line', 'x': '', 'y': '', 'yaxis': 'yaxis'}
+                # data = results.get_points()
+            # if i in pids:
+            #     out = {'marker': {'color': '', 'size': '10', 'symbol': 104}, 'name': i, 'type': 'line', 'x': '', 'y': '', 'yaxis': 'yaxis2'}
+                # data = results.get_points(tags={'status': 'Heating'})
+            data = results.get_points(tags={"sensorID": i['id']})
+            print data
+            for a in data:
+                times.append(a['time'])
+                values.append(a[i['type']])
+            out['colour'] = colours[count]
+            count += 1
+            out['x'] = times
+            out['y'] = values
+            res.append(out)
     print res
     return res

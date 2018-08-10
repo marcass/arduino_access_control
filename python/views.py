@@ -193,7 +193,7 @@ def get_data():
 
 @app.route("/data/values", methods=['POST',])
 @jwt_required
-def get_values(payload):
+def get_values():
     '''
     Get data from influx
     sends: {"measurement": [{"location": <location1>, "sensors":[{'id': <sens1>, 'type': <temp/hum>}........]},....], "range":<RP to graph from>, "period": int}
@@ -203,6 +203,8 @@ def get_values(payload):
     allowed = ['admin', 'sensor', 'python']
     if get_jwt_claims()['role'] in allowed:
         content = request.get_json(silent=False)
+        print 'views content is:'
+        print content
         return jsonify(sensors.custom_data(content)), 200
     else:
         return jsonify({"msg": "Forbidden"}), 403

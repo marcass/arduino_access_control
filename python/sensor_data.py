@@ -125,7 +125,8 @@ def custom_data(payload):
     res = []
     colours = ['red', 'blue', 'green', 'black', 'yellow', 'orange']
     count = 0
-    results = client.query('SELECT * FROM "24_hours".marcus WHERE time > \'%s\'' %(timestamp))
+    # results = client.query('SELECT * FROM "24_hours".marcus WHERE time > \'%s\'' %(timestamp))
+    results = client.query('SELECT * FROM "7_days".values_7d WHERE time > \'%s\'' %(timestamp))
     # print results.raw
     for x in payload['measurement']:
         for i in x['sensors']:
@@ -134,7 +135,7 @@ def custom_data(payload):
             values = []
             # if i in temps:
             # out = {'marker': {'color': '', 'size': '10', 'symbol': 104}, 'name': i['id'], 'type': 'line', 'x': '', 'y': '', 'yaxis': 'yaxis'}
-            out = {'marker': {'color': '', 'size': '10', 'symbol': 104}, 'name': i['id'], 'type': 'line', 'x': '', 'y': ''}
+            out = {'marker': {'color': 'red', 'size': '10'}, 'name': i['id'], 'type': 'line', 'x': '', 'y': ''}
                 # data = results.get_points()
             # if i in pids:
             #     out = {'marker': {'color': '', 'size': '10', 'symbol': 104}, 'name': i, 'type': 'line', 'x': '', 'y': '', 'yaxis': 'yaxis2'}
@@ -144,7 +145,7 @@ def custom_data(payload):
             for a in data:
                 times.append(a['time'])
                 values.append(a[i['type']])
-            out['colour'] = colours[count]
+            # out['colour'] = colours[count]
             count += 1
             out['x'] = times
             out['y'] = values

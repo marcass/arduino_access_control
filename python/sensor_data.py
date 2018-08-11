@@ -3,14 +3,17 @@ from datetime import timedelta
 import datetime
 import time
 
-locations = ['julian', 'marcus']
+sites = []
 
 db_name = 'sensors'
-# setup reteniton plicy list
+# setup reteniton plicy list must match index of durations
 retention_policies = ['24_hours', '7_days','2_months', '1_year', '5_years']
 # setup retention policy detail
-durations = {'24_hours': {'dur':'1d', 'default':True}, '7_days': {'dur':'7d', 'default':False},
-             '2_months': {'dur':'4w', 'default':False}, '1_year': {'dur':'52w','default':False}, '5_years': {'dur':'260w','default':False}}
+durations = [{'name':'24_hours', 'dur':'1d', 'default':True},
+             {'name': '7_days', 'dur':'7d', 'default':False},
+             {'name': '2_months', 'dur':'4w', 'default':False},
+             {'name': '1_year', 'dur':'52w','default':False},
+             {'name': '5_years', 'dur':'260w','default':False}]
 # orgainse graphing periods
 periods = {'hours': ['24_hours'], 'days': ['7_days', '2_months'], 'months': ['1_year'], 'years': ['5_years']}
 # setup db
@@ -35,12 +38,11 @@ setup_db()
 client.switch_database(db_name)
 # client.drop_database(db_name)
 
-# values we want top preserve in retention policies:
-rp_fields = ['temp', 'location', 'humidity']
-
-def setup_RP():
+def setup_RP(site):
     global retention_policies
+    global sites
     RP_list = []
+    site_rps = []
     try:
         RP = client.get_list_retention_policies(db_name)
         for i in RP:
@@ -49,23 +51,30 @@ def setup_RP():
     except:
         print 'No retention polices here'
     for i in retention_policies:
+        site_rps.append(site+'_'+i)
+    for i in site_rps:
+        val = site_rps.index(i)
         if i not in RP_list:
-            client.create_retention_policy(i, durations[i]['dur'], 1, database='sensors', default=durations[i]['default'])
+            client.create_retention_policy(i, durations[val]['dur'], 1, database='sensors', default=durations[val]['default'])
     # https://influxdb-python.readthedocs.io/en/latest/api-documentation.html
     # https://docs.influxdata.com/influxdb/v1.6/guides/downsampling_and_retention/
     try:
-        for i in locations:
-            client.query('CREATE CONTINUOUS QUERY \"%s\" ON %s BEGIN SELECT mean(temp) AS "temp", mean(humidity) AS "humidity", mean(light) AS "light" INTO "7_days".values_7d FROM \"%s\" GROUP BY time(5m), * END' %(i+'_cq_7_days', db_name, i))
-            client.query('CREATE CONTINUOUS QUERY \"%s\" ON %s BEGIN SELECT mean(temp) AS "temp", mean(humidity) AS "humidity", mean(light) AS "light" INTO "2_months".values_2mo FROM \"%s\" GROUP BY time(10m), * END' %(i+'_cq_2_months', db_name, i))
-            client.query('CREATE CONTINUOUS QUERY \"%s\" ON %s BEGIN SELECT mean(temp) AS "temp", mean(humidity) AS "humidity", mean(light) AS "light" INTO "1_year".values_1y FROM \"%s\" GROUP BY time(20m), * END' %(i+'_cq_1_year', db_name, i))
-            client.query('CREATE CONTINUOUS QUERY \"%s\" ON %s BEGIN SELECT mean(temp) AS "temp", mean(humidity) AS "humidity", mean(light) AS "light" INTO "5_years".values_5y FROM \"%s\" GROUP BY time(30m), * END' %(i+'_cq_5_years', db_name, i))
+        client.query('CREATE CONTINUOUS QUERY \"%s\" ON %s BEGIN SELECT mean(temp) AS "temp", mean(humidity) AS "humidity", mean(light) AS "light" INTO \"%s\".values_7d FROM \"%s\" GROUP BY time(5m), * END' %(site+'_cq_7_days', db_name, site+'_7_days', site))
+        client.query('CREATE CONTINUOUS QUERY \"%s\" ON %s BEGIN SELECT mean(temp) AS "temp", mean(humidity) AS "humidity", mean(light) AS "light" INTO \"%s\".values_2mo FROM \"%s\" GROUP BY time(10m), * END' %(site+'_cq_2_months', db_name, site+'_2_months', site))
+        client.query('CREATE CONTINUOUS QUERY \"%s\" ON %s BEGIN SELECT mean(temp) AS "temp", mean(humidity) AS "humidity", mean(light) AS "light" INTO \"%s\".values_1y FROM \"%s\" GROUP BY time(20m), * END' %(site+'_cq_1_year', db_name, site+'_1_year', site))
+        client.query('CREATE CONTINUOUS QUERY \"%s\" ON %s BEGIN SELECT mean(temp) AS "temp", mean(humidity) AS "humidity", mean(light) AS "light" INTO \"%s\".values_5y FROM \"%s\" GROUP BY time(30m), * END' %(site+'_cq_5_years', db_name, site+'_5_years', site))
     except:
         # already exist
-        print "Failed to create CQ's, do they already exist?"
+        print "Failed to create CQ for "+i+", as it already exists"
 
-setup_RP()
+# setup_RP()
 
 def write_data(json):
+    # ensure RP's and CQ's in place for new sites
+    global sites
+    if json['group'] not in sites:
+        sites.append(json['group'])
+        setup_RP(json['group'])
     try:
         json_data = [
             {
@@ -85,19 +94,33 @@ def write_data(json):
         return {'Status': 'error', 'Messgage': 'failed to wrote data points'}
 
 def get_sensorIDs():
-    locations = get_measurements()
+    global sites
     ret = []
-    for a in locations:
+    for a in sites:
+        print a
+        res_dict = {'site': a, 'location': []}
         # results = client.query('SHOW TAG VALUES ON "sensors" WITH KEY = sensorID')
         # results = client.query('SHOW TAG VALUES ON "sensors" WITH KEY = sensorID WHERE "group" = \"%s\"' %(location))
         results = client.query('SHOW TAG VALUES ON "sensors" FROM \"%s\" WITH KEY = sensorID' %(a))
-        sensors = results.get_points()
-        ids = []
-        for i in sensors:
-            ids.append(i['value'])
-        res = {a: ids}
-        ret.append(res)
+        locations = results.get_points()
+        # ids = []
+        # ret.append(res_dict)
+        for i in locations:
+            # this_dict = {'id': i['value'], 'fields': []}
+            this_res = client.query('SHOW FIELD KEYS ON "sensors" FROM \"%s\"' %(a))
+            sensors = this_res.get_points()
+            fields = [x['fieldKey'] for x in sensors]
+            this_dict = {'id': i['value'], 'fields': fields}
+            # for x in sensors:
+            #     fields =
+            #     this_dict['fields'].append(x['fieldKey'])
+            # ids.append(i['value'])
+            res_dict['location'].append(this_dict)
+        ret.append(res_dict)
     print ret
+    # [{site: marcus, locatons: [{id: lounge, fields: []}, {id: kitchen, fields: []}]
+    # returns:
+    # [{'site': 'marcus', 'location': [{'fields': [u'light', u'temp'], 'id': u'downhall'}, {'fields': [u'light', u'temp'], 'id': u'kitchen'}, {'fields': [u'light', u'temp'], 'id': u'lounge'}, {'fields': [u'light', u'temp'], 'id': u'spare'}, {'fields': [u'light', u'temp'], 'id': u'window'}]}]
     return ret
 
 def get_measurements():
@@ -110,15 +133,17 @@ def get_measurements():
 
 q_dict = {'24_hours': {'rp_val':'sensorData', 'period_type': 'hours'}, '7_days': {'rp_val':'values_7d', 'period_type': 'days'}, '2_months': {'rp_val':'values_2mo', 'period_type': 'days'}, '1_year': {'rp_val':'values_1y', 'period_type': 'months'}, '5_years': {'rp_val':'values_5y', 'period_type': 'years'}}
 def custom_data(payload):
+    # want to graph sensors from one site, so payload should be in this format:
+    # {"site":"marcus", "sensorIDs":[], "range":<RP to graph from>, "period": int}
     # payload = {"measurement": [{"location": <location1>, "sensors":[{'id': <sens1>, 'type': <temp/hum>}........]},....], "range":<RP to graph from>, "period": int}
-    print 'payload for graph is:'
-    print payload
-    # try:
-    #     arg_dict = {q_dict[payload['range']]['period_type']: payload['period']}
-    #     timestamp = (datetime.datetime.utcnow() - datetime.timedelta(**arg_dict)).strftime("%Y-%m-%dT%H:%M:%S.%f000Z")
-    # except:
+    # print 'payload for graph is:'
+    # print payload
+    try:
+        arg_dict = {q_dict[payload['range']]['period_type']: payload['period']}
+        timestamp = (datetime.datetime.utcnow() - datetime.timedelta(**arg_dict)).strftime("%Y-%m-%dT%H:%M:%S.%f000Z")
+    except:
     # timestamp = (datetime.datetime.utcnow() - datetime.timedelta(hours=int(payload['period']))).strftime("%Y-%m-%dT%H:%M:%S.%f000Z")
-    timestamp = (datetime.datetime.utcnow() - datetime.timedelta(hours=24)).strftime("%Y-%m-%dT%H:%M:%S.%f000Z")
+        timestamp = (datetime.datetime.utcnow() - datetime.timedelta(hours=24)).strftime("%Y-%m-%dT%H:%M:%S.%f000Z")
     # results = client.query('SELECT * FROM "boiler"."autogen"."boilerEvents" WHERE time > %s' %("'"+timestamp+"'"))
     # target = payload["range"]+"."+q_dict[payload["range"]]["rp_val"]
     # print target
@@ -126,7 +151,8 @@ def custom_data(payload):
     colours = ['red', 'blue', 'green', 'black', 'yellow', 'orange']
     count = 0
     # results = client.query('SELECT * FROM "24_hours".marcus WHERE time > \'%s\'' %(timestamp))
-    results = client.query('SELECT * FROM "7_days".values_7d WHERE time > \'%s\'' %(timestamp))
+    results = client.query('SELECT * FROM "marcus_7_days".values_7d WHERE time > \'%s\'' %(timestamp))
+    # results = client.query('SELECT * FROM \"%s\".%s WHERE time > \'%s\'' %(payload['range'], q_dict[payload['range']['rp_val']], timestamp))
     # print results.raw
     for x in payload['measurement']:
         for i in x['sensors']:

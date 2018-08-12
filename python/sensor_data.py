@@ -9,11 +9,11 @@ db_name = 'sensors'
 # setup reteniton plicy list must match index of durations
 retention_policies = ['24_hours', '7_days','2_months', '1_year', '5_years']
 # setup retention policy detail
-durations = [{'name':'24_hours', 'dur':'1d', 'default':True},
-             {'name': '7_days', 'dur':'7d', 'default':False},
-             {'name': '2_months', 'dur':'4w', 'default':False},
-             {'name': '1_year', 'dur':'52w','default':False},
-             {'name': '5_years', 'dur':'260w','default':False}]
+durations = {'24_hours': {'dur':'1d', 'default':True},
+             '7_days': {'dur':'7d', 'default':False},
+             '2_months': {'dur':'4w', 'default':False},
+             '1_year': {'dur':'52w','default':False},
+             '5_years': {'dur':'260w','default':False}}
 # orgainse graphing periods
 periods = {'hours': ['24_hours'], 'days': ['7_days', '2_months'], 'months': ['1_year'], 'years': ['5_years']}
 # setup db
@@ -42,20 +42,20 @@ def setup_RP(meas):
     global retention_policies
     global measurement
     RP_list = []
-    meas_rps = []
-    try:
-        RP = client.get_list_retention_policies(db_name)
-        for i in RP:
-            # produce list of existing retention policies
-            RP_list.append(i['name'])
-    except:
-        print 'No retention polices here'
+    # try:
+    RP = client.get_list_retention_policies(db_name)
+    for i in RP:
+        # produce list of existing retention policies
+        RP_list.append(i['name'])
+    # print RP_list
+    # except:
+    #     print 'No retention polices here'
     for i in retention_policies:
-        meas_rps.append(meas+'_'+i)
-    for i in meas_rps:
-        val = meas_rps.index(i)
-        if i not in RP_list:
-            client.create_retention_policy(i, durations[val]['dur'], 1, database='sensors', default=durations[val]['default'])
+        if i in RP_list:
+            print 'RP already here'
+        else:
+            print 'making rp for '+i
+            client.create_retention_policy(i, durations[i]['dur'], 1, database='sensors', default=durations[i]['default'])
     # https://influxdb-python.readthedocs.io/en/latest/api-documentation.html
     # https://docs.influxdata.com/influxdb/v1.6/guides/downsampling_and_retention/
     try:
@@ -63,13 +63,14 @@ def setup_RP(meas):
         # client.query('CREATE CONTINUOUS QUERY \"%s\" ON %s BEGIN SELECT mean(temp) AS "temp", mean(humidity) AS "humidity", mean(light) AS "light" INTO \"%s\".values_2mo FROM \"%s\" GROUP BY time(10m), * END' %(meas+'_cq_2_months', db_name, meas+'_2_months', meas))
         # client.query('CREATE CONTINUOUS QUERY \"%s\" ON %s BEGIN SELECT mean(temp) AS "temp", mean(humidity) AS "humidity", mean(light) AS "light" INTO \"%s\".values_1y FROM \"%s\" GROUP BY time(20m), * END' %(meas+'_cq_1_year', db_name, meas+'_1_year', meas))
         # client.query('CREATE CONTINUOUS QUERY \"%s\" ON %s BEGIN SELECT mean(temp) AS "temp", mean(humidity) AS "humidity", mean(light) AS "light" INTO \"%s\".values_5y FROM \"%s\" GROUP BY time(30m), * END' %(meas+'_cq_5_years', db_name, meas+'_5_years', meas))
-        client.query('CREATE CONTINUOUS QUERY \"%s\" ON %s BEGIN SELECT mean(value) AS "value" INTO \"%s\".values_7d FROM \"%s\" GROUP BY time(5m), * END' %(meas+'_cq_7_days', db_name, meas+'_7_days', meas))
-        client.query('CREATE CONTINUOUS QUERY \"%s\" ON %s BEGIN SELECT mean(value) AS "value" INTO \"%s\".values_2mo FROM \"%s\" GROUP BY time(10m), * END' %(meas+'_cq_2_months', db_name, meas+'_2_months', meas))
-        client.query('CREATE CONTINUOUS QUERY \"%s\" ON %s BEGIN SELECT mean(value) AS "value" INTO \"%s\".values_1y FROM \"%s\" GROUP BY time(20m), * END' %(meas+'_cq_1_year', db_name, meas+'_1_year', meas))
-        client.query('CREATE CONTINUOUS QUERY \"%s\" ON %s BEGIN SELECT mean(value) AS "value" INTO \"%s\".values_5y FROM \"%s\" GROUP BY time(30m), * END' %(meas+'_cq_5_years', db_name, meas+'_5_years', meas))
+        client.query('CREATE CONTINUOUS QUERY \"%s\" ON %s BEGIN SELECT mean(value) AS "value" INTO "7_days".values_7d FROM \"%s\" GROUP BY time(5m), * END' %(meas+'_cq_7_days', db_name, meas))
+        client.query('CREATE CONTINUOUS QUERY \"%s\" ON %s BEGIN SELECT mean(value) AS "value" INTO "2_months".values_2mo FROM \"%s\" GROUP BY time(10m), * END' %(meas+'_cq_2_months', db_name, meas))
+        client.query('CREATE CONTINUOUS QUERY \"%s\" ON %s BEGIN SELECT mean(value) AS "value" INTO "1_year".values_1y FROM \"%s\" GROUP BY time(20m), * END' %(meas+'_cq_1_year', db_name, meas))
+        client.query('CREATE CONTINUOUS QUERY \"%s\" ON %s BEGIN SELECT mean(value) AS "value" INTO "5_years".values_5y FROM \"%s\" GROUP BY time(30m), * END' %(meas+'_cq_5_years', db_name, meas))
+        print 'making cqs for '+meas
     except:
         # already exist
-        print "Failed to create CQ for "+i+", as it already exists"
+        print "Failed to create CQs for "+meas+", as it already exists"
 
 # setup_RP()
 
@@ -124,12 +125,23 @@ def write_data(json):
 def get_sensorIDs():
     measurements = get_measurements()
     meas = []
+    sites = []
     for i in measurements:
         print i
+        if i not in meas:
+            meas.append(i)
         results = client.query('SHOW TAG VALUES ON "sensors" FROM \"%s\" WITH KEY = site' %(i))
+        sens = results = client.query('SHOW TAG VALUES ON "sensors" FROM \"%s\" WITH KEY = sensorID' %(i))
         meas_types = results.get_points()
         for a in meas_types:
             print a
+            if a['value'] not in sites:
+                sites.append(a['value'])
+        print sites
+        print meas
+        sens = results = client.query('SHOW TAG VALUES ON "sensors" FROM \"%s\" WITH KEY = sensorID' %(i))
+        res = {}
+    ret = {'sites': sites, 'julian': {'temp': ['hall', 'lounge'], 'light': ['hall']}, 'marcus': 'etc'}
 
 # def get_sensorIDs1():
 #     global sites
@@ -178,6 +190,7 @@ def custom_data(payload):
     # print payload
     try:
         arg_dict = {q_dict[payload['range']]['period_type']: payload['period']}
+        print arg_dict
         timestamp = (datetime.datetime.utcnow() - datetime.timedelta(**arg_dict)).strftime("%Y-%m-%dT%H:%M:%S.%f000Z")
     except:
     # timestamp = (datetime.datetime.utcnow() - datetime.timedelta(hours=int(payload['period']))).strftime("%Y-%m-%dT%H:%M:%S.%f000Z")
@@ -189,7 +202,7 @@ def custom_data(payload):
     colours = ['red', 'blue', 'green', 'black', 'yellow', 'orange']
     count = 0
     # results = client.query('SELECT * FROM "24_hours".marcus WHERE time > \'%s\'' %(timestamp))
-    results = client.query('SELECT * FROM "marcus_7_days".values_7d WHERE time > \'%s\'' %(timestamp))
+    results = client.query('SELECT * FROM "24_hours".temp WHERE time > \'%s\'' %(timestamp))
     # results = client.query('SELECT * FROM \"%s\".%s WHERE time > \'%s\'' %(payload['range'], q_dict[payload['range']['rp_val']], timestamp))
     # print results.raw
     for x in payload['measurement']:

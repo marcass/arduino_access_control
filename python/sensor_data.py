@@ -63,40 +63,15 @@ def setup_RP(meas):
         # client.query('CREATE CONTINUOUS QUERY \"%s\" ON %s BEGIN SELECT mean(temp) AS "temp", mean(humidity) AS "humidity", mean(light) AS "light" INTO \"%s\".values_2mo FROM \"%s\" GROUP BY time(10m), * END' %(meas+'_cq_2_months', db_name, meas+'_2_months', meas))
         # client.query('CREATE CONTINUOUS QUERY \"%s\" ON %s BEGIN SELECT mean(temp) AS "temp", mean(humidity) AS "humidity", mean(light) AS "light" INTO \"%s\".values_1y FROM \"%s\" GROUP BY time(20m), * END' %(meas+'_cq_1_year', db_name, meas+'_1_year', meas))
         # client.query('CREATE CONTINUOUS QUERY \"%s\" ON %s BEGIN SELECT mean(temp) AS "temp", mean(humidity) AS "humidity", mean(light) AS "light" INTO \"%s\".values_5y FROM \"%s\" GROUP BY time(30m), * END' %(meas+'_cq_5_years', db_name, meas+'_5_years', meas))
-        client.query('CREATE CONTINUOUS QUERY \"%s\" ON %s BEGIN SELECT mean(value) AS "value" INTO "7_days".values_7d FROM \"%s\" GROUP BY time(5m), * END' %(meas+'_cq_7_days', db_name, meas))
-        client.query('CREATE CONTINUOUS QUERY \"%s\" ON %s BEGIN SELECT mean(value) AS "value" INTO "2_months".values_2mo FROM \"%s\" GROUP BY time(10m), * END' %(meas+'_cq_2_months', db_name, meas))
-        client.query('CREATE CONTINUOUS QUERY \"%s\" ON %s BEGIN SELECT mean(value) AS "value" INTO "1_year".values_1y FROM \"%s\" GROUP BY time(20m), * END' %(meas+'_cq_1_year', db_name, meas))
-        client.query('CREATE CONTINUOUS QUERY \"%s\" ON %s BEGIN SELECT mean(value) AS "value" INTO "5_years".values_5y FROM \"%s\" GROUP BY time(30m), * END' %(meas+'_cq_5_years', db_name, meas))
+        client.query('CREATE CONTINUOUS QUERY \"%s\" ON %s BEGIN SELECT mean(%s) AS \"%s\" INTO "7_days".%s FROM "24_hours".\"%s\" GROUP BY time(5m), * END' %(meas+'_cq_7_days', db_name, meas, meas, meas, meas))
+        client.query('CREATE CONTINUOUS QUERY \"%s\" ON %s BEGIN SELECT mean(%s) AS \"%s\" INTO "2_months".%s FROM "24_hours".\"%s\" GROUP BY time(10m), * END' %(meas+'_cq_2_months', db_name, meas, meas, meas, meas))
+        client.query('CREATE CONTINUOUS QUERY \"%s\" ON %s BEGIN SELECT mean(%s) AS \"%s\" INTO "1_year".%s FROM "24_hours".\"%s\" GROUP BY time(20m), * END' %(meas+'_cq_1_year', db_name, meas, meas, meas, meas))
+        client.query('CREATE CONTINUOUS QUERY \"%s\" ON %s BEGIN SELECT mean(%s) AS \"%s\" INTO "5_years".%s FROM "24_hours".\"%s\" GROUP BY time(30m), * END' %(meas+'_cq_5_years', db_name, meas, meas, meas, meas))
         print 'making cqs for '+meas
     except:
         # already exist
         print "Failed to create CQs for "+meas+", as it already exists"
 
-# setup_RP()
-
-# def write_data(json):
-#     # ensure RP's and CQ's in place for new sites
-#     global sites
-#     if json['group'] not in sites:
-#         sites.append(json['group'])
-#         setup_RP(json['group'])
-#     try:
-#         json_data = [
-#             {
-#                 'measurement': json['group'],
-#                 'tags': {
-#                     'sensorID': json['sensor']
-#                 },
-#                 'fields': {
-#                     json['type']: float(json['value'])
-#                 },
-#                 'time': datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S.%fZ")
-#                 }
-#             ]
-#         client.write_points(json_data)
-#         return {'Status': 'success', 'Message': 'successfully wrote data points'}
-#     except:
-#         return {'Status': 'error', 'Messgage': 'failed to wrote data points'}
 def write_data(json):
     # ensure RP's and CQ's in place for new sites
     global measurement
@@ -109,7 +84,8 @@ def write_data(json):
                 'measurement': json['type'],
                 'tags': {
                     'sensorID': json['sensor'],
-                    'site': json['group']
+                    'site': json['group'],
+                    'type': json['type']
                 },
                 'fields': {
                     json['type']: json['value']
@@ -122,26 +98,74 @@ def write_data(json):
     except:
         return {'Status': 'error', 'Messgage': 'failed to wrote data points'}
 
-def get_sensorIDs():
+# def get_sensorIDs():
+#     measurements = get_measurements()
+#     meas = []
+#     sites = []
+#     for i in measurements:
+#         # print i
+#         if i not in meas:
+#             meas.append(i)
+#         results = client.query('SHOW TAG VALUES ON "sensors" FROM \"%s\" WITH KEY = site' %(i))
+#         # SHOW TAG VALUES on sensors with key= sensorID where "site" = 'marcus'
+#         meas_types = results.get_points()
+#         for a in meas_types:
+#             print i
+#             sens = client.query('SHOW TAG VALUES ON "sensors" WITH KEY = sensorID WHERE "site" = \'%s\' AND "type" = \'%s\'' %(a['value'], i))
+#             # print 'meas_types item = ' +str(a)
+#             sens_res = sens.get_points()
+#             sens_list = []
+#             for c in sens_res:
+#                 sens_list.append(c['value'])
+#                 # print 'sensors for '+a['value'] +' are: ' +str(c)
+#             type_dict = {i:sens_list}
+#             final = {'site': a['value'], 'types': []}
+#             print a['value'] + ' types are '+str(type_dict)
+#             if a['value'] not in sites:
+#                 sites.append(a['value'])
+#         # print 'sites list ='
+#         # print sites
+#         # for x in sites:
+#         #     sensorIDs = sens.get_points(tags={'site': x})
+#         #     for b in sensorIDs:
+#         #         print 'sensor id is: '+str(b)
+#         # print 'sensors list ='
+#         # print meas
+#         res = {}
+#     ret = {'sites': sites, 'julian': {'temp': ['hall', 'lounge'], 'light': ['hall']}, 'marcus': 'etc'}
+def get_sensorIDs(site):
     measurements = get_measurements()
     meas = []
     sites = []
     for i in measurements:
-        print i
-        if i not in meas:
-            meas.append(i)
         results = client.query('SHOW TAG VALUES ON "sensors" FROM \"%s\" WITH KEY = site' %(i))
-        sens = results = client.query('SHOW TAG VALUES ON "sensors" FROM \"%s\" WITH KEY = sensorID' %(i))
+        # SHOW TAG VALUES on sensors with key= sensorID where "site" = 'marcus'
         meas_types = results.get_points()
         for a in meas_types:
-            print a
+            print i
+            sens = client.query('SHOW TAG VALUES ON "sensors" WITH KEY = sensorID WHERE "site" = \'%s\' AND "type" = \'%s\'' %(a['value'], i))
+            # print 'meas_types item = ' +str(a)
+            sens_res = sens.get_points()
+            sens_list = []
+            for c in sens_res:
+                sens_list.append(c['value'])
+                # print 'sensors for '+a['value'] +' are: ' +str(c)
+            type_dict = {i:sens_list}
+            final = {'site': a['value'], 'types': []}
+            print a['value'] + ' types are '+str(type_dict)
             if a['value'] not in sites:
                 sites.append(a['value'])
-        print sites
-        print meas
-        sens = results = client.query('SHOW TAG VALUES ON "sensors" FROM \"%s\" WITH KEY = sensorID' %(i))
+        # print 'sites list ='
+        # print sites
+        # for x in sites:
+        #     sensorIDs = sens.get_points(tags={'site': x})
+        #     for b in sensorIDs:
+        #         print 'sensor id is: '+str(b)
+        # print 'sensors list ='
+        # print meas
         res = {}
     ret = {'sites': sites, 'julian': {'temp': ['hall', 'lounge'], 'light': ['hall']}, 'marcus': 'etc'}
+
 
 # def get_sensorIDs1():
 #     global sites
@@ -181,11 +205,25 @@ def get_measurements():
         locs.append(i['name'])
     return locs
 
+def get_sites():
+    measurements = get_measurements()
+    meas = []
+    sites = []
+    for i in measurements:
+        results = client.query('SHOW TAG VALUES ON "sensors" FROM \"%s\" WITH KEY = site' %(i))
+        # SHOW TAG VALUES on sensors with key= sensorID where "site" = 'marcus'
+        meas_types = results.get_points()
+        for a in meas_types:
+            if a['value'] not in sites:
+                sites.append(a['value'])
+    print sites
+    return sites
+
 q_dict = {'24_hours': {'rp_val':'sensorData', 'period_type': 'hours'}, '7_days': {'rp_val':'values_7d', 'period_type': 'days'}, '2_months': {'rp_val':'values_2mo', 'period_type': 'days'}, '1_year': {'rp_val':'values_1y', 'period_type': 'months'}, '5_years': {'rp_val':'values_5y', 'period_type': 'years'}}
 def custom_data(payload):
     # want to graph sensors from one site, so payload should be in this format:
     # {"site":"marcus", "sensorIDs":[], "range":<RP to graph from>, "period": int}
-    # payload = {"measurement": [{"location": <location1>, "sensors":[{'id': <sens1>, 'type': <temp/hum>}........]},....], "range":<RP to graph from>, "period": int}
+    # payload = {"measurement": [{"site": <site1>, "sensors":[{'id': <sens1>, 'type': <temp/hum>}........]},....], "range":<RP to graph from>, "period": int}
     # print 'payload for graph is:'
     # print payload
     try:

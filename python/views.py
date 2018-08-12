@@ -169,7 +169,7 @@ def update_data():
     Writes data to influx from remote sensor
     '''
     # print request.headers
-    allowed = ['admin', 'sensor', 'python']
+    allowed = ['sensor']
     if get_jwt_claims()['role'] in allowed:
         content = request.get_json(silent=False)
         # print content
@@ -190,7 +190,7 @@ def get_data():
                     {'fields': [u'light', u'temp'], 'id': u'window'}]}]
     '''
     # print request.headers
-    allowed = ['admin', 'sensor', 'python']
+    allowed = ['admin']
     if get_jwt_claims()['role'] in allowed:
         return jsonify({"sensorID": sensors.get_sensorIDs(), "measurements": sensors.get_measurements()}), 200
     else:
@@ -205,12 +205,44 @@ def get_values():
     returns: traces for plotly
     '''
     # print request.headers
-    allowed = ['admin', 'sensor', 'python']
+    allowed = ['admin']
     if get_jwt_claims()['role'] in allowed:
         content = request.get_json(silent=False)
         # print 'views content is:'
         # print content
         return jsonify(sensors.custom_data(content)), 200
+    else:
+        return jsonify({"msg": "Forbidden"}), 403
+
+@app.route("/data/values", methods=['GET',])
+@jwt_required
+def get_sites():
+    '''
+    Get a list of sites
+    '''
+    # print request.headers
+    allowed = ['admin']
+    if get_jwt_claims()['role'] in allowed:
+        content = request.get_json(silent=False)
+        # print 'views content is:'
+        # print content
+        return jsonify(sensors.get_sites()), 200
+    else:
+        return jsonify({"msg": "Forbidden"}), 403
+
+@app.route("/data/values/<site>", methods=['GET',])
+@jwt_required
+def get_site_data(site):
+    '''
+    Get a site data keys
+    '''
+    # print request.headers
+    allowed = ['admin']
+    if get_jwt_claims()['role'] in allowed:
+        content = request.get_json(silent=False)
+        # print 'views content is:'
+        # print content
+        return jsonify(sensors.get_sensorIDs(site)), 200
     else:
         return jsonify({"msg": "Forbidden"}), 403
 

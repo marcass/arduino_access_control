@@ -135,26 +135,31 @@ def write_data(json):
 #     ret = {'sites': sites, 'julian': {'temp': ['hall', 'lounge'], 'light': ['hall']}, 'marcus': 'etc'}
 def get_sensorIDs(site):
     measurements = get_measurements()
-    meas = []
-    sites = []
+    ret = {'site': site, 'types': [], 'traces': []}
     for i in measurements:
-        results = client.query('SHOW TAG VALUES ON "sensors" FROM \"%s\" WITH KEY = site' %(i))
-        # SHOW TAG VALUES on sensors with key= sensorID where "site" = 'marcus'
-        meas_types = results.get_points()
-        for a in meas_types:
-            print i
-            sens = client.query('SHOW TAG VALUES ON "sensors" WITH KEY = sensorID WHERE "site" = \'%s\' AND "type" = \'%s\'' %(a['value'], i))
-            # print 'meas_types item = ' +str(a)
-            sens_res = sens.get_points()
-            sens_list = []
-            for c in sens_res:
-                sens_list.append(c['value'])
-                # print 'sensors for '+a['value'] +' are: ' +str(c)
-            type_dict = {i:sens_list}
-            final = {'site': a['value'], 'types': []}
-            print a['value'] + ' types are '+str(type_dict)
-            if a['value'] not in sites:
-                sites.append(a['value'])
+        # print i
+        sens = client.query('SHOW TAG VALUES ON "sensors" WITH KEY = sensorID WHERE "site" = \'%s\' AND "type" = \'%s\'' %(site, i))
+        sens_res = sens.get_points()
+        for c in sens_res:
+            if c:
+                if i not in ret['types']:
+                    ret['types'].append(i)
+            # print c
+            sens_list = {'name': i, 'sensor': c['value']}
+            ret['traces'].append(sens_list)
+            # print 'sensors for '+a['value'] +' are: ' +str(c)
+        # type_dict = {i:sens_list}
+        # ret['traces'].append(sens_list)
+    print ret
+    # clean_list = []
+    # for x in ret['traces']:
+    #     # print x
+    #     if x['sensors'] != []:
+    #         clean_list.append(x)
+    # ret['traces'] = clean_list
+    # print ret
+    return ret
+        # print a['value'] + ' types are '+str(type_dict)
         # print 'sites list ='
         # print sites
         # for x in sites:
@@ -163,8 +168,8 @@ def get_sensorIDs(site):
         #         print 'sensor id is: '+str(b)
         # print 'sensors list ='
         # print meas
-        res = {}
-    ret = {'sites': sites, 'julian': {'temp': ['hall', 'lounge'], 'light': ['hall']}, 'marcus': 'etc'}
+    #     res = {}
+    # ret = {'sites': sites, 'julian': {'temp': ['hall', 'lounge'], 'light': ['hall']}, 'marcus': 'etc'}
 
 
 # def get_sensorIDs1():
@@ -200,10 +205,10 @@ def get_sensorIDs(site):
 def get_measurements():
     results = client.query('SHOW MEASUREMENTS ON "sensors"')
     measurement = results.get_points()
-    locs = []
+    types = []
     for i in measurement:
-        locs.append(i['name'])
-    return locs
+        types.append(i['name'])
+    return types
 
 def get_sites():
     measurements = get_measurements()
@@ -216,11 +221,45 @@ def get_sites():
         for a in meas_types:
             if a['value'] not in sites:
                 sites.append(a['value'])
-    print sites
+    # print sites
     return sites
 
 q_dict = {'24_hours': {'rp_val':'sensorData', 'period_type': 'hours'}, '7_days': {'rp_val':'values_7d', 'period_type': 'days'}, '2_months': {'rp_val':'values_2mo', 'period_type': 'days'}, '1_year': {'rp_val':'values_1y', 'period_type': 'months'}, '5_years': {'rp_val':'values_5y', 'period_type': 'years'}}
 def custom_data(payload):
+    print payload
+    # {'traces':traces, 'range':range, 'period':period, 'site': values.site}
+    try:
+        arg_dict = {q_dict[payload['range']]['period_type']: payload['period']}
+        print arg_dict
+        timestamp = (datetime.datetime.utcnow() - datetime.timedelta(**arg_dict)).strftime("%Y-%m-%dT%H:%M:%S.%f000Z")
+    except:
+    # timestamp = (datetime.datetime.utcnow() - datetime.timedelta(hours=int(payload['period']))).strftime("%Y-%m-%dT%H:%M:%S.%f000Z")
+        timestamp = (datetime.datetime.utcnow() - datetime.timedelta(hours=24)).strftime("%Y-%m-%dT%H:%M:%S.%f000Z")
+    res = []
+    colours = ['red', 'blue', 'green', 'black', 'yellow', 'orange']
+    count = 0
+    # parse values to graph:
+    # results = client.query('SELECT * FROM \"%s\".%s WHERE time > \'%s\'' %(payload['range'], val_type, timestamp))
+    for i in payload['traces']:
+        val_type, sensor = i.split('+')
+        # this is too slow, need to rearrange db so meaurements are site based, rather than type based
+        results = client.query('SELECT * FROM \"%s\".%s WHERE time > \'%s\'' %(payload['range'], val_type, timestamp))
+        dat = results.get_points(tags={'sensorID':sensor})
+        times = []
+        values = []
+        out = {'marker': {'color': '', 'size': '10'}, 'name': sensor+' '+val_type, 'type': 'line', 'x': '', 'y': ''}
+        for a in dat:
+            times.append(a['time'])
+            values.append(a[val_type])
+        out['x'] = times
+        out['y'] = values
+        out['colour'] = colours[count]
+        count += 1
+        res.append(out)
+    # print res
+    return res
+
+def start_data(payload):
     # want to graph sensors from one site, so payload should be in this format:
     # {"site":"marcus", "sensorIDs":[], "range":<RP to graph from>, "period": int}
     # payload = {"measurement": [{"site": <site1>, "sensors":[{'id': <sens1>, 'type': <temp/hum>}........]},....], "range":<RP to graph from>, "period": int}
@@ -240,7 +279,7 @@ def custom_data(payload):
     colours = ['red', 'blue', 'green', 'black', 'yellow', 'orange']
     count = 0
     # results = client.query('SELECT * FROM "24_hours".marcus WHERE time > \'%s\'' %(timestamp))
-    results = client.query('SELECT * FROM "24_hours".temp WHERE time > \'%s\'' %(timestamp))
+    results = client.query('SELECT * FROM "7_days".temp WHERE time > \'%s\'' %(timestamp))
     # results = client.query('SELECT * FROM \"%s\".%s WHERE time > \'%s\'' %(payload['range'], q_dict[payload['range']['rp_val']], timestamp))
     # print results.raw
     for x in payload['measurement']:

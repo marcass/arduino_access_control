@@ -210,6 +210,24 @@ def get_values():
         content = request.get_json(silent=False)
         # print 'views content is:'
         # print content
+        return jsonify(sensors.start_data(content)), 200
+    else:
+        return jsonify({"msg": "Forbidden"}), 403
+
+@app.route("/data/values/custom", methods=['POST',])
+@jwt_required
+def get_cust_values():
+    '''
+    Get data from influx
+    sends: {"measurement": [{"location": <location1>, "sensors":[{'id': <sens1>, 'type': <temp/hum>}........]},....], "range":<RP to graph from>, "period": int}
+    returns: traces for plotly
+    '''
+    # print request.headers
+    allowed = ['admin']
+    if get_jwt_claims()['role'] in allowed:
+        content = request.get_json(silent=False)
+        # print 'views content is:'
+        # print content
         return jsonify(sensors.custom_data(content)), 200
     else:
         return jsonify({"msg": "Forbidden"}), 403

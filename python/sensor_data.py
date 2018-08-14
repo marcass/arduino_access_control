@@ -218,6 +218,7 @@ def get_sites():
         results = client.query('SHOW TAG VALUES ON "sensors" FROM \"%s\" WITH KEY = site' %(i))
         # SHOW TAG VALUES on sensors with key= sensorID where "site" = 'marcus'
         meas_types = results.get_points()
+        # sites = np.unique[a['value'] for a in meas_types]
         for a in meas_types:
             if a['value'] not in sites:
                 sites.append(a['value'])
@@ -251,21 +252,36 @@ def custom_data(payload):
         dat = results.get_points(tags={'sensorID':sensor})
         times = []
         values = []
+        # if (val_type == 'light'):
+        #     if not thousands:
+        #         layout.update({'yaxis2': {'title': 'Light', 'overlaying': 'y', 'side': 'right'}})
+        #     thousands = True
+        #     out = {'connectgaps': False,'marker': {'color': '', 'size': '10'}, 'name': sensor+' '+val_type, 'type': 'line', 'x': '', 'y': '', 'yaxis': 'y2'}
+        # if (val_type == 'pid') or (val_type == 'humidity'):
+        #     if not hundreds:
+        #         layout.update({'yaxis3': {'title': 'Percent', 'overlaying': 'y', 'side': 'right'}})
+        #     hundreds = True
+        #     out = {'connectgaps': False, 'marker': {'color': '', 'size': '10'}, 'name': sensor+' '+val_type, 'type': 'line', 'x': '', 'y': '', 'yaxis': 'y3'}
+        # if (val_type == 'temp'):
+        #     if not tens:
+        #         layout.update({'yaxis':{'title': 'Temperature'}})
+        #     tens = True
+        #     out = {'connectgaps': False, 'marker': {'color': '', 'size': '10'}, 'name': sensor+' '+val_type, 'type': 'line', 'x': '', 'y': ''}
         if (val_type == 'light'):
             if not thousands:
                 layout.update({'yaxis2': {'title': 'Light', 'overlaying': 'y', 'side': 'right'}})
             thousands = True
-            out = {'connectgaps': False,'marker': {'color': '', 'size': '10'}, 'name': sensor+' '+val_type, 'type': 'line', 'x': '', 'y': '', 'yaxis': 'y2'}
+            out = {'connectgaps': False, 'name': sensor+' '+val_type, 'type': 'line', 'x': '', 'y': '', 'yaxis': 'y2'}
         if (val_type == 'pid') or (val_type == 'humidity'):
             if not hundreds:
                 layout.update({'yaxis3': {'title': 'Percent', 'overlaying': 'y', 'side': 'right'}})
             hundreds = True
-            out = {'connectgaps': False, 'marker': {'color': '', 'size': '10'}, 'name': sensor+' '+val_type, 'type': 'line', 'x': '', 'y': '', 'yaxis': 'y3'}
+            out = {'connectgaps': False, 'name': sensor+' '+val_type, 'type': 'line', 'x': '', 'y': '', 'yaxis': 'y3'}
         if (val_type == 'temp'):
             if not tens:
                 layout.update({'yaxis':{'title': 'Temperature'}})
             tens = True
-            out = {'connectgaps': False, 'marker': {'color': '', 'size': '10'}, 'name': sensor+' '+val_type, 'type': 'line', 'x': '', 'y': ''}
+            out = {'connectgaps': False, 'name': sensor+' '+val_type, 'type': 'line', 'x': '', 'y': ''}
         for a in dat:
             times.append(a['time'])
             values.append(a[val_type])

@@ -247,7 +247,10 @@ def custom_data(payload):
         dat = results.get_points(tags={'sensorID':sensor})
         times = []
         values = []
-        out = {'marker': {'color': '', 'size': '10'}, 'name': sensor+' '+val_type, 'type': 'line', 'x': '', 'y': ''}
+        if (val_type == 'light'):
+            out = {'marker': {'color': '', 'size': '10'}, 'name': sensor+' '+val_type, 'type': 'line', 'x': '', 'y': '', 'yaxis': 'y2'}
+        else:
+            out = {'marker': {'color': '', 'size': '10'}, 'name': sensor+' '+val_type, 'type': 'line', 'x': '', 'y': ''}
         for a in dat:
             times.append(a['time'])
             values.append(a[val_type])

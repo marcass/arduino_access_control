@@ -238,8 +238,13 @@ def custom_data(payload):
     res = []
     colours = ['red', 'blue', 'green', 'black', 'yellow', 'orange']
     count = 0
+    thousands = False
+    hundreds = False
+    tens = False
     # parse values to graph:
     # results = client.query('SELECT * FROM \"%s\".%s WHERE time > \'%s\'' %(payload['range'], val_type, timestamp))
+    # setup layout of graph
+    layout = {'title': 'House data'}
     for i in payload['traces']:
         val_type, sensor = i.split('+')
         # this is too slow, need to rearrange db so meaurements are site based, rather than type based
@@ -248,8 +253,19 @@ def custom_data(payload):
         times = []
         values = []
         if (val_type == 'light'):
+            if not thousands:
+                layout.update({'yaxis2': {'title': 'Light', 'overlaying': 'y', 'side': 'right'}})
+            thousands = True
             out = {'marker': {'color': '', 'size': '10'}, 'name': sensor+' '+val_type, 'type': 'line', 'x': '', 'y': '', 'yaxis': 'y2'}
+        if (val_type == 'pid') or (val_type == 'humidity'):
+            if not hundreds:
+                layout.update({'yaxis3': {'title': 'Percent', 'overlaying': 'y', 'side': 'middle'}})
+            hundreds = True
+            out = {'marker': {'color': '', 'size': '10'}, 'name': sensor+' '+val_type, 'type': 'line', 'x': '', 'y': '', 'yaxis': 'y3'}
         else:
+            if not tens:
+                layout.update('yaxis':{'title': 'Temperature'}})
+            tens = True
             out = {'marker': {'color': '', 'size': '10'}, 'name': sensor+' '+val_type, 'type': 'line', 'x': '', 'y': ''}
         for a in dat:
             times.append(a['time'])
@@ -260,7 +276,7 @@ def custom_data(payload):
         count += 1
         res.append(out)
     # print res
-    return res
+    return {'layout':layout, 'data': res}
 
 def start_data(payload):
     # want to graph sensors from one site, so payload should be in this format:

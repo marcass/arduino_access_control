@@ -226,15 +226,14 @@ def get_sites():
 
 q_dict = {'24_hours': {'rp_val':'sensorData', 'period_type': 'hours'}, '7_days': {'rp_val':'values_7d', 'period_type': 'days'}, '2_months': {'rp_val':'values_2mo', 'period_type': 'days'}, '1_year': {'rp_val':'values_1y', 'period_type': 'months'}, '5_years': {'rp_val':'values_5y', 'period_type': 'years'}}
 def custom_data(payload):
-    print payload
+    # print payload
     # {'traces':traces, 'range':range, 'period':period, 'site': values.site}
     try:
         arg_dict = {q_dict[payload['range']]['period_type']: payload['period']}
         print arg_dict
         timestamp = (datetime.datetime.utcnow() - datetime.timedelta(**arg_dict)).strftime("%Y-%m-%dT%H:%M:%S.%f000Z")
     except:
-    # timestamp = (datetime.datetime.utcnow() - datetime.timedelta(hours=int(payload['period']))).strftime("%Y-%m-%dT%H:%M:%S.%f000Z")
-        timestamp = (datetime.datetime.utcnow() - datetime.timedelta(days=7)).strftime("%Y-%m-%dT%H:%M:%S.%f000Z")
+        timestamp = (datetime.datetime.utcnow() - datetime.timedelta(hours=1)).strftime("%Y-%m-%dT%H:%M:%S.%f000Z")
     res = []
     colours = ['red', 'blue', 'green', 'black', 'yellow', 'orange']
     count = 0
@@ -256,17 +255,17 @@ def custom_data(payload):
             if not thousands:
                 layout.update({'yaxis2': {'title': 'Light', 'overlaying': 'y', 'side': 'right'}})
             thousands = True
-            out = {'marker': {'color': '', 'size': '10'}, 'name': sensor+' '+val_type, 'type': 'line', 'x': '', 'y': '', 'yaxis': 'y2'}
+            out = {'connectgaps': False,'marker': {'color': '', 'size': '10'}, 'name': sensor+' '+val_type, 'type': 'line', 'x': '', 'y': '', 'yaxis': 'y2'}
         if (val_type == 'pid') or (val_type == 'humidity'):
             if not hundreds:
-                layout.update({'yaxis3': {'title': 'Percent', 'overlaying': 'y', 'side': 'middle'}})
+                layout.update({'yaxis3': {'title': 'Percent', 'overlaying': 'y', 'side': 'right'}})
             hundreds = True
-            out = {'marker': {'color': '', 'size': '10'}, 'name': sensor+' '+val_type, 'type': 'line', 'x': '', 'y': '', 'yaxis': 'y3'}
-        else:
+            out = {'connectgaps': False, 'marker': {'color': '', 'size': '10'}, 'name': sensor+' '+val_type, 'type': 'line', 'x': '', 'y': '', 'yaxis': 'y3'}
+        if (val_type == 'temp'):
             if not tens:
-                layout.update('yaxis':{'title': 'Temperature'}})
+                layout.update({'yaxis':{'title': 'Temperature'}})
             tens = True
-            out = {'marker': {'color': '', 'size': '10'}, 'name': sensor+' '+val_type, 'type': 'line', 'x': '', 'y': ''}
+            out = {'connectgaps': False, 'marker': {'color': '', 'size': '10'}, 'name': sensor+' '+val_type, 'type': 'line', 'x': '', 'y': ''}
         for a in dat:
             times.append(a['time'])
             values.append(a[val_type])
@@ -275,7 +274,8 @@ def custom_data(payload):
         out['colour'] = colours[count]
         count += 1
         res.append(out)
-    # print res
+    final_res = {'layout':layout, 'data': res}
+    # print final_res
     return {'layout':layout, 'data': res}
 
 def start_data(payload):

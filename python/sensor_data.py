@@ -6,16 +6,6 @@ import time
 measurement = []
 
 db_name = 'sensors'
-# setup reteniton plicy list must match index of durations
-retention_policies = ['24_hours', '7_days','2_months', '1_year', '5_years']
-# setup retention policy detail
-durations = {'24_hours': {'dur':'1d', 'default':True},
-             '7_days': {'dur':'7d', 'default':False},
-             '2_months': {'dur':'4w', 'default':False},
-             '1_year': {'dur':'52w','default':False},
-             '5_years': {'dur':'260w','default':False}}
-# orgainse graphing periods
-periods = {'hours': ['24_hours'], 'days': ['7_days', '2_months'], 'months': ['1_year'], 'years': ['5_years']}
 # setup db
 client = InfluxDBClient(host='localhost', port=8086)
 # setup db if it ins't already:
@@ -38,6 +28,16 @@ setup_db()
 client.switch_database(db_name)
 # client.drop_database(db_name)
 
+# setup reteniton plicy list must match index of durations
+retention_policies = ['24_hours', '7_days','2_months', '1_year', '5_years']
+# setup retention policy detail
+durations = {'24_hours': {'dur':'1d', 'default':True},
+             '7_days': {'dur':'7d', 'default':False},
+             '2_months': {'dur':'4w', 'default':False},
+             '1_year': {'dur':'52w','default':False},
+             '5_years': {'dur':'260w','default':False}}
+# orgainse graphing periods
+periods = {'hours': ['24_hours'], 'days': ['7_days', '2_months'], 'months': ['1_year'], 'years': ['5_years']}
 def setup_RP(meas):
     global retention_policies
     global measurement
@@ -234,7 +234,7 @@ def custom_data(payload):
         timestamp = (datetime.datetime.utcnow() - datetime.timedelta(**arg_dict)).strftime("%Y-%m-%dT%H:%M:%S.%f000Z")
     except:
     # timestamp = (datetime.datetime.utcnow() - datetime.timedelta(hours=int(payload['period']))).strftime("%Y-%m-%dT%H:%M:%S.%f000Z")
-        timestamp = (datetime.datetime.utcnow() - datetime.timedelta(hours=24)).strftime("%Y-%m-%dT%H:%M:%S.%f000Z")
+        timestamp = (datetime.datetime.utcnow() - datetime.timedelta(days=7)).strftime("%Y-%m-%dT%H:%M:%S.%f000Z")
     res = []
     colours = ['red', 'blue', 'green', 'black', 'yellow', 'orange']
     count = 0

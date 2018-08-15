@@ -1,9 +1,9 @@
-import sql
+# import sql
 import requests
 import creds
 import json
 
-URL = 'http://localhost/api'
+URL = 'https://skibo.duckdns.org/api'
 
 headers = ''
 jwt = ''
@@ -37,7 +37,7 @@ def parseData(data, method, route):
     global jwt_refresh
     global headers
     #print 'Auth header is: '+str(headers)
-    # catch all for furst use
+    # catch all for first use
     if (jwt == ''):
         print 'Getting token'
         getToken()
@@ -47,10 +47,7 @@ def parseData(data, method, route):
         r = put(data, route)
     #print 'First response is: ' +str(r)
     if '200' not in str(r):
-        print 'Oops, not matchin'
-    # if (r.json()['status'] != '200'):
-    # if (r.json()['msg'] == The token has expired'):
-        # do refresh stuff
+        print 'Oops, not authenticated'
         try:
             getToken()
             if (method == 'POST'):
@@ -63,23 +60,23 @@ def parseData(data, method, route):
     print r.json()
     return r.json()
 
-def use_key(key, door):
-    d = sql.validate_key(key, door)
-    if d is None:
-        x = sql.insert_actionLog('Pinpad', door, key)
-        print x
-        return False
-    else:
-        if d == 'burner':
-            print 'user tested true for burner'
-            sql.remove_disable_key(d)
-        print 'username = '+str(d)+' for '+door
-        y = sql.insert_actionLog('Pinpad', door, key, d)
-        print y
-        return True
+# def use_key(key, door):
+#     d = sql.validate_key(key, door)
+#     if d is None:
+#         x = sql.insert_actionLog('Pinpad', door, key)
+#         print x
+#         return False
+#     else:
+#         if d == 'burner':
+#             print 'user tested true for burner'
+#             sql.remove_disable_key(d)
+#         print 'username = '+str(d)+' for '+door
+#         y = sql.insert_actionLog('Pinpad', door, key, d)
+#         print y
+#         return True
 
-def update_door_status(door, status):
-    sql.update_doorstatus(status, door)
+# def update_door_status(door, status):
+#     sql.update_doorstatus(status, door)
 
 def use_key_api(key, door):
     method = 'POST'

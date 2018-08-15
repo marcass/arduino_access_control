@@ -43,6 +43,7 @@ def on_message(client, userdata, msg):
         except:
             print 'Status error'
 
+# use to auth through endpoint
 def on_message_api(client, userdata, msg):
     door = msg.topic.split('/')[-1]
     if 'request' in msg.topic:
@@ -60,12 +61,13 @@ def on_message_api(client, userdata, msg):
             print resp
         except:
             print 'Status error'
+    print resp
     return resp
 
 #subscribe to broker and test for messages below alert values
 client = mqtt.Client("Python_doors")
 client.username_pw_set(username=auth['username'], password=auth['password'])
 client.on_connect = on_connect
-client.on_message = on_message
+client.on_message = on_message_api
 client.connect(broker, 1883, 60)
 client.loop_start()

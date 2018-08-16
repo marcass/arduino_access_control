@@ -5,8 +5,6 @@ import middleman
 
 broker = creds.broker
 auth = creds.mosq_auth
-# = 'https://skibo.duckdns.org/api/usekey'
-# auth = {'username':creds.mosq_auth['username'], 'password':creds.mosq_auth['password']}
 
 def notify_door(resp, door):
     topic = 'doors/response/'+door
@@ -15,7 +13,6 @@ def notify_door(resp, door):
 # The callback for when the client receives a CONNACK response from the server.
 def on_connect(client, userdata, flags, rc):
     print("Connected with result code "+str(rc))
-
     # Subscribing in on_connect() means that if we lose the connection and
     # reconnect then subscriptions will be renewed.
     client.subscribe([("doors/request/#", 2), ("doors/status/#", 2)])
@@ -27,7 +24,7 @@ def on_message(client, userdata, msg):
     # print 'Door is '+door
     if 'request' in msg.topic:
         # print 'Checking door key'
-        if (middleman.use_key(msg.payload, door)):
+        if (middleman.use_key_api(msg.payload, door)):
             resp = "1"
         else:
             resp = "0"
@@ -39,7 +36,7 @@ def on_message(client, userdata, msg):
         #publish status
         try:
             # print msg.payload
-            middleman.update_door_status(door, msg.payload)
+            middleman.update_door_status_api(door, msg.payload)
         except:
             print 'Status error'
 
@@ -48,8 +45,8 @@ def on_message_api(client, userdata, msg):
     door = msg.topic.split('/')[-1]
     if 'request' in msg.topic:
         key = msg.payload
-        resp = middleman.use_key_api(key, door)['pin_correct']
-        print 'key rsponse is '+str(resp)
+        resp = middleman.use_key_api(key, door)
+        print 'key response is '+str(resp)
         try:
             notify_door(resp, door)
             print 'key sent successfully'
@@ -58,7 +55,7 @@ def on_message_api(client, userdata, msg):
     if 'status' in msg.topic:
         try:
             resp = middleman.update_door_status_api(door, msg.payload)
-            print resp
+            # print resp
             return resp
         except:
             print 'Status error'

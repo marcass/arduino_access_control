@@ -59,10 +59,9 @@ def on_message_api(client, userdata, msg):
         try:
             resp = middleman.update_door_status_api(door, msg.payload)
             print resp
+            return resp
         except:
             print 'Status error'
-    print resp
-    return resp
 
 #subscribe to broker and test for messages below alert values
 client = mqtt.Client("Python_doors")
@@ -70,4 +69,5 @@ client.username_pw_set(username=auth['username'], password=auth['password'])
 client.on_connect = on_connect
 client.on_message = on_message_api
 client.connect(broker, 1883, 60)
-client.loop_start()
+#client.loop_start()
+client.loop_forever()

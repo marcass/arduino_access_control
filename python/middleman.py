@@ -3,7 +3,7 @@ import requests
 import creds
 import json
 
-URL = 'https://skibo.duckdns.org/api'
+URL = 'https://skibo.duckdns.org/api/door'
 
 headers = ''
 jwt = ''
@@ -29,12 +29,13 @@ def post(data, route):
     # api opens door via mqtt puclish
     global headers
     ret = requests.post(URL+route, json = data, headers = headers)
-    # print ret
+    print ret
     return ret
 
 def put(data, route):
     global headers
-    # print headers
+    ret = requests.put(URL+route, json = data, headers = headers)
+    print ret
     return requests.put(URL+route, json = data, headers = headers)
 
 def parseData(data, method, route):

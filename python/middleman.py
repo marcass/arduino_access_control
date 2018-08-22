@@ -29,13 +29,14 @@ def post(data, route):
     # api opens door via mqtt puclish
     global headers
     ret = requests.post(URL+route, json = data, headers = headers)
-    # print ret
+    print ret
     return ret
 
 def put(data, route):
     global headers
-    # print headers
-    return requests.put(URL+route, json = data, headers = headers)
+    ret = requests.put(URL+route, json = data, headers = headers)
+    print ret
+    return ret
 
 def parseData(data, method, route):
     global jwt
@@ -92,13 +93,14 @@ def parseData(data, method, route):
 def use_key_api(key, door):
     method = 'POST'
     # print [{'door': door, 'pincode': key}, method, '/usekey']
-    ret = parseData({'door': door, 'pincode': key}, method, '/usekey')
-    print ret
+    ret = parseData({'door': door, 'pincode': key}, method, '/door/usekey')
+    print 'using key, return in: '+str(ret)
     return ret
 
 
 def update_door_status_api(door, status):
     method = 'PUT'
     data = {'door': door, 'status': status}
-    ret = parseData(data, method, '/door/status')
+    ret = parseData(data, method, '/door/door/status')
+    print 'updating status, return is: '+str(ret)
     return ret

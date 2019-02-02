@@ -17,6 +17,7 @@ def on_connect(client, userdata, flags, rc):
     # reconnect then subscriptions will be renewed.
     client.subscribe([("doors/request/#", 2), ("doors/status/#", 2)])
 
+# not used
 # The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
     # print(msg.topic+' '+msg.payload)

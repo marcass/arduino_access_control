@@ -56,9 +56,9 @@ def post_data(data):
     ret = requests.post(DATA_URL, json = data, headers = headers)
     #print 'JWT = '+str(jwt)
     #print 'First response is: ' +str(ret)
-    if '200' in str(ret):
-        print('Success')
-        print(data)
+    # if '200' in str(ret):
+    #     print('Success')
+        # print(data)
     if '200' not in str(ret):
         print('Oops, not authenticated')
         try:
@@ -79,36 +79,20 @@ def on_connect(client, userdata, flags, rc):
 
 # use to auth through endpoint
 def on_message(client, userdata, msg):
-    # print(msg.payload)
-    message = ast.literal_eval(msg.payload.decode('UTF-8'))
-    # print(message)
-    sensor = sensor_names[message['name']]
-    # print('found sensor is '+sensor)
-    temp = float(message['signal'])
-    data = {'measurement': 'things', 'tags':{'type':'temp',
-            'sensorID':sensor, 'site': 'marcus'}, 'value':temp}
-    # print(data)
-    post_data(data)
+    try:
+        message = ast.literal_eval(msg.payload.decode('UTF-8'))
+        sensor = sensor_names[message['name']]
+        temp = float(message['signal'])
+        data = {'measurement': 'things', 'tags':{'type':'temp',
+                'sensorID':sensor, 'site': 'marcus'}, 'value':temp}
+        post_data(data)
+    except:
+        print('unable to fomrat message for posting')
 
-    # if 'request' in msg.topic:
-    #     key = msg.payload
-    #     resp = middleman.use_key_api(key, door)
-    #     print 'key response is '+str(resp)
-    #     try:
-    #         notify_door(resp, door)
-    #         print 'key sent successfully'
-    #     except:
-    #         print 'failed to publish'
-    # if 'status' in msg.topic:
-    #     try:
-    #         resp = middleman.update_door_status_api(door, msg.payload)
-    #         # print resp
-    #         return resp
-    #     except:
-    #         print 'Status error'
 
 #subscribe to broker and test for messages below alert values
 client = mqtt.Client("Python_temps")
+# not using auth wiht hcc data
 # client.username_pw_set(username=auth['username'], password=auth['password'])
 client.on_connect = on_connect
 client.on_message = on_message

@@ -85,15 +85,29 @@ void loop() {
         Serial.print( "Connected " );
         Serial.println( WiFi.localIP() );
     }
-    //if connection OK, execute command 'b' from master
-    int size = udp.parsePacket();
-    if ( size == 0 )
-        return;
-    char c = udp.read();
-    if ( c == 'b' ){
-        digitalWrite(5, !digitalRead(5));//toggle Led
-        Serial.println("RECEIVED!");
-        Serial.println(millis());
+    udp.beginPacket( { 192, 168, 4, 255 }, 8888 );//send a broadcast message
+    udp.write( 'b' );//the payload
+    digitalWrite(5, !digitalRead(5));
+
+    if ( !udp.endPacket() ){
+        Serial.println("NOT SEND!");
+        delay(100);
+        ESP.restart(); // When the connection is bad, the TCP stack refuses to work
     }
-    udp.flush();
+    else{
+          Serial.println("SEND IT!!");
+    }
+
+    delay( 1000 );//wait a second for the next message
+//    //if connection OK, execute command 'b' from master
+//    int size = udp.parsePacket();
+//    if ( size == 0 )
+//        return;
+//    char c = udp.read();
+//    if ( c == 'b' ){
+//        digitalWrite(5, !digitalRead(5));//toggle Led
+//        Serial.println("RECEIVED!");
+//        Serial.println(millis());
+//    }
+//    udp.flush();
 }

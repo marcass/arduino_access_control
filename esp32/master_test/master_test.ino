@@ -7,11 +7,12 @@
 #include <WiFi.h>
 #include <WiFiUdp.h>
 #include <esp_wifi.h>
+#include "secrets.h"
 
 const char* ssid = "kkkkk";//AP ssid
 const char* password = "12345678";//AP password
-const char* ssidRouter = "MySSID";//STA router ssid
-const char* passwordRouter = "MyPASSWORD";//STA router password
+const char* ssidRouter = MYSSID;//STA router ssid
+const char* passwordRouter = PASS;//STA router password
 WiFiUDP udp;
 
 void setup() {
@@ -51,18 +52,29 @@ void setup() {
 
 void loop()
 {
-    udp.beginPacket( { 192, 168, 4, 255 }, 8888 );//send a broadcast message
-    udp.write( 'b' );//the payload
-    digitalWrite(5, !digitalRead(5));
-
-    if ( !udp.endPacket() ){
-        Serial.println("NOT SEND!");
-        delay(100);
-        ESP.restart(); // When the connection is bad, the TCP stack refuses to work
+    int size = udp.parsePacket();
+    if ( size == 0 )
+        return;
+    char c = udp.read();
+    if ( c == 'b' ){
+        digitalWrite(5, !digitalRead(5));//toggle Led
+        Serial.println("RECEIVED!");
+        Serial.println(millis());
     }
-    else{
-          Serial.println("SEND IT!!");
-    }
+    udp.flush();
 
-    delay( 1000 );//wait a second for the next message
+//    udp.beginPacket( { 192, 168, 4, 255 }, 8888 );//send a broadcast message
+//    udp.write( 'b' );//the payload
+//    digitalWrite(5, !digitalRead(5));
+//
+//    if ( !udp.endPacket() ){
+//        Serial.println("NOT SEND!");
+//        delay(100);
+//        ESP.restart(); // When the connection is bad, the TCP stack refuses to work
+//    }
+//    else{
+//          Serial.println("SEND IT!!");
+//    }
+//
+//    delay( 1000 );//wait a second for the next message
 }

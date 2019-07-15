@@ -8,7 +8,7 @@
 #define debug
 
 // content in secrets.h in this format: #define VAR "var"
-char DOOR[] = DOOR;
+char DOOR[] = thisDOOR;
 char ssid[] = MYSSID;            // your network SSID (name)
 char pass[] = PASS;            // your network password
 const char* mqttServer = BROKER;
@@ -63,9 +63,9 @@ const int             RELAY = 33;
 #define               SW_CLOSED 32
 // How many NeoPixels are attached to the Arduino?
 #define               NUMPIXELS      24
-char                  DOOR_PUB[] = D_PUB[;
-char                  DOOR_SUB[] = D_SUB;
-char                  DOOR_STATE[] = D_STATE;
+//char                  DOOR_PUB[] = D_PUB;
+//char                  DOOR_SUB[] = D_SUB;
+//char                  DOOR_STATE[] = D_STATE;
 //door states
 const int             STATE_OPEN = 0;
 const int             STATE_CLOSED = 1;
@@ -103,8 +103,8 @@ void connect_WIFI(){
   // We start by connecting to a WiFi network
   Serial.println();
   Serial.print("Connecting to ");
-  Serial.println(ssid);
-  WiFi.begin(ssid, password);
+  Serial.println(MYSSID);
+  WiFi.begin(MYSSID, PASS);
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
@@ -118,13 +118,17 @@ void connect_WIFI(){
 
 //mqtt
 void reconnect_MQTT() {
+  // Check wifi:
+  if (WiFi.status() != WL_CONNECTED) {
+    connect_WIFI();
+  }
   // Loop until we're reconnected
   while (!client.connected()) {
     Serial.print("Attempting MQTT connection...");
     // Create a client ID
     String clientId = (String)DOOR;
     // Attempt to connect
-    if (client.connect(clientId.c_str(),MQSER,MQPASS)) {
+    if (client.connect(clientId.c_str(),MQUSER,MQPASS)) {
       Serial.println("connected to mqtt broker");
       //Once connected, publish an announcement...
 //      client.publish("/icircuit/presence/ESP32/", "hello world");
@@ -145,12 +149,23 @@ void reconnect_MQTT() {
 }
 
 void callback(char* topic, byte *payload, unsigned int length) {
-    Serial.println("-------new message from broker-----");
-    Serial.print("channel:");
-    Serial.println(topic);
-    Serial.print("data:");  
-    Serial.write(payload, length);
-    Serial.println();
+  Serial.println("-------new message from broker-----");
+  Serial.print("channel:");
+  Serial.println(topic);
+  Serial.print("data:");  
+  Serial.write(payload, length);
+  Serial.println();
+  payload[length] = '\0';
+  String s = String((char*)payload);
+  if (s == "1"){
+    state = STATE_TRIGGER;
+    led_state = state;
+  }else{
+    led_state = DENIED;
+    #ifdef debug
+      Serial.println("no, open it yourself");
+    #endif
+  }
 }
 
 void setup() {
@@ -164,14 +179,10 @@ void setup() {
   pinMode(SW_OPEN, INPUT_PULLUP);
   pinMode(SW_CLOSED, INPUT_PULLUP);
 
-  // MQTT brokers usually use port 8883 for secure connections.
-  client.begin(HOST, net);
-  client.onMessage(messageReceived);
-
   connect_WIFI();
-  client.setServer(mqtt_server, mqtt_port);
+  client.setServer(mqttServer, mqttPort);
   client.setCallback(callback);
-  reconnect();
+  reconnect_MQTT();
   pixels.begin();
 }
 
@@ -196,7 +207,7 @@ void check_state(){
     #endif
 //    https://pubsubclient.knolleary.net/api.html#publish2
     if (!client.connected()) {
-      reconnect();
+      reconnect_MQTT();
     }
     client.publish(DOOR_STATE, doorStates[door_state], true);
     prev_door_state = door_state;
@@ -205,8 +216,14 @@ void check_state(){
 }
 
 void send_pin(String pin){
+  //  have to convert String to char array for mqtt lib
+  int str_len = pin.length() + 1;
+  // Prepare the character array (the buffer) 
+  char char_array[str_len];
+  // Copy it over 
+  pin.toCharArray(char_array, str_len);
   //boolean publish(const String &topic, const String &payload, bool retained, int qos);
-  if (client.publish(DOOR_PUB, pin, false, 2)){
+  if (client.publish(DOOR_PUB, char_array, false)){
     #ifdef debug
       Serial.println("Send successful");
     #endif
@@ -318,7 +335,7 @@ void loop() {
   //Serial.println(state);
   if (!client.connected()) {
     led_state = NOT_CONN;
-    connect();
+    reconnect_MQTT();
   }
   switch (state){
     case STATE_IDLE:
@@ -355,24 +372,6 @@ void loop() {
     }
   }
   //check_state();
-}
-
-void messageReceived(String &topic, String &payload) {
-//  Won't work with following serial prints: 
-//  Serial.println("Receiving the payload");
-//  Serial.println(payload);
-//  #ifdef debug
-//    Serial.println("incoming: " + topic + " - " + payload);
-//  #endif
-  if (payload == "1"){
-    state = STATE_TRIGGER;
-    led_state = state;
-  }else{
-    led_state = DENIED;
-    #ifdef debug
-      Serial.println("no, open it yourself");
-    #endif
-  }
 }
 
 void printWifiStatus()

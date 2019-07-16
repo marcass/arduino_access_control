@@ -40,8 +40,10 @@ char hexaKeys[ROWS][COLS] = {
  * byte rowPins[ROWS] = {6, 7, 8, 9}; //connect to the row pinouts of the keypad
  * byte colPins[COLS] = {2, 3, 4, 5}; //connect to the column pinouts of the keypad
  */
-byte                  colPins[ROWS] = {15,16,17,18}; //connect to the row pinouts of the keypad
-byte                  rowPins[COLS] = {19,23,27,26}; //connect to the column pinouts of the keypad
+//byte                  colPins[ROWS] = {15,16,17,18}; //connect to the row pinouts of the keypad
+//byte                  rowPins[COLS] = {19,23,21,22}; //connect to the column pinouts of the keypad
+byte                  colPins[ROWS] = {19,23,21,22}; //connect to the row pinouts of the keypad
+byte                  rowPins[COLS] = {15,16,17,18}; //connect to the column pinouts of the keypad
 String                key_str = "";
 bool                  sendKey = false;
 unsigned long         pin_start = 0;
@@ -58,9 +60,9 @@ const byte            STATE_IDLE = 1;
 const byte            STATE_TRIGGER = 2;
 byte                  state = STATE_IDLE;
 const int             RELAY = 33;
-#define               LED 25
-#define               SW_OPEN 14
-#define               SW_CLOSED 32
+#define               LED 32
+#define               SW_OPEN 25
+#define               SW_CLOSED 26
 // How many NeoPixels are attached to the Arduino?
 #define               NUMPIXELS      24
 //char                  DOOR_PUB[] = D_PUB;

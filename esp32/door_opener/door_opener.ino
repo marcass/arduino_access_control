@@ -11,11 +11,11 @@
 char DOOR[] = thisDOOR;
 char ssid[] = MYSSID;            // your network SSID (name)
 char pass[] = PASS;            // your network password
-const char* mqttServer = BROKER;
+const char mqttServer[] = BROKER;
 const char DOOR_PUB[] = D_PUB;
 const char DOOR_SUB[] = D_SUB;
 const char DOOR_STATE[] = D_STATE;
-const char mqttPort = 1883;
+const int mqttPort = 1883;
 
 const byte ROWS = 4; //four rows
 const byte COLS = 4; //four columns
@@ -128,7 +128,8 @@ void reconnect_MQTT() {
     // Create a client ID
     String clientId = (String)DOOR;
     // Attempt to connect
-    if (client.connect(clientId.c_str(),MQUSER,MQPASS)) {
+    if (client.connect(clientId.c_str())) {
+//    if (client.connect(clientId.c_str(),MQUSER,MQPASS)) {
       Serial.println("connected to mqtt broker");
       //Once connected, publish an announcement...
 //      client.publish("/icircuit/presence/ESP32/", "hello world");

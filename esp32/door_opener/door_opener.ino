@@ -42,7 +42,7 @@ char hexaKeys[ROWS][COLS] = {
  */
 //byte                  colPins[ROWS] = {15,16,17,18}; //connect to the row pinouts of the keypad
 //byte                  rowPins[COLS] = {19,23,21,22}; //connect to the column pinouts of the keypad
-byte                  colPins[ROWS] = {19,23,21,22}; //connect to the row pinouts of the keypad
+byte                  colPins[ROWS] = {19,21,22,23}; //connect to the row pinouts of the keypad
 byte                  rowPins[COLS] = {15,16,17,18}; //connect to the column pinouts of the keypad
 String                key_str = "";
 bool                  sendKey = false;
@@ -130,8 +130,8 @@ void reconnect_MQTT() {
     // Create a client ID
     String clientId = (String)DOOR;
     // Attempt to connect
-    if (client.connect(clientId.c_str())) {
-//    if (client.connect(clientId.c_str(),MQUSER,MQPASS)) {
+//    if (client.connect(clientId.c_str())) {
+    if (client.connect(clientId.c_str(),MQUSER,MQPASS)) {
       Serial.println("connected to mqtt broker");
       //Once connected, publish an announcement...
 //      client.publish("/icircuit/presence/ESP32/", "hello world");

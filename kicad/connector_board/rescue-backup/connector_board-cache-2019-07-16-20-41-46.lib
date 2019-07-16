@@ -1,11 +1,11 @@
-EESchema-LIBRARY Version 2.4
+EESchema-LIBRARY Version 2.3
 #encoding utf-8
 #
-# connector_board-rescue_CONN_01X01
+# CONN_01X01
 #
-DEF connector_board-rescue_CONN_01X01 J 0 40 Y N 1 F N
+DEF CONN_01X01 J 0 40 Y N 1 F N
 F0 "J" 0 100 50 H V C CNN
-F1 "connector_board-rescue_CONN_01X01" 100 0 50 V V C CNN
+F1 "CONN_01X01" 100 0 50 V V C CNN
 F2 "" 0 0 50 H I C CNN
 F3 "" 0 0 50 H I C CNN
 $FPLIST
@@ -21,11 +21,11 @@ X P1 1 -200 0 150 R 50 50 1 1 P
 ENDDRAW
 ENDDEF
 #
-# connector_board-rescue_CONN_01X03
+# CONN_01X03
 #
-DEF connector_board-rescue_CONN_01X03 J 0 40 Y N 1 F N
+DEF CONN_01X03 J 0 40 Y N 1 F N
 F0 "J" 0 200 50 H V C CNN
-F1 "connector_board-rescue_CONN_01X03" 100 0 50 V V C CNN
+F1 "CONN_01X03" 100 0 50 V V C CNN
 F2 "" 0 0 50 H I C CNN
 F3 "" 0 0 50 H I C CNN
 $FPLIST
@@ -45,11 +45,11 @@ X P3 3 -200 -100 150 R 50 50 1 1 P
 ENDDRAW
 ENDDEF
 #
-# connector_board-rescue_CONN_01X08
+# CONN_01X08
 #
-DEF connector_board-rescue_CONN_01X08 J 0 40 Y N 1 F N
+DEF CONN_01X08 J 0 40 Y N 1 F N
 F0 "J" 0 450 50 H V C CNN
-F1 "connector_board-rescue_CONN_01X08" 100 0 50 V V C CNN
+F1 "CONN_01X08" 100 0 50 V V C CNN
 F2 "" 0 0 50 H I C CNN
 F3 "" 0 0 50 H I C CNN
 $FPLIST

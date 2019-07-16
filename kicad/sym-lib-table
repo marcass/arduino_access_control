@@ -1,6 +1,3 @@
 (sym_lib_table
   (lib (name access_board-rescue)(type Legacy)(uri ${KIPRJMOD}/access_board-rescue.lib)(options "")(descr ""))
-  (lib (name ArduinoProMicro)(type Legacy)(uri ${KIPRJMOD}/lib/ArduinoProMicro.lib)(options "")(descr ""))
-  (lib (name LM2596b)(type Legacy)(uri ${KIPRJMOD}/lib/LM2596b.lib)(options "")(descr ""))
-  (lib (name arduino)(type Legacy)(uri ${KIPRJMOD}/lib/arduino.lib)(options "")(descr ""))
 )

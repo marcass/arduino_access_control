@@ -1,0 +1,3 @@
+(sym_lib_table
+  (lib (name connector_board-rescue)(type Legacy)(uri ${KIPRJMOD}/connector_board-rescue.lib)(options "")(descr ""))
+)

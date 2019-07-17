@@ -1,10 +1,10 @@
 [Unit]
-Description=Garage door controller api
+Description=Garage door controller MQTT listener
 
 [Service]
-User=marcus
-ExecStart=/usr/bin/uwsgi --ini /home/amrcus/git/arduino_access_control/python/uwsgi.ini
-Restart=always
+User=mw
+ExecStart=/usr/bin/python3 /home/mw/git/arduino_access_control/python/mqtt.py
+Restart=on-failure
 KillSignal=SIGQUIT
 Type=notify
 StandardError=syslog

@@ -1,14 +1,13 @@
 import paho.mqtt.client as mqtt
 import paho.mqtt.publish as publish
 import creds
-import middleman
 
 broker = creds.broker
-auth = creds.mosq_auth
 
 def notify_door(resp, door):
     topic = 'doors/response/'+door
-    publish.single(topic, resp, qos=2, auth=auth, hostname=broker)
+    print('sending '+resp+' to '+topic)
+    publish.single(topic, resp, qos=2)
 
 # The callback for when the client receives a CONNACK response from the server.
 def on_connect(client, userdata, flags, rc):
@@ -17,55 +16,30 @@ def on_connect(client, userdata, flags, rc):
     # reconnect then subscriptions will be renewed.
     client.subscribe([("doors/request/#", 2), ("doors/status/#", 2)])
 
-# not used
 # The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
-    # print(msg.topic+' '+msg.payload)
+    print('stuff')
+    print(msg.topic)
+    print(msg.payload)
+    data = msg.payload.decode("utf-8")
     door = msg.topic.split('/')[-1]
     # print 'Door is '+door
     if 'request' in msg.topic:
-        # print 'Checking door key'
-        if (middleman.use_key_api(msg.payload, door)):
+        print ('Checking door key')
+        if (data in creds.users):
             resp = "1"
         else:
             resp = "0"
+        print('response is: '+resp)
         try:
             notify_door(resp, door)
         except:
-            print 'failed to publish'
-    if 'status' in msg.topic:
-        #publish status
-        try:
-            # print msg.payload
-            middleman.update_door_status_api(door, msg.payload)
-        except:
-            print 'Status error'
-
-# use to auth through endpoint
-def on_message_api(client, userdata, msg):
-    door = msg.topic.split('/')[-1]
-    if 'request' in msg.topic:
-        key = msg.payload
-        resp = middleman.use_key_api(key, door)
-        print 'key response is '+str(resp)
-        try:
-            notify_door(resp, door)
-            print 'key sent successfully'
-        except:
-            print 'failed to publish'
-    if 'status' in msg.topic:
-        try:
-            resp = middleman.update_door_status_api(door, msg.payload)
-            # print resp
-            return resp
-        except:
-            print 'Status error'
+            print ('failed to publish')
 
 #subscribe to broker and test for messages below alert values
 client = mqtt.Client("Python_doors")
-client.username_pw_set(username=auth['username'], password=auth['password'])
 client.on_connect = on_connect
-client.on_message = on_message_api
+client.on_message = on_message
 client.connect(broker, 1883, 60)
 #client.loop_start()
 client.loop_forever()

@@ -193,10 +193,12 @@ void check_state(){
   //if SW_OPEN is LOW (and SW_CLOSED is HIGH) door is open and vice versa. Unkown if not in either of these
   int open_reed = digitalRead(SW_OPEN);
   int closed_reed = digitalRead(SW_CLOSED);
-  if ((open_reed == LOW) && (closed_reed == HIGH)){
+//  if ((open_reed == LOW) && (closed_reed == HIGH)){
+  if (open_reed == LOW){
     door_state = STATE_OPEN;
   }
-  else if ((open_reed == HIGH) && (closed_reed == LOW)){
+//  else if ((open_reed == HIGH) && (closed_reed == LOW)){
+  else if (closed_reed == LOW){
     door_state = STATE_CLOSED;
   }
   else{
@@ -212,9 +214,10 @@ void check_state(){
     if (!client.connected()) {
       reconnect_MQTT();
     }
-    client.publish(DOOR_STATE, doorStates[door_state], true);
+    client.publish(DOOR_STATE, doorStates[door_state]);
     prev_door_state = door_state;
     //manage_led();
+    delay(1000);
   }
 }
 

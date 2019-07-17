@@ -1,38 +1,6 @@
-EESchema Schematic File Version 2
-LIBS:power
-LIBS:device
-LIBS:transistors
-LIBS:conn
-LIBS:linear
-LIBS:regul
-LIBS:74xx
-LIBS:cmos4000
-LIBS:adc-dac
-LIBS:memory
-LIBS:xilinx
-LIBS:microcontrollers
-LIBS:dsp
-LIBS:microchip
-LIBS:analog_switches
-LIBS:motorola
-LIBS:texas
-LIBS:intel
-LIBS:audio
-LIBS:interface
-LIBS:digital-audio
-LIBS:philips
-LIBS:display
-LIBS:cypress
-LIBS:siliconi
-LIBS:opto
-LIBS:atmel
-LIBS:contrib
-LIBS:valves
-LIBS:ArduinoProMicro
-LIBS:LM2596b
-LIBS:arduino
+EESchema Schematic File Version 4
 LIBS:access_board-cache
-EELAYER 25 0
+EELAYER 26 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
@@ -47,7 +15,7 @@ Comment3 ""
 Comment4 ""
 $EndDescr
 $Comp
-L D D1
+L access_board-rescue:D D1
 U 1 1 59BB21D5
 P 9300 4550
 F 0 "D1" H 9300 4650 50  0000 C CNN
@@ -58,7 +26,7 @@ F 3 "" H 9300 4550 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L ESP-01v090 U2
+L access_board-rescue:ESP-01v090 U2
 U 1 1 59BB251E
 P 5700 1650
 F 0 "U2" H 5700 1550 50  0000 C CNN
@@ -69,7 +37,7 @@ F 3 "" H 5700 1650 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L +3.3V #PWR01
+L access_board-rescue:+3.3V #PWR01
 U 1 1 59BB291B
 P 6450 2450
 F 0 "#PWR01" H 6450 2300 50  0001 C CNN
@@ -80,7 +48,7 @@ F 3 "" H 6450 2450 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L CP C1
+L access_board-rescue:CP C1
 U 1 1 59BB2C05
 P 7450 1650
 F 0 "C1" H 7475 1750 50  0000 L CNN
@@ -91,7 +59,7 @@ F 3 "" H 7450 1650 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L +3.3V #PWR02
+L access_board-rescue:+3.3V #PWR02
 U 1 1 59BB2D04
 P 7800 950
 F 0 "#PWR02" H 7800 800 50  0001 C CNN
@@ -102,12 +70,12 @@ F 3 "" H 7800 950 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	6650 1500 7800 1500
+	6650 1500 6850 1500
 Wire Wire Line
 	7800 1500 7800 950 
 Connection ~ 7450 1500
 $Comp
-L GND #PWR03
+L access_board-rescue:GND #PWR03
 U 1 1 59BB2D5B
 P 7450 1800
 F 0 "#PWR03" H 7450 1550 50  0001 C CNN
@@ -118,7 +86,7 @@ F 3 "" H 7450 1800 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR04
+L access_board-rescue:GND #PWR04
 U 1 1 59BB2D7E
 P 4650 2000
 F 0 "#PWR04" H 4650 1750 50  0001 C CNN
@@ -146,7 +114,7 @@ TX
 Text GLabel 3650 2450 2    60   Input ~ 0
 RX
 $Comp
-L CONN_01X04 J5
+L access_board-rescue:CONN_01X04 J5
 U 1 1 59BEF50E
 P 5100 4650
 F 0 "J5" H 5100 4900 50  0000 C CNN
@@ -165,7 +133,7 @@ Wire Wire Line
 Wire Wire Line
 	4550 4600 4900 4600
 $Comp
-L +3.3V #PWR05
+L access_board-rescue:+3.3V #PWR05
 U 1 1 59BEFBB2
 P 3800 4600
 F 0 "#PWR05" H 3800 4450 50  0001 C CNN
@@ -176,7 +144,7 @@ F 3 "" H 3800 4600 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR06
+L access_board-rescue:GND #PWR06
 U 1 1 59BEFBD8
 P 4850 5400
 F 0 "#PWR06" H 4850 5150 50  0001 C CNN
@@ -197,7 +165,7 @@ Wire Wire Line
 Text Notes 3950 4250 0    60   ~ 0
 ESP8266 firmware flasher
 $Comp
-L CONN_01X03 J4
+L access_board-rescue:CONN_01X03 J4
 U 1 1 59BEFC59
 P 4150 5300
 F 0 "J4" H 4150 5500 50  0000 C CNN
@@ -212,7 +180,7 @@ GPIO0
 Text GLabel 4500 1600 0    60   Input ~ 0
 GPIO0
 $Comp
-L GND #PWR07
+L access_board-rescue:GND #PWR07
 U 1 1 59BEFCF9
 P 3500 5650
 F 0 "#PWR07" H 3500 5400 50  0001 C CNN
@@ -233,7 +201,7 @@ Wire Wire Line
 Text Notes 8500 3600 0    60   ~ 0
 Connector for keypad
 $Comp
-L GND #PWR08
+L access_board-rescue:GND #PWR08
 U 1 1 59BEFEAD
 P 2950 3950
 F 0 "#PWR08" H 2950 3700 50  0001 C CNN
@@ -246,7 +214,7 @@ $EndComp
 Text Notes 950  5400 0    60   ~ 0
 LEDs and keypad \nconnecter keypad end
 $Comp
-L arduino_mini U1
+L access_board-rescue:arduino_mini U1
 U 1 1 59D56A22
 P 2950 2400
 F 0 "U1" H 3450 1450 70  0000 C CNN
@@ -257,7 +225,7 @@ F 3 "" H 2950 2400 60  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L LD1117S33TR U3
+L access_board-rescue:LD1117S33TR U3
 U 1 1 59D56ED7
 P 5950 2750
 F 0 "U3" H 5950 3000 50  0000 C CNN
@@ -268,7 +236,7 @@ F 3 "" H 5950 2750 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR09
+L access_board-rescue:GND #PWR09
 U 1 1 59D5702E
 P 5950 3000
 F 0 "#PWR09" H 5950 2750 50  0001 C CNN
@@ -319,7 +287,7 @@ Text GLabel 3650 2050 2    60   Input ~ 0
 Text GLabel 3650 1950 2    60   Input ~ 0
 11
 $Comp
-L CONN_01X08 J7
+L access_board-rescue:CONN_01X08 J7
 U 1 1 59D57E70
 P 9900 3750
 F 0 "J7" H 9900 4200 50  0000 C CNN
@@ -330,7 +298,7 @@ F 3 "" H 9900 3750 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L CONN_01X03 J8
+L access_board-rescue:CONN_01X03 J8
 U 1 1 59D57F83
 P 10000 4550
 F 0 "J8" H 10000 4750 50  0000 C CNN
@@ -341,7 +309,7 @@ F 3 "" H 10000 4550 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L R R3
+L access_board-rescue:R R3
 U 1 1 59D5820E
 P 9650 4450
 F 0 "R3" V 9730 4450 50  0000 C CNN
@@ -352,7 +320,7 @@ F 3 "" H 9650 4450 50  0001 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L GND #PWR010
+L access_board-rescue:GND #PWR010
 U 1 1 59D585CA
 P 9650 4800
 F 0 "#PWR010" H 9650 4550 50  0001 C CNN
@@ -370,7 +338,7 @@ Wire Wire Line
 Wire Wire Line
 	9650 4650 9650 4800
 $Comp
-L GND #PWR011
+L access_board-rescue:GND #PWR011
 U 1 1 59D58716
 P 8850 4850
 F 0 "#PWR011" H 8850 4600 50  0001 C CNN
@@ -391,9 +359,9 @@ Wire Wire Line
 Wire Wire Line
 	9800 4550 9450 4550
 Wire Wire Line
-	8200 4550 9150 4550
+	8200 4550 8850 4550
 $Comp
-L CP C2
+L access_board-rescue:CP C2
 U 1 1 59D5933F
 P 8850 4700
 F 0 "C2" H 8875 4800 50  0000 L CNN
@@ -412,7 +380,7 @@ relay
 Text GLabel 9550 2150 0    60   Input ~ 0
 relay
 $Comp
-L +5V #PWR012
+L access_board-rescue:+5V #PWR012
 U 1 1 59D72015
 P 8900 1300
 F 0 "#PWR012" H 8900 1150 50  0001 C CNN
@@ -427,7 +395,7 @@ OPEN
 Text GLabel 9550 1950 0    60   Input ~ 0
 Closed
 $Comp
-L GND #PWR013
+L access_board-rescue:GND #PWR013
 U 1 1 59D720EC
 P 9000 2050
 F 0 "#PWR013" H 9000 1800 50  0001 C CNN
@@ -444,7 +412,7 @@ Wire Wire Line
 Text Notes 9100 1200 0    60   ~ 0
 Relay and sensor connectors
 $Comp
-L R R2
+L access_board-rescue:R R2
 U 1 1 59DC3D25
 P 4250 2600
 F 0 "R2" V 4330 2600 50  0000 C CNN
@@ -455,7 +423,7 @@ F 3 "" H 4250 2600 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L R R1
+L access_board-rescue:R R1
 U 1 1 59DC3E75
 P 4050 2350
 F 0 "R1" V 4130 2350 50  0000 C CNN
@@ -466,14 +434,14 @@ F 3 "" H 4050 2350 50  0001 C CNN
 	0    -1   -1   0   
 $EndComp
 Wire Wire Line
-	4350 2350 4200 2350
+	4350 2350 4250 2350
 Wire Wire Line
 	3900 2350 3650 2350
 Wire Wire Line
 	4250 2450 4250 2350
 Connection ~ 4250 2350
 $Comp
-L GND #PWR014
+L access_board-rescue:GND #PWR014
 U 1 1 59DC404E
 P 4250 2750
 F 0 "#PWR014" H 4250 2500 50  0001 C CNN
@@ -490,7 +458,7 @@ VIN
 Text GLabel 2800 1250 1    60   Input ~ 0
 VIN
 $Comp
-L CONN_01X08 J6
+L access_board-rescue:CONN_01X08 J6
 U 1 1 59DD2646
 P 9750 1800
 F 0 "J6" H 9750 2250 50  0000 C CNN
@@ -505,7 +473,7 @@ A2
 Text GLabel 2250 2400 0    60   Input ~ 0
 A2
 $Comp
-L CONN_01X01 J9
+L access_board-rescue:CONN_01X01 J9
 U 1 1 59DD5F50
 P 7150 5500
 F 0 "J9" H 7150 5600 50  0000 C CNN
@@ -516,7 +484,7 @@ F 3 "" H 7150 5500 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L CONN_01X01 J10
+L access_board-rescue:CONN_01X01 J10
 U 1 1 59DD5FB1
 P 7650 5700
 F 0 "J10" H 7650 5800 50  0000 C CNN
@@ -531,7 +499,7 @@ http://www.electronic-discount.be/product-details/box-g311/shop.htm?lng=en (for 
 Text Notes 3900 6500 0    60   ~ 0
 http://support.seeedstudio.com/knowledgebase/articles/388503-what-are-the-pcb-panelization-rules
 $Comp
-L +5V #PWR?
+L access_board-rescue:+5V #PWR?
 U 1 1 59DE983C
 P 2950 1250
 F 0 "#PWR?" H 2950 1100 50  0001 C CNN
@@ -546,6 +514,16 @@ Wire Wire Line
 Wire Wire Line
 	9000 1850 9000 2050
 Wire Wire Line
-	9550 1650 9550 1850
+	9550 1650 9550 1750
 Connection ~ 9550 1750
+Wire Wire Line
+	7450 1500 7800 1500
+Wire Wire Line
+	6850 1500 7450 1500
+Wire Wire Line
+	8850 4550 9150 4550
+Wire Wire Line
+	4250 2350 4200 2350
+Wire Wire Line
+	9550 1750 9550 1850
 $EndSCHEMATC

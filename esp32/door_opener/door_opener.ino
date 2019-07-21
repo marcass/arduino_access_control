@@ -214,7 +214,7 @@ void check_state(){
     if (!client.connected()) {
       reconnect_MQTT();
     }
-    client.publish(DOOR_STATE, doorStates[door_state]);
+    client.publish(DOOR_STATE, doorStates[door_state], true);
     prev_door_state = door_state;
     //manage_led();
     delay(1000);

@@ -131,7 +131,7 @@ void reconnect_MQTT() {
     String clientId = (String)DOOR;
     // Attempt to connect
 //    if (client.connect(clientId.c_str())) {
-    if (client.connect(clientId.c_str(),MQUSER,MQPASS)) {
+    if (client.connect(clientId.c_str(),willTopic, 0, true, willMessage)) {
       Serial.println("connected to mqtt broker");
       //Once connected, publish an announcement...
 //      client.publish("/icircuit/presence/ESP32/", "hello world");
@@ -193,12 +193,12 @@ void check_state(){
   //if SW_OPEN is LOW (and SW_CLOSED is HIGH) door is open and vice versa. Unkown if not in either of these
   int open_reed = digitalRead(SW_OPEN);
   int closed_reed = digitalRead(SW_CLOSED);
-//  if ((open_reed == LOW) && (closed_reed == HIGH)){
-  if (open_reed == LOW){
+  if ((open_reed == LOW) && (closed_reed == HIGH)){
+//  if (open_reed == LOW){
     door_state = STATE_OPEN;
   }
-//  else if ((open_reed == HIGH) && (closed_reed == LOW)){
-  else if (closed_reed == LOW){
+  else if ((open_reed == HIGH) && (closed_reed == LOW)){
+//  else if (closed_reed == LOW){
     door_state = STATE_CLOSED;
   }
   else{

@@ -133,8 +133,8 @@ void reconnect_MQTT() {
 //    if (client.connect(clientId.c_str())) {
     if (client.connect(clientId.c_str(),willTopic, 0, true, willMessage)) {
       Serial.println("connected to mqtt broker");
-      //Once connected, publish an announcement...
-//      client.publish("/icircuit/presence/ESP32/", "hello world");
+      //Once connected, publish an empty message to offline topic...
+      client.publish(willTopic, true, "online");
       // ... and resubscribe
       client.subscribe(D_SUB);
       new_led_state = state;

@@ -5,16 +5,19 @@
 #include <MQTTClient.h>
 #include <Adafruit_NeoPixel.h>
 
-
 #define debug
 
-char DOOR[] = "bottomgarage";
-char ssid[] = "";            // your network SSID (name)
-char pass[] = "";            // your network password
-char HOST[] = "192.168.0.3";
+const char DOOR[] = "bottomgarage";
+const char ssid[] = "";            // your network SSID (name)
+const char pass[] = "";            // your network password
+const char HOST[] = "192.168.0.152";
+//char HOST[] = "nuc";
 
-const char USER[] = "";
-const char MOSQ_PASS[] = "";
+const char willTOPIC[] = "doors/offline/bottomgarage";
+const char willMESS[] = "offline";
+
+//const char USER[] = "";
+//const char MOSQ_PASS[] = "";
 
 const byte ROWS = 4; //four rows
 const byte COLS = 4; //four columns
@@ -127,12 +130,19 @@ void setup() {
   WiFi.init(&Serial1);
 
   // MQTT brokers usually use port 8883 for secure connections.
+  client.setWill(willTOPIC, willMESS, true, 0);
   client.begin(HOST, net);
   client.onMessage(messageReceived);
-
+  
   connect();
   pixels.begin();
 }
+
+
+//void setWill(const char topic[]);
+//void setWill(const char topic[], const char payload[]);
+//void setWill(const char topic[], const char payload[], bool retained, int qos);
+//void clearWill();
 
 void connect(){
   // check for the presence of the shield
@@ -144,26 +154,28 @@ void connect(){
     while (true);
   }
 
-  // attempt to connect to WiFi network
-  while ( status != WL_CONNECTED) {
-    Serial.print("Attempting to connect to WPA SSID: ");
-    Serial.println(ssid);
-    // Connect to WPA/WPA2 network
-    status = WiFi.begin(ssid, pass);
-  }
+  // attempt to connect to WiFi network don't do in a while loop as it may time out
+//  while ( status != WL_CONNECTED) {
+  Serial.print("Attempting to connect to WPA SSID: ");
+  Serial.println(ssid);
+  // Connect to WPA/WPA2 network
+  status = WiFi.begin(ssid, pass);
+//  }
   #ifdef debug
     // you're connected now, so print out the data
     Serial.println("You're connected to the network");
     printWifiStatus();
   #endif
-
   Serial.print("\nconnecting...");
-  while (!client.connect(DOOR, USER, MOSQ_PASS)) {
+//  while (!client.connect(DOOR, USER, MOSQ_PASS)) {
+  while (!client.connect(DOOR)) {
     Serial.print(".");
     delay(1000);
   }
-  client.setOptions(60, true, 1000);
-
+//  client.connect(DOOR);
+//  delay(1000);
+//  client.setOptions(60, true, 1000);
+  client.publish(willTOPIC, "online", true, 1);
   //boolean connect(const char clientId[], const char username[], const char password[]);
   //client.connect(DOOR, USER, MOSQ_PASS);
   //client.subscribe(DOOR_SUB, 1);
@@ -316,6 +328,7 @@ void loop() {
   //Serial.println(state);
   if (!client.connected()) {
     led_state = NOT_CONN;
+    Serial.println("not connected....");
     connect();
   }
   switch (state){

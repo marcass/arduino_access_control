@@ -8,8 +8,8 @@
 #define debug
 
 const char DOOR[] = "bottomgarage";
-const char ssid[] = "";            // your network SSID (name)
-const char pass[] = "";            // your network password
+const char ssid[] = "skibo";            // your network SSID (name)
+const char pass[] = "r4bb1tshurtlegs";            // your network password
 const char HOST[] = "192.168.0.152";
 //char HOST[] = "nuc";
 
@@ -46,6 +46,7 @@ byte                  colPins[ROWS] = {8,9,10,11}; //connect to the row pinouts 
 byte                  rowPins[COLS] = {2,3,4,5}; //connect to the column pinouts of the keypad
 String                key_str = "";
 bool                  sendKey = false;
+bool                  looped = false;
 unsigned long         pin_start = 0;
 const unsigned long   KEY_THRESH = 30000; //30sec to put pin in
 unsigned long         relay_time = 0;
@@ -56,6 +57,8 @@ unsigned long         INTERVAL = 50;  // the time we need to wait for led update
 unsigned long         previousMillis = 0;
 unsigned long         LED_CHANGE_TIME = 2000;
 unsigned long         led_change_time;
+unsigned long         loop_timer = millis();
+const unsigned long   LOOP_THRESH = 100;
 const byte            STATE_IDLE = 1;
 const byte            STATE_TRIGGER = 2;
 byte                  state = STATE_IDLE;
@@ -168,7 +171,7 @@ void connect(){
   #endif
   Serial.print("\nconnecting...");
 //  while (!client.connect(DOOR, USER, MOSQ_PASS)) {
-  while (!client.connect(DOOR)) {
+  while (!client.connect("testdoor")) {
     Serial.print(".");
     delay(1000);
   }
@@ -321,9 +324,18 @@ void manage_led(){
 }
 
 void loop() {
+  if(looped) {
+    Serial.println("client is looping");
+    looped = false;
+  }
 //  Serial.print("Led_state is ");
 //  Serial.println(led_state);
-  client.loop();
+  if (millis() - loop_timer > LOOP_THRESH) {
+    client.loop();
+//    loop_timer = millis();
+//    looped = true;
+  }
+//  client.loop();
   //delay(100);
   //Serial.println(state);
   if (!client.connected()) {
@@ -372,9 +384,9 @@ void messageReceived(String &topic, String &payload) {
 //  Won't work with following serial prints: 
 //  Serial.println("Receiving the payload");
 //  Serial.println(payload);
-//  #ifdef debug
-//    Serial.println("incoming: " + topic + " - " + payload);
-//  #endif
+  #ifdef debug
+    Serial.println("incoming: " + topic + " - " + payload);
+  #endif
   if (payload == "1"){
     state = STATE_TRIGGER;
     led_state = state;

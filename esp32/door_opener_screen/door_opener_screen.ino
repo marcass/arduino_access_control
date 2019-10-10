@@ -24,9 +24,9 @@ const unsigned long   RELAY_TRIG = 300;
 const byte            STATE_IDLE = 1;
 const byte            STATE_TRIGGER = 2;
 byte                  state = STATE_IDLE;
-#define               RELAY 13
-#define               SW_OPEN 2
-#define               SW_CLOSED 17
+#define               RELAY 26
+#define               SW_OPEN 25
+#define               SW_CLOSED 16
 
 //door states
 const int             STATE_OPEN = 0;

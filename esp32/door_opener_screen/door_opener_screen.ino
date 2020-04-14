@@ -32,6 +32,7 @@ byte                  state = STATE_IDLE;
 const int             STATE_OPEN = 0;
 const int             STATE_CLOSED = 1;
 const int             STATE_UNKNOWN = 2;
+const int             STATE_ERROR = 3;
 int                   door_state = STATE_UNKNOWN;
 int                   prev_door_state;
 
@@ -160,11 +161,13 @@ void check_state(){
 //  else if (closed_reed == LOW){
     door_state = STATE_CLOSED;
   }
-  else{
+  else if ((open_reed == HIGH) && (closed_reed == HIGH)){
     door_state = STATE_UNKNOWN;
+  }else {
+    door_state- STATE_ERROR;
   }
   if (door_state != prev_door_state){
-    char* doorStates[] = {"open", "closed", "unknown"};
+    char* doorStates[] = {"open", "closed", "unknown", "error"};
     #ifdef debug
       Serial.print("Publishing state change to: ");
       Serial.println(doorStates[door_state]);
@@ -188,7 +191,6 @@ void check_state(){
     }
     client.publish(DOOR_STATE, doorStates[door_state], true);
     prev_door_state = door_state;
-    //manage_led();
     delay(1000);
   }
 }
